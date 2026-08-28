@@ -140,6 +140,19 @@ h2.sec{font-size:15px;font-weight:640;margin:0 0 12px;letter-spacing:-.01em}
 .mbtn.ghost{background:var(--surface);color:var(--text-2);border:1px solid var(--border-strong)}
 .mbtn.ghost:hover{color:var(--text)}
 .actchk{width:17px;height:17px;accent-color:var(--s1);cursor:pointer;vertical-align:middle}
+select.stsel{width:100%;font-family:inherit;font-size:12.5px;font-weight:600;padding:5px 8px;border-radius:99px;
+  border:1px solid transparent;cursor:pointer;-webkit-appearance:none;appearance:none;text-align:center;text-align-last:center}
+select.stsel.s-ok{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent);border-color:color-mix(in srgb,var(--good) 32%,transparent)}
+select.stsel.s-no{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent);border-color:color-mix(in srgb,var(--crit) 32%,transparent)}
+select.stsel option{background:var(--surface);color:var(--text);font-weight:500}
+input.amt{width:100%;font-family:inherit;font-size:13.5px;padding:5px 8px;border-radius:8px;text-align:right;
+  border:1px solid transparent;background:transparent;color:var(--text-3);font-variant-numeric:tabular-nums}
+input.amt.has{color:var(--text);font-weight:550}
+input.amt:hover{border-color:var(--border-strong)}
+input.amt:focus{border-color:transparent;background:var(--surface-2)}
+tr.edited td{background:color-mix(in srgb,var(--s1) 7%,transparent)}
+pre#mo-json{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow:auto;max-height:320px;
+  font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
 tr.off td.name,tr.off td.num{opacity:.5}
 pre#m-json{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow:auto;max-height:340px;
   font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
@@ -329,7 +342,22 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
     <div class="grid g2">
       <div class="card">
         <div class="ch"><h3>Danh sách đóng quỹ</h3><p id="mo-sub"></p></div>
-        <div class="cb"><div class="tblwrap"><table><thead><tr><th>#</th><th>Thành viên</th><th class="num">Số tiền</th><th>Trạng thái</th><th>Ghi chú</th></tr></thead><tbody id="motbl"></tbody></table></div></div>
+        <div class="cb">
+          <div class="tblwrap"><table><thead><tr><th>#</th><th>Thành viên</th><th class="num" style="width:120px">Số tiền</th><th style="width:150px">Trạng thái</th><th>Ghi chú</th></tr></thead><tbody id="motbl"></tbody></table></div>
+          <div class="note mt-s" id="mo-savebar" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <b>Đánh dấu đóng quỹ đang lưu trên máy bạn.</b><br>
+              <span id="mo-savestate">Chưa thay đổi gì so với dữ liệu chung.</span>
+            </div>
+            <button class="mbtn" id="mo-export">Lưu chung lên GitHub</button>
+            <button class="mbtn ghost" id="mo-reset">Đặt lại tháng này</button>
+          </div>
+          <div class="card mt-s" id="mo-exportbox" style="display:none">
+            <div class="ch"><h3>Dán khối này vào <code>data.json</code></h3>
+              <p>Mở <code>data.json</code> trên GitHub → bấm ✏️ → tìm khối <code id="mo-exportmonth"></code> trong mục <code>"months"</code> → thay bằng khối dưới (đã tự sao chép) → Commit changes.</p></div>
+            <div class="cb"><pre id="mo-json"></pre></div>
+          </div>
+        </div>
       </div>
       <div class="card">
         <div class="ch"><h3>Chi tiêu trong tháng</h3><p id="mo-sub2"></p></div>
@@ -385,8 +413,12 @@ $$('nav.tabs button').forEach(b=>b.onclick=()=>{
 });
 
 /* ================= state ================= */
-let DATA=null, TX=[], MONTHS=[], MEMBERS=[], ACTIVE={}, BASE={};
-const LSKEY='clb-active-v1';
+let DATA=null, TX=[], MONTHS=[], MEMBERS=[], ACTIVE={}, BASE={}, PAID={};
+const LSKEY='clb-active-v1', LSPAID='clb-paid-v1';
+const STD=50000;                              // mức đóng chuẩn 50k/tháng
+const pkey=(mo,name)=>mo+'|'+name;
+/* số tiền hiệu lực: ưu tiên chỉnh sửa tạm trên máy, không có thì lấy từ data.json */
+const effPaid=(mo,x)=> (pkey(mo,x.name) in PAID) ? PAID[pkey(mo,x.name)] : x.paid;
 let sortKey='date', sortDir=-1;
 
 /* ================= load ================= */
@@ -401,14 +433,8 @@ function init(){
   TX=[...DATA.incomes.map(x=>({...x,type:'thu'})),...DATA.expenses.map(x=>({...x,type:'chi'}))];
   MONTHS=DATA.months;
 
-  /* member aggregation */
-  const map=new Map();
-  MONTHS.forEach(m=>m.members.forEach(x=>{
-    if(!map.has(x.name)) map.set(x.name,{name:x.name,total:0,months:0,paidMonths:0,last:null,lastPaid:0});
-    const o=map.get(x.name); o.total+=x.paid; o.months++; if(x.paid>0)o.paidMonths++;
-    o.last=m.month; o.lastPaid=x.paid;
-  }));
-  MEMBERS=[...map.values()];
+  try{ PAID=JSON.parse(localStorage.getItem(LSPAID)||'{}')||{} }catch(e){ PAID={} }
+  aggregateMembers();
 
   /* trạng thái hoạt động: data.json là dữ liệu chung, localStorage là chỉnh sửa tạm trên máy */
   const lastM=MONTHS[MONTHS.length-1].month;
@@ -421,6 +447,18 @@ function init(){
   }catch(e){}
 
   buildFilters(); renderDash(); renderLedger(); renderMembers(); renderMonths(); renderCharts();
+}
+
+/* gom số liệu từng thành viên — gọi lại mỗi khi đánh dấu đóng quỹ */
+function aggregateMembers(){
+  const map=new Map();
+  MONTHS.forEach(m=>m.members.forEach(x=>{
+    const v=effPaid(m.month,x);
+    if(!map.has(x.name)) map.set(x.name,{name:x.name,total:0,months:0,paidMonths:0,last:null,lastPaid:0});
+    const o=map.get(x.name); o.total+=v; o.months++; if(v>0)o.paidMonths++;
+    o.last=m.month; o.lastPaid=v;
+  }));
+  MEMBERS=[...map.values()];
 }
 
 /* ================= dashboard ================= */
@@ -695,34 +733,126 @@ $('#m-reset').onclick=()=>{
 };
 
 /* ================= months ================= */
-$('#mo-pick').onchange=renderMonths;
+$('#mo-pick').onchange=()=>{ $('#mo-exportbox').style.display='none'; renderMonths(); };
+
+function savePaid(){ try{localStorage.setItem(LSPAID,JSON.stringify(PAID))}catch(e){} }
+
+/* số tiền gợi ý khi đánh dấu "Đã đóng": mức người đó vẫn đóng, không có thì lấy 50k */
+function usualAmount(name, uptoMonth){
+  let v=0;
+  for(const m of MONTHS){
+    if(m.month>uptoMonth) break;
+    const x=m.members.find(y=>y.name===name);
+    if(x){ const p=effPaid(m.month,x); if(p>0) v=p; }
+  }
+  if(!v) for(const m of MONTHS){
+    const x=m.members.find(y=>y.name===name);
+    if(x && x.paid>0){ v=x.paid; break; }
+  }
+  return v||STD;
+}
+
+function setPaid(mo,name,val){
+  const src=MONTHS.find(m=>m.month===mo).members.find(x=>x.name===name);
+  const k=pkey(mo,name);
+  if(val===src.paid) delete PAID[k]; else PAID[k]=val;
+  savePaid(); aggregateMembers(); renderMonths(); renderMembers();
+}
+
+function changedInMonth(mo){
+  const m=MONTHS.find(x=>x.month===mo);
+  return m.members.filter(x=>pkey(mo,x.name) in PAID).map(x=>x.name);
+}
+function monthsWithChanges(){
+  return [...new Set(Object.keys(PAID).map(k=>k.split('|')[0]))].sort();
+}
+
 function renderMonths(){
   const key=$('#mo-pick').value||MONTHS[MONTHS.length-1].month;
   const m=MONTHS.find(x=>x.month===key);
-  const paid=m.members.filter(x=>x.paid>0), unpaid=m.members.filter(x=>x.paid===0);
+  const rows=m.members.map(x=>({...x, val:effPaid(key,x), edited:pkey(key,x.name) in PAID}));
+  const paid=rows.filter(x=>x.val>0), unpaid=rows.filter(x=>x.val<=0);
+  const total=rows.reduce((s,x)=>s+x.val,0);
   const chi=DATA.expenses.filter(e=>e.date.startsWith(key));
   const chiT=chi.reduce((s,x)=>s+x.amount,0);
-  $('#mo-k1').textContent=fmt(m.calc_total);
-  $('#mo-k2').textContent=paid.length+'/'+m.members.length;
+
+  $('#mo-k1').textContent=fmt(total);
+  $('#mo-k2').textContent=paid.length+'/'+rows.length;
   $('#mo-k2').style.color='var(--good)';
   $('#mo-k3').textContent=unpaid.length+' người';
   $('#mo-k3').style.color=unpaid.length?'var(--crit)':'var(--good)';
   $('#mo-k4').textContent=fmt(chiT);
-  $('#mo-sub').textContent=moLabel(key)+' · '+m.members.length+' thành viên';
+  $('#mo-sub').textContent=moLabel(key)+' · '+rows.length+' thành viên · chọn ở cột Trạng thái để đánh dấu';
   $('#mo-sub2').textContent=chi.length+' khoản chi trong '+moLabel(key).toLowerCase();
-  const std=50000;
-  $('#motbl').innerHTML=m.members.map((x,i)=>{
-    let cls='p-no',txt='Chưa đóng';
-    if(x.paid>=std){cls='p-ok';txt='Đã đóng'} else if(x.paid>0){cls='p-part';txt='Đóng một phần'}
-    return `<tr><td class="num" style="color:var(--text-3)">${i+1}</td><td class="name">${esc(x.name)}</td>
-      <td class="num" style="color:${x.paid>0?'var(--text)':'var(--text-3)'};font-weight:${x.paid>0?550:400}">${fmt(x.paid)}</td>
-      <td><span class="pill ${cls}">${txt}</span></td><td class="muted">${esc(x.note)}</td></tr>`}).join('');
+
+  $('#motbl').innerHTML=rows.map((x,i)=>{
+    const on=x.val>0;
+    return `<tr class="${x.edited?'edited':''}">
+      <td class="num" style="color:var(--text-3)">${i+1}</td>
+      <td class="name">${esc(x.name)}</td>
+      <td class="num"><input type="text" inputmode="numeric" class="amt ${on?'has':''}" value="${on?fmt(x.val):'0 đ'}" placeholder="0 đ"
+           data-n="${esc(x.name)}" data-raw="${x.val}" aria-label="Số tiền ${esc(x.name)} đóng"></td>
+      <td><select class="stsel ${on?'s-ok':'s-no'}" data-n="${esc(x.name)}" aria-label="Trạng thái đóng quỹ ${esc(x.name)}">
+            <option value="1" ${on?'selected':''}>Đã đóng</option>
+            <option value="0" ${on?'':'selected'}>Chưa đóng</option>
+          </select></td>
+      <td class="muted">${esc(x.note)}</td></tr>`}).join('');
+
+  $$('#motbl .stsel').forEach(sel=>sel.onchange=()=>{
+    const n=sel.dataset.n;
+    setPaid(key,n, sel.value==='1' ? usualAmount(n,key) : 0);
+  });
+  $$('#motbl .amt').forEach(inp=>{
+    inp.onfocus=()=>{ inp.value = +inp.dataset.raw>0 ? inp.dataset.raw : ''; inp.select(); };
+    inp.onblur=()=>{
+      const v=Math.max(0, Math.round(+String(inp.value).replace(/[^0-9]/g,'')||0));
+      if(v===+inp.dataset.raw){ inp.value = v>0?fmt(v):'0 đ'; return; }
+      setPaid(key,inp.dataset.n,v);
+    };
+    inp.onkeydown=e=>{ if(e.key==='Enter') inp.blur() };
+  });
+
   $('#mochi').innerHTML=chi.length?chi.map(e=>`<tr><td>${dLabel(e.date)}</td><td class="name">${esc(e.desc)}</td>
     <td><span style="display:inline-flex;align-items:center;gap:7px"><i class="dot" style="background:${catColor(e.cat)}"></i>${esc(e.cat)}</span></td>
     <td class="num">${fmt(e.amount)}</td></tr>`).join('')
     +`<tr><td colspan="3" style="font-weight:600;color:var(--text)">Tổng chi</td><td class="num" style="font-weight:650;color:var(--crit)">${fmt(chiT)}</td></tr>`
     :'<tr><td colspan="4" class="muted" style="text-align:center;padding:24px">Không có khoản chi nào</td></tr>';
+
+  const ch=changedInMonth(key), other=monthsWithChanges().filter(x=>x!==key);
+  $('#mo-savestate').innerHTML = ch.length
+    ? `Tháng này có ${ch.length} thay đổi chưa lưu chung: ${ch.slice(0,6).map(esc).join(', ')}${ch.length>6?'…':''}`
+      + (other.length?`<br>Các tháng khác cũng đang có thay đổi: ${other.map(moLabel).join(', ')} — chọn từng tháng rồi lưu.`:'')
+    : (other.length?`Tháng này chưa đổi gì. Các tháng khác đang có thay đổi: ${other.map(moLabel).join(', ')}.`
+                  : 'Chưa thay đổi gì so với dữ liệu chung.');
+  $('#mo-export').disabled = ch.length===0;
+  $('#mo-export').style.opacity = ch.length? 1 : .45;
+  $('#mo-reset').style.display = ch.length? 'inline-block':'none';
 }
+
+$('#mo-export').onclick=()=>{
+  const key=$('#mo-pick').value, m=MONTHS.find(x=>x.month===key);
+  const mem=m.members.map(x=>{
+    const v=effPaid(key,x);
+    return `     { "name": ${JSON.stringify(x.name)}, "paid": ${v}, "note": ${JSON.stringify(x.note||'')} }`;
+  });
+  const tot=m.members.reduce((s,x)=>s+effPaid(key,x),0);
+  const blk=`  {\n   "month": ${JSON.stringify(key)},\n   "label": ${JSON.stringify(moLabel(key))},\n   "total": ${tot},\n   "members": [\n${mem.join(',\n')}\n   ]\n  }`;
+  $('#mo-json').textContent=blk;
+  $('#mo-exportmonth').textContent='"month": "'+key+'"';
+  $('#mo-exportbox').style.display='block';
+  const b=$('#mo-export'), t=b.textContent, done=()=>{b.textContent='Đã sao chép ✓';setTimeout(()=>b.textContent=t,1800)};
+  navigator.clipboard.writeText(blk).then(done).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=blk;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');ta.remove();done();
+  });
+  $('#mo-exportbox').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+$('#mo-reset').onclick=()=>{
+  const key=$('#mo-pick').value;
+  Object.keys(PAID).forEach(k=>{ if(k.split('|')[0]===key) delete PAID[k] });
+  savePaid(); aggregateMembers(); $('#mo-exportbox').style.display='none';
+  renderMonths(); renderMembers();
+};
 </script>
 </body>
 </html>

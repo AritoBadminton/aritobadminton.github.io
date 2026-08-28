@@ -11,7 +11,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Tổng quan** | Số dư quỹ, tổng thu, tổng chi, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
 | **Sổ thu chi** | Toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp |
 | **Thành viên** | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động** |
-| **Đóng quỹ theo tháng** | Ai đã đóng / chưa đóng trong từng tháng + các khoản chi của tháng đó |
+| **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng cho từng người**, sửa được số tiền, + các khoản chi của tháng đó |
 
 ## Cấu trúc file
 
@@ -33,6 +33,19 @@ Tick lưu ngay trên trình duyệt của bạn. Muốn **cả nhóm cùng thấ
 **Lưu chung lên GitHub** — nó tự sao chép khối `"roster"` để bạn dán đè vào `data.json`
 (giống cách dán khoản thu/chi bên dưới). Nút **Đặt lại theo dữ liệu chung** huỷ mọi tick
 chưa lưu và quay về đúng những gì đang có trong `data.json`.
+
+## Đánh dấu thành viên đã đóng tiền
+
+Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng:
+
+- Cột **Trạng thái** là dropdown — chọn **Đã đóng** hoặc **Chưa đóng** cho từng người
+- Chọn "Đã đóng" sẽ tự điền **đúng mức người đó vẫn đóng** (Chị Lu 100k, Ngọc Em 80k…), không cào bằng 50k
+- Số tiền khác thường thì bấm thẳng vào ô **Số tiền** gõ lại
+- 4 ô thống kê phía trên (Thu được, Đã đóng x/y, Chưa đóng) và cả tab Thành viên tự cập nhật theo
+
+Đánh dấu lưu ngay trên trình duyệt của bạn. Muốn cả nhóm cùng thấy, bấm **Lưu chung lên GitHub** —
+nó sao chép sẵn khối tháng đó để bạn dán đè vào `data.json`. Sửa nhiều tháng thì chọn từng tháng
+rồi lưu từng khối. Nút **Đặt lại tháng này** huỷ mọi đánh dấu chưa lưu của tháng đang xem.
 
 ## Cách cập nhật dữ liệu
 
