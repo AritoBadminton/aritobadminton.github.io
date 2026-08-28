@@ -519,7 +519,7 @@ const effPaid=(mo,x)=> (pkey(mo,x.name) in PAID) ? PAID[pkey(mo,x.name)] : x.pai
 let sortKey='date', sortDir=-1;
 
 /* ================= load ================= */
-fetch('data.json').then(r=>r.json()).then(d=>{DATA=d;init()}).catch(e=>{
+fetch('data.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.json()).then(d=>{DATA=d;init()}).catch(e=>{
   $('#loading').innerHTML='Không tải được <code>data.json</code>.<br><span class="muted">Nếu bạn mở file trực tiếp từ máy, hãy mở qua GitHub Pages hoặc chạy máy chủ cục bộ.</span>';
 });
 
