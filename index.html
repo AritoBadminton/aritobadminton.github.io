@@ -143,6 +143,13 @@ h2.sec{font-size:15px;font-weight:640;margin:0 0 12px;letter-spacing:-.01em}
 .authbtn:hover{border-color:var(--border-strong);color:var(--text)}
 body.admin .authbtn{color:var(--good);border-color:color-mix(in srgb,var(--good) 38%,transparent);
   background:color-mix(in srgb,var(--good) 10%,transparent)}
+.autobar{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:11px 15px;border-radius:11px;font-size:13.5px;color:var(--text-2);
+  border:1px solid color-mix(in srgb,var(--s1) 34%,var(--border));
+  background:color-mix(in srgb,var(--s1) 9%,var(--surface))}
+.autobar svg{width:17px;height:17px;flex:none;color:var(--s1)}
+.autobar b{color:var(--text)}
+tr.added td.name::after{content:"mới";margin-left:8px;font-size:10.5px;font-weight:700;color:var(--s1);
+  background:color-mix(in srgb,var(--s1) 14%,transparent);padding:2px 7px;border-radius:99px;vertical-align:middle}
 .robar{display:none;align-items:center;gap:11px;max-width:1180px;margin:16px auto 0;padding:11px 15px;
   border-radius:11px;font-size:13.5px;color:var(--text-2);
   border:1px solid color-mix(in srgb,var(--s4) 40%,var(--border));
@@ -477,6 +484,11 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
   <section class="page" id="p-months">
     <div class="controls">
       <select id="mo-pick"></select>
+      <button class="mbtn ghost editonly" id="mo-fill" style="display:none">+ Bổ sung thành viên đang hoạt động</button>
+    </div>
+    <div class="autobar" id="mo-autobar" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9"/></svg>
+      <span id="mo-autotxt"></span>
     </div>
     <div class="grid g4" style="margin-bottom:14px">
       <div class="card stat"><div class="lb">Thu được</div><div class="vl" id="mo-k1" style="font-size:22px">—</div></div>
@@ -499,7 +511,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
           </div>
           <div class="card mt-s editonly" id="mo-exportbox" style="display:none">
             <div class="ch"><h3>Dán khối này vào <code>data.json</code></h3>
-              <p>Mở <code>data.json</code> trên GitHub → bấm ✏️ → tìm khối <code id="mo-exportmonth"></code> trong mục <code>"months"</code> → thay bằng khối dưới (đã tự sao chép) → Commit changes.</p></div>
+              <p>Mở <code>data.json</code> trên GitHub → bấm ✏️ → <span id="mo-exportmonth"></span> → Commit changes. Khối dưới đã được sao chép sẵn.</p></div>
             <div class="cb"><pre id="mo-json"></pre></div>
           </div>
         </div>
@@ -612,7 +624,8 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#loginmodal'
 
 /* ================= state ================= */
 let DATA=null, TX=[], MONTHS=[], MEMBERS=[], ACTIVE={}, BASE={}, PAID={};
-const LSKEY='clb-active-v1', LSPAID='clb-paid-v1', LSTX='clb-tx-v1', LSNOTE='clb-note-v1';
+const LSKEY='clb-active-v1', LSPAID='clb-paid-v1', LSTX='clb-tx-v1', LSNOTE='clb-note-v1', LSFILL='clb-fill-v1';
+let FILL={};   // tháng nào được bổ sung thêm DS thành viên đang hoạt động
 let NOTES={};
 const effNote=(mo,x)=> (pkey(mo,x.name) in NOTES) ? NOTES[pkey(mo,x.name)] : (x.note||'');
 let EXTRA={incomes:[],expenses:[]};
@@ -643,17 +656,20 @@ function init(){
 
   try{ PAID=JSON.parse(localStorage.getItem(LSPAID)||'{}')||{} }catch(e){ PAID={} }
   try{ NOTES=JSON.parse(localStorage.getItem(LSNOTE)||'{}')||{} }catch(e){ NOTES={} }
+  try{ FILL=JSON.parse(localStorage.getItem(LSFILL)||'{}')||{} }catch(e){ FILL={} }
   aggregateMembers();
 
   /* trạng thái hoạt động: data.json là dữ liệu chung, localStorage là chỉnh sửa tạm trên máy */
   const lastM=MONTHS[MONTHS.length-1].month;
-  BASE={}; MEMBERS.forEach(m=>BASE[m.name]= m.last===lastM);          // mặc định: có tên ở tháng mới nhất
+  const inLast=new Set(MONTHS[MONTHS.length-1].members.map(x=>x.name));
+  BASE={}; MEMBERS.forEach(m=>BASE[m.name]= inLast.has(m.name));      // mặc định: có tên ở tháng mới nhất đã ghi
   (DATA.roster||[]).forEach(r=>{ if(r && r.name in BASE) BASE[r.name]=!!r.active; });
   ACTIVE={...BASE};
   try{
     const saved=JSON.parse(localStorage.getItem(LSKEY)||'null');
     if(saved) Object.keys(saved).forEach(n=>{ if(n in ACTIVE) ACTIVE[n]=!!saved[n] });
   }catch(e){}
+  aggregateMembers();   // gom lại: giờ mới biết ai đang hoạt động để tính tháng tự sinh / bổ sung
 
   buildFilters(); renderDash(); renderLedger(); renderMembers(); renderMonths(); renderCharts();
 }
@@ -661,12 +677,22 @@ function init(){
 /* gom số liệu từng thành viên — gọi lại mỗi khi đánh dấu đóng quỹ */
 function aggregateMembers(){
   const map=new Map();
-  MONTHS.forEach(m=>m.members.forEach(x=>{
-    const v=effPaid(m.month,x);
-    if(!map.has(x.name)) map.set(x.name,{name:x.name,total:0,months:0,paidMonths:0,last:null,lastPaid:0});
-    const o=map.get(x.name); o.total+=v; o.months++; if(v>0)o.paidMonths++;
-    o.last=m.month; o.lastPaid=v;
-  }));
+  /* mọi thành viên từng có tên, kể cả người đã bị bỏ tick hoạt động */
+  const keys=MONTHS.map(m=>m.month);
+  /* tháng tự sinh chỉ được tính khi đã thực sự đánh dấu, để việc xem trước không làm lệch thống kê */
+  if(typeof futureKeys==='function') futureKeys().forEach(k=>{
+    if(Object.keys(PAID).concat(Object.keys(NOTES)).some(x=>x.split('|')[0]===k)) keys.push(k);
+  });
+  keys.forEach(k=>{
+    const list = (typeof monthMembers==='function') ? monthMembers(k)
+               : (MONTHS.find(m=>m.month===k)||{members:[]}).members;
+    list.forEach(x=>{
+      const v=effPaid(k,x);
+      if(!map.has(x.name)) map.set(x.name,{name:x.name,total:0,months:0,paidMonths:0,last:null,lastPaid:0});
+      const o=map.get(x.name); o.total+=v; o.months++; if(v>0)o.paidMonths++;
+      o.last=k; o.lastPaid=v;
+    });
+  });
   MEMBERS=[...map.values()];
 }
 
@@ -817,10 +843,14 @@ function buildFilters(){
   $('#f-month').innerHTML='<option value="">Tất cả các tháng</option>'+ms.map(m=>`<option value="${m}">${moLabel(m)}</option>`).join('');
   const cs=[...new Set(TX.map(t=>t.cat))].sort();
   $('#f-cat').innerHTML='<option value="">Tất cả danh mục</option>'+cs.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
-  $('#mo-pick').innerHTML=MONTHS.map(m=>`<option value="${m.month}">${moLabel(m.month)} — ${m.members.length} thành viên</option>`).join('');
+  const nAct=activeNames().length;
+  $('#mo-pick').innerHTML=
+    MONTHS.map(m=>`<option value="${m.month}">${moLabel(m.month)} — ${m.members.length} thành viên</option>`).join('')
+    + futureKeys().map(k=>`<option value="${k}">${moLabel(k)} — tự tạo, ${nAct} người đang hoạt động</option>`).join('');
   if(ms.includes(keepMo)) $('#f-month').value=keepMo;
   if(cs.includes(keepCat)) $('#f-cat').value=keepCat;
-  $('#mo-pick').value = MONTHS.some(m=>m.month===keepPick) ? keepPick : MONTHS[MONTHS.length-1].month;
+  const opts=[...$('#mo-pick').options].map(o=>o.value);
+  $('#mo-pick').value = opts.includes(keepPick) ? keepPick : MONTHS[MONTHS.length-1].month;
 }
 let fType='all';
 $$('#typeseg button').forEach(b=>b.onclick=()=>{
@@ -1055,10 +1085,46 @@ $('#m-reset').onclick=()=>{
 /* ================= months ================= */
 $('#mo-pick').onchange=()=>{ $('#mo-exportbox').style.display='none'; renderMonths(); };
 
+/* --- tháng tự sinh --- */
+const nextMonth=k=>{ let[y,m]=k.split('-').map(Number); m++; if(m>12){m=1;y++} return `${y}-${String(m).padStart(2,'0')}` };
+/* các tháng chưa có trong data.json, đề xuất sẵn để đánh dấu trước */
+function futureKeys(){
+  const last=MONTHS[MONTHS.length-1].month;
+  const out=[]; let k=last;
+  for(let i=0;i<3;i++){ k=nextMonth(k); out.push(k); }
+  return out;
+}
+const isVirtual=k=>!MONTHS.some(m=>m.month===k);
+function activeNames(){ return MEMBERS.filter(m=>ACTIVE[m.name]).map(m=>m.name) }
+
+/* Danh sách đóng quỹ của một tháng.
+   - Tháng đã có trong data.json: giữ nguyên danh sách đã ghi (không phá lịch sử),
+     chỉ bổ sung người đang hoạt động khi bật FILL.
+   - Tháng chưa có: tự sinh toàn bộ từ danh sách đang hoạt động. */
+function monthMembers(key){
+  const rec=MONTHS.find(m=>m.month===key);
+  const base=rec? rec.members.map(x=>({...x})) : [];
+  if(!rec || FILL[key]){
+    const have=new Set(base.map(x=>x.name));
+    /* giữ thứ tự quen thuộc: theo tháng gần nhất trước, còn lại xếp theo bảng chữ cái */
+    const prev=rec? null : (MONTHS[MONTHS.length-1]||{members:[]}).members.map(x=>x.name);
+    const act=activeNames();
+    const ordered = prev
+      ? [...prev.filter(n=>act.includes(n)), ...act.filter(n=>!prev.includes(n)).sort((a,b)=>a.localeCompare(b,'vi'))]
+      : act;
+    ordered.forEach(n=>{ if(!have.has(n)){ base.push({name:n,paid:0,note:'',added:true}); have.add(n) } });
+  }
+  return base;
+}
+function monthTotalRecorded(key){
+  const rec=MONTHS.find(m=>m.month===key); return rec? rec.calc_total : 0;
+}
+function saveFill(){ try{localStorage.setItem(LSFILL,JSON.stringify(FILL))}catch(e){} }
+
 function savePaid(){ try{localStorage.setItem(LSPAID,JSON.stringify(PAID))}catch(e){} }
 function saveNotes(){ try{localStorage.setItem(LSNOTE,JSON.stringify(NOTES))}catch(e){} }
 function setNote(mo,name,val){
-  const src=MONTHS.find(m=>m.month===mo).members.find(x=>x.name===name);
+  const src=monthMembers(mo).find(x=>x.name===name)||{note:''};
   const k=pkey(mo,name);
   if(val===(src.note||'')) delete NOTES[k]; else NOTES[k]=val;
   saveNotes(); renderMonths();
@@ -1068,7 +1134,7 @@ function setNote(mo,name,val){
 function usualAmount(name, uptoMonth){
   let v=0;
   for(const m of MONTHS){
-    if(m.month>uptoMonth) break;
+    if(m.month>uptoMonth) break;   /* chỉ nhìn lịch sử đã ghi */
     const x=m.members.find(y=>y.name===name);
     if(x){ const p=effPaid(m.month,x); if(p>0) v=p; }
   }
@@ -1080,25 +1146,32 @@ function usualAmount(name, uptoMonth){
 }
 
 function setPaid(mo,name,val){
-  const src=MONTHS.find(m=>m.month===mo).members.find(x=>x.name===name);
+  const src=monthMembers(mo).find(x=>x.name===name)||{paid:0};
   const k=pkey(mo,name);
   if(val===src.paid) delete PAID[k]; else PAID[k]=val;
   savePaid(); aggregateMembers(); renderMonths(); renderMembers();
 }
 
 function changedInMonth(mo){
-  const m=MONTHS.find(x=>x.month===mo);
-  return m.members.filter(x=>(pkey(mo,x.name) in PAID)||(pkey(mo,x.name) in NOTES)).map(x=>x.name);
+  return monthMembers(mo)
+    .filter(x=>x.added||(pkey(mo,x.name) in PAID)||(pkey(mo,x.name) in NOTES)).map(x=>x.name);
 }
 function monthsWithChanges(){
-  return [...new Set([...Object.keys(PAID),...Object.keys(NOTES)].map(k=>k.split('|')[0]))].sort();
+  return [...new Set([
+    ...Object.keys(PAID).map(k=>k.split('|')[0]),
+    ...Object.keys(NOTES).map(k=>k.split('|')[0]),
+    ...Object.keys(FILL).filter(k=>FILL[k]),
+    ...futureKeys().filter(k=>monthMembers(k).some(x=>(pkey(k,x.name) in PAID)||(pkey(k,x.name) in NOTES)))
+  ])].sort();
 }
 
 function renderMonths(){
   const key=$('#mo-pick').value||MONTHS[MONTHS.length-1].month;
-  const m=MONTHS.find(x=>x.month===key);
-  const rows=m.members.map(x=>({...x, val:effPaid(key,x), nt:effNote(key,x),
-    edited:(pkey(key,x.name) in PAID)||(pkey(key,x.name) in NOTES)}));
+  const virt=isVirtual(key);
+  const rows=monthMembers(key).map(x=>({...x,
+    val:effPaid(key,x), nt:effNote(key,x),
+    isNewRow: !!x.added && !virt,
+    edited:(pkey(key,x.name) in PAID)||(pkey(key,x.name) in NOTES)||(!!x.added && !virt)}));
   const paid=rows.filter(x=>x.val>0), unpaid=rows.filter(x=>x.val<=0);
   const total=rows.reduce((s,x)=>s+x.val,0);
   const chi=allExpenses().filter(e=>e.date.startsWith(key));
@@ -1112,12 +1185,21 @@ function renderMonths(){
   $('#mo-k4').textContent=fmt(chiT);
   $('#mo-sub').textContent=moLabel(key)+' · '+rows.length+' thành viên'
     + (isAdmin?' · chọn ở cột Trạng thái để đánh dấu':'');
+
+  const nAdded=rows.filter(x=>x.isNewRow).length;
+  $('#mo-autobar').style.display = (virt||FILL[key])? 'flex':'none';
+  $('#mo-autotxt').innerHTML = virt
+    ? `<b>${moLabel(key)} chưa có trong dữ liệu chung.</b> Bảng dưới được tự sinh từ ${activeNames().length} thành viên đang hoạt động, tất cả để "Chưa đóng". Đánh dấu xong bấm <b>Lưu chung lên GitHub</b> để tạo tháng này thật.`
+    : `Đã bổ sung <b>${nAdded} người</b> đang hoạt động chưa có tên trong tháng này. Các dòng cũ giữ nguyên.`;
+  const canFill = !virt && !FILL[key] && monthMembers(key).length < (MONTHS.find(m=>m.month===key).members.length + 1)
+                  && activeNames().some(n=>!MONTHS.find(m=>m.month===key).members.some(x=>x.name===n));
+  $('#mo-fill').style.display = (isAdmin && canFill)? 'inline-block':'none';
   $('#mo-notehint').textContent = isAdmin?'(sửa được)':'';
   $('#mo-sub2').textContent=chi.length+' khoản chi trong '+moLabel(key).toLowerCase();
 
   $('#motbl').innerHTML=rows.map((x,i)=>{
     const on=x.val>0;
-    return `<tr class="${x.edited?'edited':''}">
+    return `<tr class="${x.edited?'edited':''} ${x.isNewRow?'added':''}">
       <td class="num" style="color:var(--text-3)">${i+1}</td>
       <td class="name">${esc(x.name)}</td>
       <td class="num"><input type="text" inputmode="numeric" class="amt ${on?'has':''}" value="${on?fmt(x.val):'0 đ'}" placeholder="0 đ" ${isAdmin?'':'disabled'}
@@ -1154,26 +1236,41 @@ function renderMonths(){
     :'<tr><td colspan="4" class="muted" style="text-align:center;padding:24px">Không có khoản chi nào</td></tr>';
 
   const ch=changedInMonth(key), other=monthsWithChanges().filter(x=>x!==key);
-  $('#mo-savestate').innerHTML = ch.length
-    ? `Tháng này có ${ch.length} thay đổi chưa lưu chung: ${ch.slice(0,6).map(esc).join(', ')}${ch.length>6?'…':''}`
-      + (other.length?`<br>Các tháng khác cũng đang có thay đổi: ${other.map(moLabel).join(', ')} — chọn từng tháng rồi lưu.`:'')
-    : (other.length?`Tháng này chưa đổi gì. Các tháng khác đang có thay đổi: ${other.map(moLabel).join(', ')}.`
-                  : 'Chưa thay đổi gì so với dữ liệu chung.');
-  $('#mo-export').disabled = ch.length===0;
-  $('#mo-export').style.opacity = ch.length? 1 : .45;
-  $('#mo-reset').style.display = ch.length? 'inline-block':'none';
+  const marked=rows.filter(x=>(pkey(key,x.name) in PAID)||(pkey(key,x.name) in NOTES)).map(x=>x.name);
+  const otherTxt = other.length
+    ? `<br>Các tháng khác cũng đang có thay đổi: ${other.map(moLabel).join(', ')} — chọn từng tháng rồi lưu.` : '';
+  $('#mo-savestate').innerHTML = virt
+    ? `Tháng mới, sẽ thêm <b>${rows.length} dòng</b> vào dữ liệu chung`
+      + (marked.length? ` — đã đánh dấu ${marked.length} người: ${marked.slice(0,6).map(esc).join(', ')}${marked.length>6?'…':''}.`
+                      : ' — chưa đánh dấu ai đóng tiền.') + otherTxt
+    : (ch.length
+        ? `Tháng này có ${ch.length} thay đổi chưa lưu chung: ${ch.slice(0,6).map(esc).join(', ')}${ch.length>6?'…':''}` + otherTxt
+        : (other.length?`Tháng này chưa đổi gì. Các tháng khác đang có thay đổi: ${other.map(moLabel).join(', ')}.`
+                      : 'Chưa thay đổi gì so với dữ liệu chung.'));
+  const canSave = virt || ch.length>0;
+  $('#mo-export').disabled = !canSave;
+  $('#mo-export').style.opacity = canSave? 1 : .45;
+  $('#mo-export').textContent = virt? 'Tạo tháng này trên GitHub' : 'Lưu chung lên GitHub';
+  $('#mo-reset').style.display = (marked.length||FILL[key])? 'inline-block':'none';
+  $('#mo-reset').textContent = virt? 'Xoá đánh dấu tháng này' : 'Đặt lại tháng này';
 }
 
+$('#mo-fill').onclick=()=>{
+  const key=$('#mo-pick').value;
+  FILL[key]=true; saveFill(); aggregateMembers(); renderMonths(); renderMembers();
+};
 $('#mo-export').onclick=()=>{
-  const key=$('#mo-pick').value, m=MONTHS.find(x=>x.month===key);
-  const mem=m.members.map(x=>{
+  const key=$('#mo-pick').value, virt=isVirtual(key), list=monthMembers(key);
+  const mem=list.map(x=>{
     const v=effPaid(key,x);
     return `     { "name": ${JSON.stringify(x.name)}, "paid": ${v}, "note": ${JSON.stringify(effNote(key,x))} }`;
   });
-  const tot=m.members.reduce((s,x)=>s+effPaid(key,x),0);
+  const tot=list.reduce((s,x)=>s+effPaid(key,x),0);
   const blk=`  {\n   "month": ${JSON.stringify(key)},\n   "label": ${JSON.stringify(moLabel(key))},\n   "total": ${tot},\n   "members": [\n${mem.join(',\n')}\n   ]\n  }`;
   $('#mo-json').textContent=blk;
-  $('#mo-exportmonth').textContent='"month": "'+key+'"';
+  $('#mo-exportmonth').textContent = virt
+    ? 'thêm khối này vào CUỐI danh sách "months" (nhớ dấu phẩy ở khối trước)'
+    : 'tìm khối "month": "'+key+'" rồi thay bằng khối dưới';
   $('#mo-exportbox').style.display='block';
   const b=$('#mo-export'), t=b.textContent, done=()=>{b.textContent='Đã sao chép ✓';setTimeout(()=>b.textContent=t,1800)};
   navigator.clipboard.writeText(blk).then(done).catch(()=>{
@@ -1186,6 +1283,7 @@ $('#mo-reset').onclick=()=>{
   const key=$('#mo-pick').value;
   Object.keys(PAID).forEach(k=>{ if(k.split('|')[0]===key) delete PAID[k] });
   Object.keys(NOTES).forEach(k=>{ if(k.split('|')[0]===key) delete NOTES[k] });
+  delete FILL[key]; saveFill();
   savePaid(); saveNotes(); aggregateMembers(); $('#mo-exportbox').style.display='none';
   renderMonths(); renderMembers();
 };

@@ -34,6 +34,21 @@ Tick lưu ngay trên trình duyệt của bạn. Muốn **cả nhóm cùng thấ
 (giống cách dán khoản thu/chi bên dưới). Nút **Đặt lại theo dữ liệu chung** huỷ mọi tick
 chưa lưu và quay về đúng những gì đang có trong `data.json`.
 
+## Tháng mới tự sinh danh sách
+
+Ô chọn tháng có sẵn **3 tháng kế tiếp** chưa có trong dữ liệu, ghi "— tự tạo".
+Chọn một tháng như vậy, bảng **Danh sách đóng quỹ** tự dựng từ **danh sách thành viên đang hoạt động**
+(cột tick ở tab Thành viên), tất cả để "Chưa đóng". Đánh dấu ai đã đóng rồi bấm
+**Tạo tháng này trên GitHub** — nó sinh sẵn khối JSON để bạn *thêm vào cuối* mục `"months"`.
+
+**Các tháng đã có trong `data.json` không bị sinh lại** — lịch sử giữ nguyên (tháng 12/2024 vẫn là 8 người,
+tháng 05/2025 vẫn 18 người). Nếu giữa tháng có người mới vào và bạn muốn thêm họ, bấm
+**+ Bổ sung thành viên đang hoạt động** — nút này chỉ thêm những người còn thiếu, các dòng cũ không đụng tới,
+và những dòng vừa thêm có nhãn **mới**.
+
+Tháng tự tạo chỉ được tính vào thống kê ở tab Thành viên **sau khi bạn đánh dấu ít nhất một người** —
+xem trước thôi thì không làm lệch số liệu.
+
 ## Đánh dấu thành viên đã đóng tiền
 
 Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng:
