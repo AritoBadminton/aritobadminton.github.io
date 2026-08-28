@@ -135,6 +135,14 @@ h2.sec{font-size:15px;font-weight:640;margin:0 0 12px;letter-spacing:-.01em}
 .note b{color:var(--text)}
 .bar-mini{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;min-width:70px}
 .bar-mini i{display:block;height:100%;border-radius:3px;background:var(--s1)}
+.mbtn{background:var(--s1);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.mbtn:hover{filter:brightness(1.08)}
+.mbtn.ghost{background:var(--surface);color:var(--text-2);border:1px solid var(--border-strong)}
+.mbtn.ghost:hover{color:var(--text)}
+.actchk{width:17px;height:17px;accent-color:var(--s1);cursor:pointer;vertical-align:middle}
+tr.off td.name,tr.off td.num{opacity:.5}
+pre#m-json{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow:auto;max-height:340px;
+  font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
 footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-size:12.5px;color:var(--text-3);display:flex;gap:12px;flex-wrap:wrap}
 .tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border-strong);border-radius:9px;padding:9px 11px;font-size:12.5px;box-shadow:var(--shadow);opacity:0;transition:opacity .1s;z-index:60;max-width:250px}
 .tip b{display:block;color:var(--text);margin-bottom:4px;font-size:13px}
@@ -270,18 +278,40 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
         <option value="months">Sắp xếp: Số tháng tham gia</option>
         <option value="name">Sắp xếp: Tên A→Z</option>
       </select>
-      <label class="muted" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="m-active"> Chỉ hiện thành viên còn sinh hoạt</label>
+      <div class="seg" id="m-stateseg">
+        <button data-s="all" aria-pressed="true">Tất cả</button>
+        <button data-s="on" aria-pressed="false">Đang hoạt động</button>
+        <button data-s="off" aria-pressed="false">Ngừng hoạt động</button>
+      </div>
     </div>
-    <div class="grid g3" style="margin-bottom:14px">
-      <div class="card stat"><div class="lb">Tổng người từng tham gia</div><div class="vl" id="m-k1" style="font-size:22px">—</div></div>
-      <div class="card stat"><div class="lb">Tổng thu từ thành viên</div><div class="vl" id="m-k2" style="font-size:22px">—</div></div>
-      <div class="card stat"><div class="lb">Chưa đóng tháng gần nhất</div><div class="vl" id="m-k3" style="font-size:22px">—</div></div>
+    <div class="grid g4" style="margin-bottom:14px">
+      <div class="card stat"><div class="lb">Đang hoạt động</div><div class="vl" id="m-k1" style="font-size:22px">—</div><div class="ft" id="m-k1f"></div></div>
+      <div class="card stat"><div class="lb">Ngừng hoạt động</div><div class="vl" id="m-k4" style="font-size:22px">—</div><div class="ft">Đã bỏ tick</div></div>
+      <div class="card stat"><div class="lb">Tổng thu từ thành viên</div><div class="vl" id="m-k2" style="font-size:22px">—</div><div class="ft" id="m-k2f"></div></div>
+      <div class="card stat"><div class="lb">Chưa đóng tháng gần nhất</div><div class="vl" id="m-k3" style="font-size:22px">—</div><div class="ft" id="m-k3f"></div></div>
     </div>
     <div class="tblwrap">
       <table>
-        <thead><tr><th>#</th><th>Thành viên</th><th class="num">Tổng đã đóng</th><th class="num">Số tháng</th><th class="num">Đã đóng đủ</th><th style="width:130px">Tỷ lệ</th><th>Tháng có tên gần nhất</th></tr></thead>
+        <thead><tr>
+          <th style="width:96px" title="Tick để đánh dấu thành viên còn sinh hoạt">Hoạt động</th>
+          <th>#</th><th>Thành viên</th><th class="num">Tổng đã đóng</th><th class="num">Số tháng</th>
+          <th class="num">Đã đóng đủ</th><th style="width:130px">Tỷ lệ</th><th>Tháng có tên gần nhất</th>
+        </tr></thead>
         <tbody id="memtbl"></tbody>
       </table>
+    </div>
+    <div class="note mt-s" id="m-savebar" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <b>Đánh dấu đang lưu trên máy bạn.</b><br>
+        <span id="m-savestate">Chưa thay đổi gì so với dữ liệu chung.</span>
+      </div>
+      <button class="mbtn" id="m-export">Lưu chung lên GitHub</button>
+      <button class="mbtn ghost" id="m-reset">Đặt lại theo dữ liệu chung</button>
+    </div>
+    <div class="card mt-s" id="m-exportbox" style="display:none">
+      <div class="ch"><h3>Dán khối này vào <code>data.json</code></h3>
+        <p>Mở <code>data.json</code> trên GitHub → bấm ✏️ → thay toàn bộ mục <code>"roster"</code> bằng khối dưới (đã tự sao chép vào clipboard) → Commit changes.</p></div>
+      <div class="cb"><pre id="m-json"></pre></div>
     </div>
   </section>
 
@@ -355,7 +385,8 @@ $$('nav.tabs button').forEach(b=>b.onclick=()=>{
 });
 
 /* ================= state ================= */
-let DATA=null, TX=[], MONTHS=[], MEMBERS=[];
+let DATA=null, TX=[], MONTHS=[], MEMBERS=[], ACTIVE={}, BASE={};
+const LSKEY='clb-active-v1';
 let sortKey='date', sortDir=-1;
 
 /* ================= load ================= */
@@ -378,6 +409,16 @@ function init(){
     o.last=m.month; o.lastPaid=x.paid;
   }));
   MEMBERS=[...map.values()];
+
+  /* trạng thái hoạt động: data.json là dữ liệu chung, localStorage là chỉnh sửa tạm trên máy */
+  const lastM=MONTHS[MONTHS.length-1].month;
+  BASE={}; MEMBERS.forEach(m=>BASE[m.name]= m.last===lastM);          // mặc định: có tên ở tháng mới nhất
+  (DATA.roster||[]).forEach(r=>{ if(r && r.name in BASE) BASE[r.name]=!!r.active; });
+  ACTIVE={...BASE};
+  try{
+    const saved=JSON.parse(localStorage.getItem(LSKEY)||'null');
+    if(saved) Object.keys(saved).forEach(n=>{ if(n in ACTIVE) ACTIVE[n]=!!saved[n] });
+  }catch(e){}
 
   buildFilters(); renderDash(); renderLedger(); renderMembers(); renderMonths(); renderCharts();
 }
@@ -567,23 +608,53 @@ function renderLedger(){
 }
 
 /* ================= members ================= */
-['#m-q','#m-sort','#m-active'].forEach(s=>$(s).oninput=renderMembers);
+let mState='all';
+['#m-q','#m-sort'].forEach(s=>$(s).oninput=renderMembers);
+$$('#m-stateseg button').forEach(b=>b.onclick=()=>{
+  $$('#m-stateseg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  mState=b.dataset.s; renderMembers();
+});
+
+function saveActive(){
+  try{localStorage.setItem(LSKEY,JSON.stringify(ACTIVE))}catch(e){}
+}
+function changedNames(){
+  return MEMBERS.filter(m=>ACTIVE[m.name]!==BASE[m.name]).map(m=>m.name);
+}
+function toggleActive(name,val){
+  ACTIVE[name]=val; saveActive(); renderMembers();
+}
+
 function renderMembers(){
   const lastM=MONTHS[MONTHS.length-1].month;
-  const q=$('#m-q').value.trim().toLowerCase(), sk=$('#m-sort').value, act=$('#m-active').checked;
-  let rows=MEMBERS.filter(m=>(!q||m.name.toLowerCase().includes(q))&&(!act||m.last===lastM));
+  const q=$('#m-q').value.trim().toLowerCase(), sk=$('#m-sort').value;
+  let rows=MEMBERS.filter(m=>
+    (!q||m.name.toLowerCase().includes(q)) &&
+    (mState==='all' || (mState==='on'? ACTIVE[m.name] : !ACTIVE[m.name])));
   const cmp={total:(a,b)=>b.total-a.total, rate:(a,b)=>b.paidMonths/b.months-a.paidMonths/a.months,
              months:(a,b)=>b.months-a.months, name:(a,b)=>a.name.localeCompare(b.name,'vi')};
   rows.sort(cmp[sk]);
+
+  const on=MEMBERS.filter(m=>ACTIVE[m.name]);
+  const off=MEMBERS.length-on.length;
+  const duesOn=on.reduce((s,m)=>s+m.total,0);
   const totalDues=MEMBERS.reduce((s,m)=>s+m.total,0);
-  const unpaid=MONTHS[MONTHS.length-1].members.filter(m=>m.paid===0).length;
-  $('#m-k1').textContent=MEMBERS.length+' người';
+  const unpaid=on.filter(m=>!(m.last===lastM&&m.lastPaid>0)).length;
+
+  $('#m-k1').textContent=on.length+' người';
+  $('#m-k1').style.color='var(--good)';
+  $('#m-k1f').textContent='trên tổng '+MEMBERS.length+' người từng tham gia';
+  $('#m-k4').textContent=off+' người';
   $('#m-k2').textContent=fmt(totalDues);
+  $('#m-k2f').textContent='Nhóm đang hoạt động: '+fmt(duesOn);
   $('#m-k3').textContent=unpaid+' người';
   $('#m-k3').style.color=unpaid?'var(--crit)':'var(--good)';
-  $('#memtbl').innerHTML=rows.map((m,i)=>{
-    const r=m.paidMonths/m.months;
-    return `<tr>
+  $('#m-k3f').textContent='trong nhóm đang hoạt động · '+moLabel(lastM);
+
+  $('#memtbl').innerHTML=rows.length?rows.map((m,i)=>{
+    const r=m.paidMonths/m.months, act=ACTIVE[m.name];
+    return `<tr class="${act?'':'off'}">
+      <td style="text-align:center"><input type="checkbox" class="actchk" data-n="${esc(m.name)}" ${act?'checked':''} aria-label="Đánh dấu ${esc(m.name)} còn hoạt động"></td>
       <td class="num" style="color:var(--text-3)">${i+1}</td>
       <td class="name">${esc(m.name)}</td>
       <td class="num" style="color:var(--text);font-weight:550">${fmt(m.total)}</td>
@@ -591,8 +662,37 @@ function renderMembers(){
       <td class="num">${m.paidMonths}/${m.months}</td>
       <td><div style="display:flex;align-items:center;gap:9px"><div class="bar-mini" style="flex:1"><i style="width:${r*100}%;background:${r>=.8?'var(--good)':r>=.5?'var(--warn)':'var(--crit)'}"></i></div><span style="font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums">${Math.round(r*100)}%</span></div></td>
       <td>${moLabel(m.last)} ${m.lastPaid>0?'<span class="pill p-ok">đã đóng</span>':'<span class="pill p-no">chưa</span>'}</td>
-    </tr>`}).join('');
+    </tr>`}).join('')
+    :'<tr><td colspan="8" style="text-align:center;padding:28px" class="muted">Không có thành viên nào khớp bộ lọc</td></tr>';
+
+  $$('#memtbl .actchk').forEach(c=>c.onchange=()=>toggleActive(c.dataset.n,c.checked));
+
+  const ch=changedNames();
+  $('#m-savestate').textContent = ch.length
+    ? `Đang có ${ch.length} thay đổi chưa lưu chung: ${ch.slice(0,6).join(', ')}${ch.length>6?'…':''}`
+    : 'Chưa thay đổi gì so với dữ liệu chung.';
+  $('#m-export').disabled = ch.length===0;
+  $('#m-export').style.opacity = ch.length? 1 : .45;
+  $('#m-reset').style.display = ch.length? 'inline-block':'none';
 }
+
+$('#m-export').onclick=()=>{
+  const rows=MEMBERS.slice().sort((a,b)=>a.name.localeCompare(b.name,'vi'))
+    .map(m=>`  { "name": ${JSON.stringify(m.name)}, "active": ${!!ACTIVE[m.name]} }`);
+  const blk='"roster": [\n'+rows.join(',\n')+'\n ],';
+  $('#m-json').textContent=blk;
+  $('#m-exportbox').style.display='block';
+  const done=()=>{const b=$('#m-export');const t=b.textContent;b.textContent='Đã sao chép ✓';setTimeout(()=>b.textContent=t,1800)};
+  navigator.clipboard.writeText(blk).then(done).catch(()=>{
+    const t=document.createElement('textarea');t.value=blk;document.body.appendChild(t);t.select();
+    document.execCommand('copy');t.remove();done();
+  });
+  $('#m-exportbox').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+$('#m-reset').onclick=()=>{
+  ACTIVE={...BASE}; try{localStorage.removeItem(LSKEY)}catch(e){}
+  $('#m-exportbox').style.display='none'; renderMembers();
+};
 
 /* ================= months ================= */
 $('#mo-pick').onchange=renderMonths;

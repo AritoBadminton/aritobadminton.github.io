@@ -6,6 +6,180 @@
   "Không phải thành viên công ty: 30k/1 buổi.100k/1 tháng",
   "Note: Chuyển xong nhắn zalo cho em ạ"
  ],
+ "roster": [
+  {
+   "name": "Anh Mạnh",
+   "active": false
+  },
+  {
+   "name": "Anh Thư",
+   "active": false
+  },
+  {
+   "name": "Anh Vũ",
+   "active": false
+  },
+  {
+   "name": "Bạn Phước",
+   "active": false
+  },
+  {
+   "name": "Chị Lu",
+   "active": true
+  },
+  {
+   "name": "Diểm Thoa",
+   "active": false
+  },
+  {
+   "name": "Hoàng Mỹ",
+   "active": false
+  },
+  {
+   "name": "Hoàng Phúc",
+   "active": false
+  },
+  {
+   "name": "Huỳnh Châu",
+   "active": false
+  },
+  {
+   "name": "Hùng Thuận",
+   "active": true
+  },
+  {
+   "name": "Kim Trinh",
+   "active": false
+  },
+  {
+   "name": "Kỳ Tường",
+   "active": true
+  },
+  {
+   "name": "Lai Phước",
+   "active": true
+  },
+  {
+   "name": "Minh Anh",
+   "active": true
+  },
+  {
+   "name": "Minh Hiếu",
+   "active": false
+  },
+  {
+   "name": "Minh Nghĩa",
+   "active": true
+  },
+  {
+   "name": "Minh Ngọc",
+   "active": false
+  },
+  {
+   "name": "Minh Nhật",
+   "active": true
+  },
+  {
+   "name": "Nguyên Hào",
+   "active": false
+  },
+  {
+   "name": "Ngọc Anh",
+   "active": true
+  },
+  {
+   "name": "Ngọc Chỉ",
+   "active": false
+  },
+  {
+   "name": "Ngọc Em",
+   "active": true
+  },
+  {
+   "name": "Nhóm bạn Lại Phước",
+   "active": false
+  },
+  {
+   "name": "Như Nguyệt",
+   "active": true
+  },
+  {
+   "name": "Phi Hoàng",
+   "active": false
+  },
+  {
+   "name": "Phúc Hưng",
+   "active": true
+  },
+  {
+   "name": "Quang Trường",
+   "active": false
+  },
+  {
+   "name": "Quang Đồng",
+   "active": false
+  },
+  {
+   "name": "Quốc Nghĩa",
+   "active": false
+  },
+  {
+   "name": "Thanh Thúy",
+   "active": false
+  },
+  {
+   "name": "Thanh Trúc",
+   "active": false
+  },
+  {
+   "name": "Thành Nguyên",
+   "active": false
+  },
+  {
+   "name": "Thái Sơn",
+   "active": true
+  },
+  {
+   "name": "Thị Thảo",
+   "active": true
+  },
+  {
+   "name": "Tiến Đạt",
+   "active": false
+  },
+  {
+   "name": "Uyên Thư",
+   "active": true
+  },
+  {
+   "name": "Võ Lâm",
+   "active": true
+  },
+  {
+   "name": "Văn Khánh",
+   "active": true
+  },
+  {
+   "name": "Văn Quang",
+   "active": true
+  },
+  {
+   "name": "Vũ Duy",
+   "active": false
+  },
+  {
+   "name": "Đình Phúc",
+   "active": false
+  },
+  {
+   "name": "Đức Khoa",
+   "active": false
+  },
+  {
+   "name": "Đức Tín",
+   "active": false
+  }
+ ],
  "expenses": [
   {
    "date": "2024-12-01",

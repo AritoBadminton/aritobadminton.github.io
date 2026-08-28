@@ -2,7 +2,7 @@
 
 Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông công ty Arito.
 
-**Xem trang:** https://<tên-tài-khoản>.github.io/<tên-repo>/
+**Xem trang:** https://aritobadminton.github.io/
 
 ## Có gì trong trang
 
@@ -10,7 +10,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 |---|---|
 | **Tổng quan** | Số dư quỹ, tổng thu, tổng chi, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
 | **Sổ thu chi** | Toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp |
-| **Thành viên** | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ |
+| **Thành viên** | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động** |
 | **Đóng quỹ theo tháng** | Ai đã đóng / chưa đóng trong từng tháng + các khoản chi của tháng đó |
 
 ## Cấu trúc file
@@ -20,6 +20,19 @@ index.html   # toàn bộ giao diện (không cần cài đặt gì)
 data.json    # TOÀN BỘ DỮ LIỆU — chỉ cần sửa file này
 nhap-lieu.html # công cụ tạo nhanh 1 dòng JSON để dán vào data.json
 ```
+
+## Phân loại thành viên đang / ngưng hoạt động
+
+Trong tab **Thành viên**, cột **Hoạt động** có ô tick ở mỗi dòng:
+
+- **Tick** = đang hoạt động · **bỏ tick** = ngưng hoạt động (dòng đó sẽ mờ đi)
+- 3 nút lọc phía trên: **Tất cả / Đang hoạt động / Ngưng hoạt động**
+- Ô "Chưa đóng tháng gần nhất" chỉ đếm trong nhóm đang hoạt động, nên người đã nghỉ không làm sai số liệu
+
+Tick lưu ngay trên trình duyệt của bạn. Muốn **cả nhóm cùng thấy giống nhau**, bấm nút
+**Lưu chung lên GitHub** — nó tự sao chép khối `"roster"` để bạn dán đè vào `data.json`
+(giống cách dán khoản thu/chi bên dưới). Nút **Đặt lại theo dữ liệu chung** huỷ mọi tick
+chưa lưu và quay về đúng những gì đang có trong `data.json`.
 
 ## Cách cập nhật dữ liệu
 
@@ -38,6 +51,11 @@ Mọi số liệu nằm trong `data.json`. Cách nhanh nhất:
   "club": "CLB Cầu Lông Arito",
   "updated": "2026-08-28",          // ngày cập nhật gần nhất
   "notes": ["Ghi chú: Thu 50k/1tháng", "..."],
+
+  "roster": [                        // phân loại đang / ngưng hoạt động
+    { "name": "Văn Khánh", "active": true },
+    { "name": "Kim Trinh", "active": false }
+  ],
 
   "expenses": [                      // các khoản CHI
     { "date": "2026-08-28", "amount": 200000, "desc": "Thuê sân 2 tiếng", "cat": "Tiền thuê sân" }
