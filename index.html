@@ -77,7 +77,8 @@ section.page.on{display:block}
 .g4{grid-template-columns:repeat(4,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g2{grid-template-columns:repeat(2,1fr)}
-@media(max-width:960px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
+.g-mo{grid-template-columns:1.35fr 1fr}
+@media(max-width:960px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2,.g-mo{grid-template-columns:1fr}}
 @media(max-width:560px){.g4{grid-template-columns:1fr}}
 
 /* stat tiles */
@@ -108,6 +109,7 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--surface-2)}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 td.name{color:var(--text);font-weight:550}
+#motbl td.name{white-space:nowrap}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:600;border:1px solid transparent}
 .p-thu{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent);border-color:color-mix(in srgb,var(--good) 30%,transparent)}
 .p-chi{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent);border-color:color-mix(in srgb,var(--crit) 30%,transparent)}
@@ -145,12 +147,28 @@ select.stsel{width:100%;font-family:inherit;font-size:12.5px;font-weight:600;pad
 select.stsel.s-ok{color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent);border-color:color-mix(in srgb,var(--good) 32%,transparent)}
 select.stsel.s-no{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent);border-color:color-mix(in srgb,var(--crit) 32%,transparent)}
 select.stsel option{background:var(--surface);color:var(--text);font-weight:500}
-input.amt{width:100%;font-family:inherit;font-size:13.5px;padding:5px 8px;border-radius:8px;text-align:right;
+.txgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:820px){.txgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.txgrid{grid-template-columns:1fr}}
+.txgrid label{display:block;font-size:12.5px;color:var(--text-2);font-weight:550}
+.txgrid input,.txgrid select{width:100%;margin-top:5px;font-family:inherit;font-size:14px;padding:9px 11px;
+  border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.pill.p-new{color:var(--s1);background:color-mix(in srgb,var(--s1) 14%,transparent);border-color:color-mix(in srgb,var(--s1) 32%,transparent)}
+.delbtn{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;padding:3px 7px;border-radius:6px}
+.delbtn:hover{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent)}
+#tx-exportbody pre{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow:auto;max-height:300px;
+  font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
+input.amt{width:100%;font-family:inherit;font-size:13.5px;padding:5px 6px;border-radius:8px;text-align:right;
   border:1px solid transparent;background:transparent;color:var(--text-3);font-variant-numeric:tabular-nums}
 input.amt.has{color:var(--text);font-weight:550}
 input.amt:hover{border-color:var(--border-strong)}
 input.amt:focus{border-color:transparent;background:var(--surface-2)}
 tr.edited td{background:color-mix(in srgb,var(--s1) 7%,transparent)}
+input.notein{width:100%;font-family:inherit;font-size:13px;padding:5px 8px;border-radius:8px;
+  border:1px solid transparent;background:transparent;color:var(--text-2)}
+input.notein::placeholder{color:var(--text-3);opacity:.6}
+input.notein:hover{border-color:var(--border-strong)}
+input.notein:focus{border-color:transparent;background:var(--surface-2);color:var(--text)}
 pre#mo-json{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow:auto;max-height:320px;
   font-size:12px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0;white-space:pre-wrap;word-break:break-word}
 tr.off td.name,tr.off td.num{opacity:.5}
@@ -253,6 +271,43 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
 
   <!-- ===== SỔ THU CHI ===== -->
   <section class="page" id="p-ledger">
+    <div class="card" style="margin-bottom:16px">
+      <div class="ch" style="display:flex;align-items:center;gap:12px;padding-bottom:0">
+        <div style="flex:1"><h3>Thêm giao dịch</h3><p>Nhập một khoản thu hoặc chi — hiện ngay trên biểu đồ và số dư</p></div>
+        <button class="mbtn" id="tx-toggle" aria-expanded="false">+ Nhập khoản mới</button>
+      </div>
+      <div class="cb" id="tx-form" style="display:none">
+        <div class="seg" id="tx-typeseg" style="margin-bottom:12px;max-width:320px">
+          <button data-t="chi" aria-pressed="true" style="flex:1">Khoản CHI</button>
+          <button data-t="thu" aria-pressed="false" style="flex:1">Khoản THU</button>
+        </div>
+        <div class="txgrid">
+          <label>Ngày<input type="date" id="tx-date"></label>
+          <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="tx-amt" placeholder="200.000"></label>
+          <label>Nội dung<input type="text" id="tx-desc" placeholder="Thuê sân 2 tiếng"></label>
+          <label>Danh mục<select id="tx-cat"></select></label>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px">
+          <button class="mbtn" id="tx-add">Thêm vào sổ</button>
+          <span class="muted" id="tx-msg"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" id="tx-savebar" style="display:none;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;min-width:220px">
+        <b id="tx-count"></b><br>
+        <span class="muted">Đang lưu trên máy bạn. Bấm "Lưu chung lên GitHub" để cả nhóm cùng thấy.</span>
+      </div>
+      <button class="mbtn" id="tx-export">Lưu chung lên GitHub</button>
+      <button class="mbtn ghost" id="tx-clear">Xoá hết khoản mới</button>
+    </div>
+    <div class="card" id="tx-exportbox" style="display:none;margin-bottom:16px">
+      <div class="ch"><h3>Dán vào <code>data.json</code> trên GitHub</h3>
+        <p>Mở <code>data.json</code> → bấm ✏️ → với mỗi khối dưới đây, bấm <b>Sao chép</b> rồi dán vào <b>cuối</b> danh sách tương ứng (nhớ thêm dấu phẩy <code>,</code> sau dấu <code>}</code> của dòng cuối cũ) → Commit changes.</p></div>
+      <div class="cb" id="tx-exportbody"></div>
+    </div>
+
     <div class="controls">
       <div class="seg" id="typeseg">
         <button data-t="all" aria-pressed="true">Tất cả</button>
@@ -274,6 +329,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
           <th data-sort="date" style="cursor:pointer">Ngày ⇅</th>
           <th>Loại</th><th>Nội dung</th><th>Danh mục</th>
           <th class="num" data-sort="amount" style="cursor:pointer">Số tiền ⇅</th>
+          <th style="width:44px"></th>
         </tr></thead>
         <tbody id="ledger"></tbody>
       </table>
@@ -339,14 +395,14 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
       <div class="card stat"><div class="lb">Chưa đóng</div><div class="vl" id="mo-k3" style="font-size:22px">—</div></div>
       <div class="card stat"><div class="lb">Chi trong tháng</div><div class="vl" id="mo-k4" style="font-size:22px">—</div></div>
     </div>
-    <div class="grid g2">
+    <div class="grid g-mo">
       <div class="card">
         <div class="ch"><h3>Danh sách đóng quỹ</h3><p id="mo-sub"></p></div>
         <div class="cb">
-          <div class="tblwrap"><table><thead><tr><th>#</th><th>Thành viên</th><th class="num" style="width:120px">Số tiền</th><th style="width:150px">Trạng thái</th><th>Ghi chú</th></tr></thead><tbody id="motbl"></tbody></table></div>
+          <div class="tblwrap"><table><thead><tr><th>#</th><th>Thành viên</th><th class="num" style="width:118px">Số tiền</th><th style="width:150px">Trạng thái</th><th style="min-width:150px">Ghi chú <span style="font-weight:400;color:var(--text-3)">(sửa được)</span></th></tr></thead><tbody id="motbl"></tbody></table></div>
           <div class="note mt-s" id="mo-savebar" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <div style="flex:1;min-width:200px">
-              <b>Đánh dấu đóng quỹ đang lưu trên máy bạn.</b><br>
+              <b>Đánh dấu đóng quỹ và ghi chú đang lưu trên máy bạn.</b><br>
               <span id="mo-savestate">Chưa thay đổi gì so với dữ liệu chung.</span>
             </div>
             <button class="mbtn" id="mo-export">Lưu chung lên GitHub</button>
@@ -414,7 +470,14 @@ $$('nav.tabs button').forEach(b=>b.onclick=()=>{
 
 /* ================= state ================= */
 let DATA=null, TX=[], MONTHS=[], MEMBERS=[], ACTIVE={}, BASE={}, PAID={};
-const LSKEY='clb-active-v1', LSPAID='clb-paid-v1';
+const LSKEY='clb-active-v1', LSPAID='clb-paid-v1', LSTX='clb-tx-v1', LSNOTE='clb-note-v1';
+let NOTES={};
+const effNote=(mo,x)=> (pkey(mo,x.name) in NOTES) ? NOTES[pkey(mo,x.name)] : (x.note||'');
+let EXTRA={incomes:[],expenses:[]};
+const allIncomes =()=>DATA.incomes.concat(EXTRA.incomes);
+const allExpenses=()=>DATA.expenses.concat(EXTRA.expenses);
+const CATS={chi:['Tiền thuê sân','Tiền cầu lông','Tiền nước','Tiền khác'],
+            thu:['Tiền quỹ công ty hàng tháng','Tiền quỹ thành viên hàng tháng']};
 const STD=50000;                              // mức đóng chuẩn 50k/tháng
 const pkey=(mo,name)=>mo+'|'+name;
 /* số tiền hiệu lực: ưu tiên chỉnh sửa tạm trên máy, không có thì lấy từ data.json */
@@ -430,10 +493,12 @@ function init(){
   $('#loading').style.display='none';
   $('#p-dash').classList.add('on');
 
-  TX=[...DATA.incomes.map(x=>({...x,type:'thu'})),...DATA.expenses.map(x=>({...x,type:'chi'}))];
+  try{ const e=JSON.parse(localStorage.getItem(LSTX)||'null'); if(e&&e.incomes&&e.expenses) EXTRA=e; }catch(e){}
+  rebuildTX();
   MONTHS=DATA.months;
 
   try{ PAID=JSON.parse(localStorage.getItem(LSPAID)||'{}')||{} }catch(e){ PAID={} }
+  try{ NOTES=JSON.parse(localStorage.getItem(LSNOTE)||'{}')||{} }catch(e){ NOTES={} }
   aggregateMembers();
 
   /* trạng thái hoạt động: data.json là dữ liệu chung, localStorage là chỉnh sửa tạm trên máy */
@@ -463,23 +528,24 @@ function aggregateMembers(){
 
 /* ================= dashboard ================= */
 function renderDash(){
-  const thu=DATA.incomes.reduce((s,x)=>s+x.amount,0);
-  const chi=DATA.expenses.reduce((s,x)=>s+x.amount,0);
+  const thu=allIncomes().reduce((s,x)=>s+x.amount,0);
+  const chi=allExpenses().reduce((s,x)=>s+x.amount,0);
   const bal=thu-chi;
   $('#k-bal').textContent=fmt(bal);
   $('#k-bal').classList.toggle('neg',bal<0);
   const first=TX.reduce((a,b)=>a.date<b.date?a:b).date;
-  $('#k-bal-ft').textContent='Cập nhật '+dLabel(DATA.updated);
+  $('#k-bal-ft').textContent='Cập nhật '+dLabel(TX.reduce((a,b)=>a.date>b.date?a:b).date);
   $('#k-thu').textContent=fmt(thu);
   $('#k-chi').textContent=fmt(chi);
   const nM=MONTHS.length;
-  $('#k-thu-ft').textContent=DATA.incomes.length+' khoản thu · TB '+fmt(thu/nM)+'/tháng';
-  $('#k-chi-ft').textContent=DATA.expenses.length+' khoản chi · TB '+fmt(chi/nM)+'/tháng';
+  $('#k-thu-ft').textContent=allIncomes().length+' khoản thu · TB '+fmt(thu/nM)+'/tháng';
+  $('#k-chi-ft').textContent=allExpenses().length+' khoản chi · TB '+fmt(chi/nM)+'/tháng';
   const lastM=MONTHS[MONTHS.length-1];
   $('#k-mem').textContent=lastM.members.length;
   $('#k-mem-ft').textContent=moLabel(lastM.month)+' · '+MEMBERS.length+' người từng tham gia';
-  $('#hdsub').textContent='Từ '+dLabel(first)+' đến '+dLabel(DATA.updated);
-  $('#fupd').textContent='Cập nhật lần cuối: '+dLabel(DATA.updated);
+  const lastD=TX.reduce((a,b)=>a.date>b.date?a:b).date;
+  $('#hdsub').textContent='Từ '+dLabel(first)+' đến '+dLabel(lastD);
+  $('#fupd').textContent='Cập nhật lần cuối: '+dLabel(lastD);
 
   const rec=[...TX].sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0,10);
   $('#recent').innerHTML=rec.map(t=>`<tr>
@@ -507,7 +573,7 @@ $$('#rangeseg button').forEach(b=>b.onclick=()=>{
 
 function renderCharts(){
   if(!DATA) return;
-  drawGrouped(); drawCat('#c-catchi',DATA.expenses); drawCat('#c-catthu',DATA.incomes); drawBalance();
+  drawGrouped(); drawCat('#c-catchi',allExpenses()); drawCat('#c-catthu',allIncomes()); drawBalance();
 }
 
 function svgEl(w,h){return `<svg class="chart" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img">`}
@@ -602,12 +668,15 @@ function drawBalance(){
 
 /* ================= ledger ================= */
 function buildFilters(){
+  const keepMo=$('#f-month').value, keepCat=$('#f-cat').value, keepPick=$('#mo-pick').value;
   const ms=[...new Set(TX.map(t=>t.date.slice(0,7)))].sort().reverse();
   $('#f-month').innerHTML='<option value="">Tất cả các tháng</option>'+ms.map(m=>`<option value="${m}">${moLabel(m)}</option>`).join('');
   const cs=[...new Set(TX.map(t=>t.cat))].sort();
   $('#f-cat').innerHTML='<option value="">Tất cả danh mục</option>'+cs.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
   $('#mo-pick').innerHTML=MONTHS.map(m=>`<option value="${m.month}">${moLabel(m.month)} — ${m.members.length} thành viên</option>`).join('');
-  $('#mo-pick').value=MONTHS[MONTHS.length-1].month;
+  if(ms.includes(keepMo)) $('#f-month').value=keepMo;
+  if(cs.includes(keepCat)) $('#f-cat').value=keepCat;
+  $('#mo-pick').value = MONTHS.some(m=>m.month===keepPick) ? keepPick : MONTHS[MONTHS.length-1].month;
 }
 let fType='all';
 $$('#typeseg button').forEach(b=>b.onclick=()=>{
@@ -638,12 +707,94 @@ function renderLedger(){
   $('#ledger').innerHTML=rows.length?rows.map(t=>`<tr>
     <td>${dLabel(t.date)}</td>
     <td><span class="pill ${t.type==='thu'?'p-thu':'p-chi'}">${t.type==='thu'?'Thu':'Chi'}</span></td>
-    <td class="name">${esc(t.desc)}</td>
+    <td class="name">${esc(t.desc)} ${t.isNew?'<span class="pill p-new">mới</span>':''}</td>
     <td><span style="display:inline-flex;align-items:center;gap:7px"><i class="dot" style="background:${catColor(t.cat)}"></i>${esc(t.cat)}</span></td>
     <td class="num" style="color:${t.type==='thu'?'var(--good)':'var(--crit)'}">${t.type==='thu'?'+':'−'}${fmt(t.amount)}</td>
-  </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;padding:28px" class="muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
+    <td>${t.isNew?`<button class="delbtn" data-id="${t.id}" title="Xoá khoản vừa thêm" aria-label="Xoá khoản ${esc(t.desc)}">×</button>`:''}</td>
+  </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:28px" class="muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
+  $$('#ledger .delbtn').forEach(b=>b.onclick=()=>delTx(b.dataset.id));
   $('#l-count').textContent=rows.length+' giao dịch';
+  renderTxBar();
 }
+
+/* ================= nhập giao dịch ================= */
+function rebuildTX(){
+  TX=[...allIncomes().map(x=>({...x,type:'thu'})),...allExpenses().map(x=>({...x,type:'chi'}))];
+}
+function saveTX(){ try{localStorage.setItem(LSTX,JSON.stringify(EXTRA))}catch(e){} }
+function refreshAll(){
+  rebuildTX(); saveTX(); buildFilters(); renderDash(); renderLedger(); renderMonths(); renderCharts();
+}
+function delTx(id){
+  EXTRA.incomes=EXTRA.incomes.filter(x=>x.id!==id);
+  EXTRA.expenses=EXTRA.expenses.filter(x=>x.id!==id);
+  refreshAll();
+}
+function renderTxBar(){
+  const n=EXTRA.incomes.length+EXTRA.expenses.length;
+  $('#tx-savebar').style.display = n? 'flex':'none';
+  if(n) $('#tx-count').textContent = `${n} khoản mới chưa lưu chung `
+    + `(${EXTRA.incomes.length} thu, ${EXTRA.expenses.length} chi)`;
+}
+
+let txType='chi';
+function fillTxCats(){ $('#tx-cat').innerHTML=CATS[txType].map(c=>`<option>${esc(c)}</option>`).join('') }
+$$('#tx-typeseg button').forEach(b=>b.onclick=()=>{
+  $$('#tx-typeseg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  txType=b.dataset.t; fillTxCats();
+});
+$('#tx-toggle').onclick=()=>{
+  const f=$('#tx-form'), open=f.style.display!=='none';
+  f.style.display=open?'none':'block';
+  $('#tx-toggle').setAttribute('aria-expanded',String(!open));
+  $('#tx-toggle').textContent=open?'+ Nhập khoản mới':'Đóng';
+  if(!open){ if(!$('#tx-date').value) $('#tx-date').value=new Date().toISOString().slice(0,10); $('#tx-desc').focus(); }
+};
+$('#tx-amt').oninput=()=>{
+  const v=String($('#tx-amt').value).replace(/[^0-9]/g,'');
+  $('#tx-amt').value = v? new Intl.NumberFormat('vi-VN').format(+v) : '';
+};
+$('#tx-add').onclick=()=>{
+  const d=$('#tx-date').value, a=+String($('#tx-amt').value).replace(/[^0-9]/g,''),
+        de=$('#tx-desc').value.trim(), c=$('#tx-cat').value;
+  const msg=$('#tx-msg');
+  if(!d||!a||!de){ msg.textContent='Vui lòng điền đủ ngày, số tiền và nội dung.'; msg.style.color='var(--crit)'; return; }
+  const rec={id:'n'+Date.now()+Math.random().toString(36).slice(2,6), date:d, amount:a, desc:de, cat:c, isNew:true};
+  (txType==='thu'?EXTRA.incomes:EXTRA.expenses).push(rec);
+  refreshAll();
+  msg.textContent=`Đã thêm: ${txType==='thu'?'thu':'chi'} ${fmt(a)} — ${de}`; msg.style.color='var(--good)';
+  $('#tx-amt').value=''; $('#tx-desc').value=''; $('#tx-desc').focus();
+};
+$('#tx-clear').onclick=()=>{
+  if(!confirm('Xoá toàn bộ khoản mới chưa lưu chung?')) return;
+  EXTRA={incomes:[],expenses:[]}; $('#tx-exportbox').style.display='none'; refreshAll();
+};
+function copyText(txt,btn){
+  const t=btn.textContent, done=()=>{btn.textContent='Đã sao chép ✓';setTimeout(()=>btn.textContent=t,1800)};
+  navigator.clipboard.writeText(txt).then(done).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');ta.remove();done();
+  });
+}
+$('#tx-export').onclick=()=>{
+  const fm=x=>`  { "date": ${JSON.stringify(x.date)}, "amount": ${x.amount}, "desc": ${JSON.stringify(x.desc)}, "cat": ${JSON.stringify(x.cat)} }`;
+  const blocks=[];
+  if(EXTRA.expenses.length) blocks.push(['Dán vào cuối danh sách <code>"expenses"</code> (khoản chi)', EXTRA.expenses.map(fm).join(',\n')]);
+  if(EXTRA.incomes.length)  blocks.push(['Dán vào cuối danh sách <code>"incomes"</code> (khoản thu)',  EXTRA.incomes.map(fm).join(',\n')]);
+  blocks.push(['Sửa dòng <code>"updated"</code> ở đầu file thành', ' "updated": '+JSON.stringify(TX.reduce((a,b)=>a.date>b.date?a:b).date)+',']);
+  $('#tx-exportbody').innerHTML=blocks.map((b,i)=>`
+    <div style="${i?'margin-top:18px':''}">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:7px">
+        <span style="flex:1;font-size:13px;color:var(--text-2)">${b[0]}</span>
+        <button class="mbtn ghost" data-i="${i}">Sao chép</button>
+      </div>
+      <pre id="tx-json${i}">${esc(b[1])}</pre>
+    </div>`).join('');
+  $$('#tx-exportbody button').forEach(btn=>btn.onclick=()=>copyText(blocks[+btn.dataset.i][1],btn));
+  $('#tx-exportbox').style.display='block';
+  $('#tx-exportbox').scrollIntoView({behavior:'smooth',block:'nearest'});
+};
+fillTxCats();
 
 /* ================= members ================= */
 let mState='all';
@@ -736,6 +887,13 @@ $('#m-reset').onclick=()=>{
 $('#mo-pick').onchange=()=>{ $('#mo-exportbox').style.display='none'; renderMonths(); };
 
 function savePaid(){ try{localStorage.setItem(LSPAID,JSON.stringify(PAID))}catch(e){} }
+function saveNotes(){ try{localStorage.setItem(LSNOTE,JSON.stringify(NOTES))}catch(e){} }
+function setNote(mo,name,val){
+  const src=MONTHS.find(m=>m.month===mo).members.find(x=>x.name===name);
+  const k=pkey(mo,name);
+  if(val===(src.note||'')) delete NOTES[k]; else NOTES[k]=val;
+  saveNotes(); renderMonths();
+}
 
 /* số tiền gợi ý khi đánh dấu "Đã đóng": mức người đó vẫn đóng, không có thì lấy 50k */
 function usualAmount(name, uptoMonth){
@@ -761,19 +919,20 @@ function setPaid(mo,name,val){
 
 function changedInMonth(mo){
   const m=MONTHS.find(x=>x.month===mo);
-  return m.members.filter(x=>pkey(mo,x.name) in PAID).map(x=>x.name);
+  return m.members.filter(x=>(pkey(mo,x.name) in PAID)||(pkey(mo,x.name) in NOTES)).map(x=>x.name);
 }
 function monthsWithChanges(){
-  return [...new Set(Object.keys(PAID).map(k=>k.split('|')[0]))].sort();
+  return [...new Set([...Object.keys(PAID),...Object.keys(NOTES)].map(k=>k.split('|')[0]))].sort();
 }
 
 function renderMonths(){
   const key=$('#mo-pick').value||MONTHS[MONTHS.length-1].month;
   const m=MONTHS.find(x=>x.month===key);
-  const rows=m.members.map(x=>({...x, val:effPaid(key,x), edited:pkey(key,x.name) in PAID}));
+  const rows=m.members.map(x=>({...x, val:effPaid(key,x), nt:effNote(key,x),
+    edited:(pkey(key,x.name) in PAID)||(pkey(key,x.name) in NOTES)}));
   const paid=rows.filter(x=>x.val>0), unpaid=rows.filter(x=>x.val<=0);
   const total=rows.reduce((s,x)=>s+x.val,0);
-  const chi=DATA.expenses.filter(e=>e.date.startsWith(key));
+  const chi=allExpenses().filter(e=>e.date.startsWith(key));
   const chiT=chi.reduce((s,x)=>s+x.amount,0);
 
   $('#mo-k1').textContent=fmt(total);
@@ -796,11 +955,16 @@ function renderMonths(){
             <option value="1" ${on?'selected':''}>Đã đóng</option>
             <option value="0" ${on?'':'selected'}>Chưa đóng</option>
           </select></td>
-      <td class="muted">${esc(x.note)}</td></tr>`}).join('');
+      <td><input type="text" class="notein" value="${esc(x.nt)}" placeholder="Thêm ghi chú…"
+           data-n="${esc(x.name)}" aria-label="Ghi chú cho ${esc(x.name)}"></td></tr>`}).join('');
 
   $$('#motbl .stsel').forEach(sel=>sel.onchange=()=>{
     const n=sel.dataset.n;
     setPaid(key,n, sel.value==='1' ? usualAmount(n,key) : 0);
+  });
+  $$('#motbl .notein').forEach(inp=>{
+    inp.onchange=()=>setNote(key,inp.dataset.n,inp.value.trim());
+    inp.onkeydown=e=>{ if(e.key==='Enter') inp.blur() };
   });
   $$('#motbl .amt').forEach(inp=>{
     inp.onfocus=()=>{ inp.value = +inp.dataset.raw>0 ? inp.dataset.raw : ''; inp.select(); };
@@ -833,7 +997,7 @@ $('#mo-export').onclick=()=>{
   const key=$('#mo-pick').value, m=MONTHS.find(x=>x.month===key);
   const mem=m.members.map(x=>{
     const v=effPaid(key,x);
-    return `     { "name": ${JSON.stringify(x.name)}, "paid": ${v}, "note": ${JSON.stringify(x.note||'')} }`;
+    return `     { "name": ${JSON.stringify(x.name)}, "paid": ${v}, "note": ${JSON.stringify(effNote(key,x))} }`;
   });
   const tot=m.members.reduce((s,x)=>s+effPaid(key,x),0);
   const blk=`  {\n   "month": ${JSON.stringify(key)},\n   "label": ${JSON.stringify(moLabel(key))},\n   "total": ${tot},\n   "members": [\n${mem.join(',\n')}\n   ]\n  }`;
@@ -850,7 +1014,8 @@ $('#mo-export').onclick=()=>{
 $('#mo-reset').onclick=()=>{
   const key=$('#mo-pick').value;
   Object.keys(PAID).forEach(k=>{ if(k.split('|')[0]===key) delete PAID[k] });
-  savePaid(); aggregateMembers(); $('#mo-exportbox').style.display='none';
+  Object.keys(NOTES).forEach(k=>{ if(k.split('|')[0]===key) delete NOTES[k] });
+  savePaid(); saveNotes(); aggregateMembers(); $('#mo-exportbox').style.display='none';
   renderMonths(); renderMembers();
 };
 </script>

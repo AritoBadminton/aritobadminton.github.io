@@ -9,16 +9,16 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | Tab | Nội dung |
 |---|---|
 | **Tổng quan** | Số dư quỹ, tổng thu, tổng chi, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
-| **Sổ thu chi** | Toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp |
+| **Sổ thu chi** | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp |
 | **Thành viên** | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động** |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng cho từng người**, sửa được số tiền, + các khoản chi của tháng đó |
 
 ## Cấu trúc file
 
 ```
-index.html   # toàn bộ giao diện (không cần cài đặt gì)
-data.json    # TOÀN BỘ DỮ LIỆU — chỉ cần sửa file này
-nhap-lieu.html # công cụ tạo nhanh 1 dòng JSON để dán vào data.json
+index.html     # toàn bộ giao diện + form nhập liệu (không cần cài đặt gì)
+data.json      # TOÀN BỘ DỮ LIỆU — chỉ cần sửa file này
+nhap-lieu.html # trang nhập liệu cũ, vẫn dùng được nhưng form trong index.html tiện hơn
 ```
 
 ## Phân loại thành viên đang / ngưng hoạt động
@@ -41,21 +41,28 @@ Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng:
 - Cột **Trạng thái** là dropdown — chọn **Đã đóng** hoặc **Chưa đóng** cho từng người
 - Chọn "Đã đóng" sẽ tự điền **đúng mức người đó vẫn đóng** (Chị Lu 100k, Ngọc Em 80k…), không cào bằng 50k
 - Số tiền khác thường thì bấm thẳng vào ô **Số tiền** gõ lại
+- Cột **Ghi chú** sửa được: bấm vào ô, gõ nội dung (ví dụ "đã chuyển khoản 29/8", "+1 buổi vãng lai"), Enter là xong
 - 4 ô thống kê phía trên (Thu được, Đã đóng x/y, Chưa đóng) và cả tab Thành viên tự cập nhật theo
 
-Đánh dấu lưu ngay trên trình duyệt của bạn. Muốn cả nhóm cùng thấy, bấm **Lưu chung lên GitHub** —
+Đánh dấu và ghi chú lưu ngay trên trình duyệt của bạn. Muốn cả nhóm cùng thấy, bấm **Lưu chung lên GitHub** —
 nó sao chép sẵn khối tháng đó để bạn dán đè vào `data.json`. Sửa nhiều tháng thì chọn từng tháng
 rồi lưu từng khối. Nút **Đặt lại tháng này** huỷ mọi đánh dấu chưa lưu của tháng đang xem.
 
-## Cách cập nhật dữ liệu
+## Nhập khoản thu / chi mới
 
-Mọi số liệu nằm trong `data.json`. Cách nhanh nhất:
+Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:
 
-1. Mở `nhap-lieu.html` (hoặc trang `.../nhap-lieu.html`), điền thông tin khoản thu/chi.
-2. Bấm **Sao chép JSON**.
-3. Vào GitHub → mở `data.json` → bấm biểu tượng bút chì ✏️ (Edit).
-4. Dán dòng vừa copy vào **cuối danh sách** `"expenses"` (khoản chi) hoặc `"incomes"` (khoản thu), nhớ thêm dấu phẩy `,` ở dòng trước.
-5. Bấm **Commit changes**. Sau ~1 phút trang web tự cập nhật.
+1. Chọn **Khoản CHI** hoặc **Khoản THU**
+2. Điền ngày, số tiền, nội dung, chọn danh mục
+3. Bấm **Thêm vào sổ**
+
+Khoản mới hiện ngay trong sổ (có nhãn **mới**) và cộng luôn vào số dư, biểu đồ, thống kê tháng.
+Bấm dấu **×** cuối dòng nếu nhập nhầm.
+
+Lúc này khoản mới chỉ nằm trên máy bạn. Để cả nhóm cùng thấy, bấm **Lưu chung lên GitHub**:
+trang sẽ hiện sẵn các khối JSON kèm nút **Sao chép** cho từng khối. Mở `data.json` trên GitHub,
+bấm ✏️, dán từng khối vào cuối danh sách tương ứng (nhớ thêm dấu phẩy `,` sau dấu `}` của dòng cuối cũ),
+sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web tự cập nhật.
 
 ### Định dạng data.json
 
