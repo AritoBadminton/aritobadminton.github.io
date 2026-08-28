@@ -137,6 +137,39 @@ h2.sec{font-size:15px;font-weight:640;margin:0 0 12px;letter-spacing:-.01em}
 .note b{color:var(--text)}
 .bar-mini{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;min-width:70px}
 .bar-mini i{display:block;height:100%;border-radius:3px;background:var(--s1)}
+/* ---- khối quy định ---- */
+.rules{
+  position:relative;border-radius:var(--r);overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--s1) 30%,var(--border));
+  background:
+    radial-gradient(120% 140% at 100% 0%, color-mix(in srgb,var(--s1) 13%,transparent) 0%, transparent 62%),
+    var(--surface);
+  box-shadow:var(--shadow);
+}
+.rules::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--s1)}
+.rules-in{padding:20px 22px 20px 26px}
+.rules-hd{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.rules-ic{width:32px;height:32px;border-radius:9px;flex:none;display:grid;place-items:center;
+  background:var(--s1);color:#fff}
+.rules-ic svg{width:18px;height:18px}
+.rules h2{margin:0;font-size:15.5px;font-weight:700;letter-spacing:.01em;text-transform:uppercase;color:var(--text)}
+.rules-sub{margin:1px 0 0;font-size:12.5px;color:var(--text-3);text-transform:none;letter-spacing:0;font-weight:400}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.rule{
+  display:flex;align-items:baseline;gap:12px;padding:14px 16px;border-radius:11px;
+  background:var(--surface-2);border:1px solid var(--border);
+}
+.rule-amt{font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--s1);
+  font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.1}
+.rule-txt{min-width:0}
+.rule-who{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.35}
+.rule-unit{font-size:12.5px;color:var(--text-3);margin-top:1px}
+.rules-ft{display:flex;align-items:flex-start;gap:10px;margin-top:15px;padding-top:14px;
+  border-top:1px dashed var(--border-strong);font-size:13.5px;color:var(--text-2)}
+.rules-ft svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--s1)}
+.rules-ft b{color:var(--text)}
+@media(max-width:560px){.rules-in{padding:17px 16px 17px 20px}.rule-amt{font-size:19px}}
+
 .mbtn{background:var(--s1);color:#fff;border:none;border-radius:9px;padding:9px 16px;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
 .mbtn:hover{filter:brightness(1.08)}
 .mbtn.ghost{background:var(--surface);color:var(--text-2);border:1px solid var(--border-strong)}
@@ -228,6 +261,8 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
       </div>
     </div>
 
+    <section class="rules mt" id="rules" aria-labelledby="rules-h"></section>
+
     <div class="card mt">
       <div class="ch"><h3>Thu và chi theo tháng</h3><p>Đơn vị: nghìn đồng. Di chuột vào cột để xem chi tiết.</p></div>
       <div class="cb">
@@ -266,7 +301,6 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
       <div class="cb"><div class="tblwrap"><table><thead><tr><th>Ngày</th><th>Loại</th><th>Nội dung</th><th>Danh mục</th><th class="num">Số tiền</th></tr></thead><tbody id="recent"></tbody></table></div></div>
     </div>
 
-    <div class="note mt-s" id="notes"></div>
   </section>
 
   <!-- ===== SỔ THU CHI ===== -->
@@ -554,7 +588,7 @@ function renderDash(){
     <td class="name">${esc(t.desc)}</td><td>${esc(t.cat)}</td>
     <td class="num" style="color:${t.type==='thu'?'var(--good)':'var(--crit)'}">${t.type==='thu'?'+':'−'}${fmt(t.amount)}</td></tr>`).join('');
 
-  $('#notes').innerHTML='<b>Quy định quỹ:</b><br>'+DATA.notes.map(esc).join('<br>');
+  renderRules();
 }
 
 /* monthly aggregation */
@@ -715,6 +749,31 @@ function renderLedger(){
   $$('#ledger .delbtn').forEach(b=>b.onclick=()=>delTx(b.dataset.id));
   $('#l-count').textContent=rows.length+' giao dịch';
   renderTxBar();
+}
+
+/* ================= khối quy định ================= */
+function renderRules(){
+  const r=DATA.rules;
+  const items = r && r.items && r.items.length ? r.items : null;
+  const ic=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>`;
+  const chat=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4 9.9 9.9 0 01-4.2-.9L3 20.5l1.5-4.4A8.4 8.4 0 1121 11.5z"/></svg>`;
+  const body = items
+    ? `<div class="rules-grid">${items.map(x=>`
+        <div class="rule">
+          <span class="rule-amt">${esc(x.amount)}</span>
+          <span class="rule-txt"><span class="rule-who">${esc(x.who)}</span><br><span class="rule-unit">${esc(x.unit)}</span></span>
+        </div>`).join('')}</div>`
+    : `<div class="rules-grid">${(DATA.notes||[]).map(n=>
+        `<div class="rule"><span class="rule-txt"><span class="rule-who">${esc(String(n).replace(/^(Ghi chú|Note)\s*:\s*/i,''))}</span></span></div>`).join('')}</div>`;
+  const ft = r && r.footer
+    ? `<div class="rules-ft">${chat}<div><b>Lưu ý:</b> ${esc(r.footer)}</div></div>` : '';
+  $('#rules').innerHTML=`<div class="rules-in">
+    <div class="rules-hd">
+      <span class="rules-ic">${ic}</span>
+      <div><h2 id="rules-h">${esc((r&&r.title)||'Quy định đóng quỹ')}</h2>
+      <p class="rules-sub">${esc((r&&r.subtitle)||'Mức đóng áp dụng cho câu lạc bộ')}</p></div>
+    </div>
+    ${body}${ft}</div>`;
 }
 
 /* ================= nhập giao dịch ================= */

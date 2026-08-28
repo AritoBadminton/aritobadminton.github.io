@@ -8,7 +8,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 
 | Tab | Nội dung |
 |---|---|
-| **Tổng quan** | Số dư quỹ, tổng thu, tổng chi, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
+| **Tổng quan** | Số dư quỹ, tổng thu, tổng chi, **khối Quy định đóng quỹ nổi bật**, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
 | **Sổ thu chi** | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp |
 | **Thành viên** | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động** |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng cho từng người**, sửa được số tiền, + các khoản chi của tháng đó |
@@ -48,6 +48,12 @@ Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng:
 nó sao chép sẵn khối tháng đó để bạn dán đè vào `data.json`. Sửa nhiều tháng thì chọn từng tháng
 rồi lưu từng khối. Nút **Đặt lại tháng này** huỷ mọi đánh dấu chưa lưu của tháng đang xem.
 
+## Sửa khối Quy định đóng quỹ
+
+Khối này nằm ngay đầu tab **Tổng quan**. Sửa mục `"rules"` trong `data.json`:
+thêm / bớt phần tử trong `items` (mỗi ô là một mức đóng), đổi `title`, `subtitle`, `footer` tuỳ ý.
+Nếu xoá hẳn `"rules"`, trang sẽ tự quay về hiển thị các dòng trong `"notes"`.
+
 ## Nhập khoản thu / chi mới
 
 Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:
@@ -70,7 +76,18 @@ sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web 
 {
   "club": "CLB Cầu Lông Arito",
   "updated": "2026-08-28",          // ngày cập nhật gần nhất
-  "notes": ["Ghi chú: Thu 50k/1tháng", "..."],
+  "notes": ["Ghi chú: Thu 50k/1tháng", "..."],   // giữ lại làm dự phòng
+
+  "rules": {                         // khối Quy định hiển thị ở đầu tab Tổng quan
+    "title": "Quy định đóng quỹ",
+    "subtitle": "Mức đóng áp dụng cho câu lạc bộ",
+    "items": [
+      { "amount": "50.000đ",  "who": "Thành viên công ty",  "unit": "mỗi tháng" },
+      { "amount": "30.000đ",  "who": "Khách ngoài công ty", "unit": "mỗi buổi chơi" },
+      { "amount": "100.000đ", "who": "Khách ngoài công ty", "unit": "trọn tháng" }
+    ],
+    "footer": "Chuyển khoản xong nhắn Zalo cho thủ quỹ để được ghi nhận."
+  },
 
   "roster": [                        // phân loại đang / ngưng hoạt động
     { "name": "Văn Khánh", "active": true },

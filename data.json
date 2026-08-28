@@ -6,6 +6,28 @@
   "Không phải thành viên công ty: 30k/1 buổi.100k/1 tháng",
   "Note: Chuyển xong nhắn zalo cho em ạ"
  ],
+ "rules": {
+  "title": "Quy định đóng quỹ",
+  "subtitle": "Mức đóng áp dụng cho câu lạc bộ",
+  "items": [
+   {
+    "amount": "50.000đ",
+    "unit": "mỗi tháng",
+    "who": "Thành viên công ty"
+   },
+   {
+    "amount": "30.000đ",
+    "unit": "mỗi buổi chơi",
+    "who": "Khách ngoài công ty"
+   },
+   {
+    "amount": "100.000đ",
+    "unit": "trọn tháng",
+    "who": "Khách ngoài công ty"
+   }
+  ],
+  "footer": "Chuyển khoản xong nhắn Zalo cho thủ quỹ để được ghi nhận."
+ },
  "roster": [
   {
    "name": "Anh Mạnh",
