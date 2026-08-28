@@ -48,6 +48,31 @@ Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng:
 nó sao chép sẵn khối tháng đó để bạn dán đè vào `data.json`. Sửa nhiều tháng thì chọn từng tháng
 rồi lưu từng khối. Nút **Đặt lại tháng này** huỷ mọi đánh dấu chưa lưu của tháng đang xem.
 
+## Đăng nhập quản trị
+
+Bấm nút **Đăng nhập** ở góc phải trên cùng.
+
+| | |
+|---|---|
+| Tài khoản | `Admin` (không phân biệt hoa thường) |
+| Mật khẩu | `Badminton2808` |
+
+- **Chưa đăng nhập** → chỉ xem: mọi ô nhập, dropdown, nút xoá và thanh "Lưu chung lên GitHub" đều bị khoá, có banner vàng nhắc ở đầu trang.
+- **Đã đăng nhập** → nhập liệu và chỉnh sửa bình thường. Nút góc phải chuyển thành **✓ Admin**, bấm lại để đăng xuất.
+- Tick "Ghi nhớ trên máy này" để không phải đăng nhập lại; bỏ tick thì chỉ giữ trong phiên làm việc.
+
+> ⚠️ **Đây không phải bảo mật thật.** Trang chạy trên GitHub Pages, không có máy chủ,
+> nên việc kiểm tra mật khẩu chạy bằng JavaScript ngay trong trình duyệt và repo lại
+> để public — người rành kỹ thuật xem mã nguồn vẫn vượt qua được. Mục đích của nó là
+> **chống bấm nhầm**, không phải chống người cố tình.
+>
+> Dữ liệu chung vẫn an toàn: mọi chỉnh sửa trên web chỉ lưu trong máy người đó, muốn
+> đổi số liệu chung thì phải commit vào `data.json` — việc này cần quyền ghi vào repo GitHub.
+>
+> **Đừng dùng lại mật khẩu này cho email, ngân hàng hay bất kỳ tài khoản nào khác.**
+> Muốn đổi mật khẩu: tính SHA-256 của mật khẩu mới (ví dụ trên trang emn178.github.io/online-tools/sha256.html)
+> rồi thay giá trị `hash` trong biến `AUTH` ở `index.html`.
+
 ## Sửa khối Quy định đóng quỹ
 
 Khối này nằm ngay đầu tab **Tổng quan**. Sửa mục `"rules"` trong `data.json`:
