@@ -1,0 +1,3177 @@
+{
+ "club": "CLB Cầu Lông Arito",
+ "updated": "2026-08-28",
+ "notes": [
+  "Ghi chú: Thu 50k/1tháng",
+  "Không phải thành viên công ty: 30k/1 buổi.100k/1 tháng",
+  "Note: Chuyển xong nhắn zalo cho em ạ"
+ ],
+ "expenses": [
+  {
+   "date": "2024-12-01",
+   "amount": 720000.0,
+   "desc": "Một tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2024-12-06",
+   "amount": 54000.0,
+   "desc": "Hai quả cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2024-12-06",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2024-12-13",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2024-12-13",
+   "amount": 285000.0,
+   "desc": "Một ống cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2024-12-20",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2024-12-27",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2024-12-27",
+   "amount": 27000.0,
+   "desc": "Một quả cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-01-03",
+   "amount": 198000.0,
+   "desc": "Hai tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-01-03",
+   "amount": 25000.0,
+   "desc": "Một bình trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-01-10",
+   "amount": 20000.0,
+   "desc": "Hai ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-01-10",
+   "amount": 180000.0,
+   "desc": "Hai tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-02-04",
+   "amount": 680000.0,
+   "desc": "Một tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-02-07",
+   "amount": 285000.0,
+   "desc": "Một ống cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-02-07",
+   "amount": 20000.0,
+   "desc": "Hai ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-02-07",
+   "amount": 132000.0,
+   "desc": "Chai xịt căng cơ",
+   "cat": "Tiền khác"
+  },
+  {
+   "date": "2025-02-14",
+   "amount": 25000.0,
+   "desc": "Một bình trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-02-21",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-02-28",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-03-06",
+   "amount": 720000.0,
+   "desc": "Một tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-03-07",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-03-07",
+   "amount": 27000.0,
+   "desc": "Một quả cầu",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-03-14",
+   "amount": 37000.0,
+   "desc": "Revive + trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-03-21",
+   "amount": 270000.0,
+   "desc": "Một ống cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-03-21",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-03-28",
+   "amount": 10000.0,
+   "desc": "Một ca trà đá",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-04-01",
+   "amount": 720000.0,
+   "desc": "Một tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-04-04",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-04-11",
+   "amount": 10000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-04-18",
+   "amount": 270000.0,
+   "desc": "Cầu",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-04-18",
+   "amount": 34000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-04-25",
+   "amount": 30000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-05-02",
+   "amount": 50000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-05-09",
+   "amount": 280000.0,
+   "desc": "Cầu",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-05-09",
+   "amount": 103000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-05-09",
+   "amount": 900000.0,
+   "desc": "Một tháng(5 buổi)",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-05-16",
+   "amount": 30000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-05-16",
+   "amount": 180000.0,
+   "desc": "Thuê thêm 1 sân",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-05-21",
+   "amount": 320000.0,
+   "desc": "Một ống cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-05-23",
+   "amount": 180000.0,
+   "desc": "Thuê thêm 1 sân",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-05-23",
+   "amount": 30000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-05-30",
+   "amount": 180000.0,
+   "desc": "Thuê thêm 1 sân",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-05-30",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-06",
+   "amount": 180000.0,
+   "desc": "Thuê thêm 1 sân",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-06-06",
+   "amount": 720000.0,
+   "desc": "Một tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-06-06",
+   "amount": 50000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-09",
+   "amount": 290000.0,
+   "desc": "Một ống cầu lông",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-06-11",
+   "amount": 30000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-20",
+   "amount": 270000.0,
+   "desc": "1 sân 2h, 1 sân 1h",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-06-20",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-20",
+   "amount": 72000.0,
+   "desc": "Revive kèo Ngọc Anh + Đình Phúc - Đoàn Hoàng + Quốc Nghĩa",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-27",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-06-27",
+   "amount": 180000.0,
+   "desc": "Thuê thêm 1 sân",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-07-01",
+   "amount": 540000.0,
+   "desc": "Thuê sân 3 buổi",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-07-04",
+   "amount": 270000.0,
+   "desc": "Một ống cầu bamboo",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-07-04",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-07-04",
+   "amount": 270000.0,
+   "desc": "Thuê sân 3 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-07-11",
+   "amount": 360000.0,
+   "desc": "Thuê sân 4 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-07-11",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-07-26",
+   "amount": 360000.0,
+   "desc": "Thuê sân 4 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-07-26",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-07-26",
+   "amount": 300000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-07-28",
+   "amount": 305000.0,
+   "desc": "Ống cầu Vina Star",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-08-08",
+   "amount": 360000.0,
+   "desc": "Thuê sân 4 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-08-08",
+   "amount": 80000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-08-15",
+   "amount": 400000.0,
+   "desc": "Thuê sân 4 tiếng",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-08-15",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-08-22",
+   "amount": 300000.0,
+   "desc": "Thuê sân 6 tiếng (50%)",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-08-22",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-08-29",
+   "amount": 200000.0,
+   "desc": "Thuê sân 4 tiếng (50%)",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-08-29",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-09-03",
+   "amount": 1600000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-09-05",
+   "amount": 280000.0,
+   "desc": "Ống cầu Kiên Long",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-09-05",
+   "amount": 44000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-09-12",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-09-12",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-09-19",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-09-19",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-09-26",
+   "amount": 93000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-10-01",
+   "amount": 2000000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-10-03",
+   "amount": 168000.0,
+   "desc": "6 quả cầu",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-10-03",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-10-09",
+   "amount": 290000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-10-10",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-10-17",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-10-17",
+   "amount": 100000.0,
+   "desc": "5 quả cầu",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-10-24",
+   "amount": 305000.0,
+   "desc": "Ống cầu Vina Star",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-10-24",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-10-31",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-11-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-11-07",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-11-07",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-11-14",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-11-14",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-11-14",
+   "amount": 260000.0,
+   "desc": "Ống cầu TARO",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-11-28",
+   "amount": 290000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-11-28",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-12-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-12-05",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-12-05",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-12-12",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-12-12",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-12-19",
+   "amount": 300000.0,
+   "desc": "Ống cầu TARO",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2025-12-19",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2025-12-26",
+   "amount": 100000.0,
+   "desc": "Thuê sân 1 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2025-12-26",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-01-02",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-01-02",
+   "amount": 72000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-01-02",
+   "amount": 1000000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-01-09",
+   "amount": 280000.0,
+   "desc": "Ống cầu VNB",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-01-16",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-01-23",
+   "amount": 300000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-01-23",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-01-30",
+   "amount": 40000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-01-30",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-02-01",
+   "amount": 400000.0,
+   "desc": "Chi tiền giải hội thao",
+   "cat": "Tiền khác"
+  },
+  {
+   "date": "2026-02-27",
+   "amount": 400000.0,
+   "desc": "Thuê sân 4 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-02-27",
+   "amount": 108000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-03-06",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-03-06",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-03-13",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-03-20",
+   "amount": 64000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-03-20",
+   "amount": 320000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-03-27",
+   "amount": 320000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-03-27",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-04-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-04-03",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-04-03",
+   "amount": 84000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-04-10",
+   "amount": 20000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-04-17",
+   "amount": 300000.0,
+   "desc": "Ống cầu Kiên Long",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-04-17",
+   "amount": 84000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-05-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-05-08",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-05-08",
+   "amount": 64000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-05-15",
+   "amount": 30000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-05-22",
+   "amount": 340000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-05-29",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-05-29",
+   "amount": 110000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-06-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-06-05",
+   "amount": 340000.0,
+   "desc": "Ống cầu 88",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-06-05",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-06-12",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-06-18",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-06-19",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-06-26",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-06-30",
+   "amount": 945000.0,
+   "desc": "3 ống cầu Li-Ning",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-07-01",
+   "amount": 1000000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-07-03",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-07-10",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-07-10",
+   "amount": 120000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-07-17",
+   "amount": 125000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-07-17",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-07-31",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-08-01",
+   "amount": 800000.0,
+   "desc": "Thuê sân 1 tháng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-08-01",
+   "amount": 315000.0,
+   "desc": "1 ống cầu Li-Ning",
+   "cat": "Tiền cầu lông"
+  },
+  {
+   "date": "2026-08-07",
+   "amount": 45000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-08-14",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  },
+  {
+   "date": "2026-08-14",
+   "amount": 85000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-08-21",
+   "amount": 60000.0,
+   "desc": "Nước",
+   "cat": "Tiền nước"
+  },
+  {
+   "date": "2026-08-28",
+   "amount": 200000.0,
+   "desc": "Thuê sân 2 tiếng",
+   "cat": "Tiền thuê sân"
+  }
+ ],
+ "incomes": [
+  {
+   "date": "2024-11-30",
+   "amount": 200000.0,
+   "desc": "Tiền quỹ tháng 11 còn lại",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2024-12-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2024-12-02",
+   "amount": 240000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-01-02",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-01-02",
+   "amount": 240000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-02-08",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-02-10",
+   "amount": 240000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-03-06",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-03-11",
+   "amount": 240000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-04-15",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-04-15",
+   "amount": 270000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-05-05",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-05-05",
+   "amount": 540000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-05-09",
+   "amount": 100000.0,
+   "desc": "Anh Quốc Nghĩa tài trợ",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-06-03",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-06-03",
+   "amount": 710000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-06-20",
+   "amount": 72000.0,
+   "desc": "Tiền Đoàn Hoàng chung kèo",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-07-03",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-07-03",
+   "amount": 1090000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-08-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-08-01",
+   "amount": 1250000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-09-03",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-09-03",
+   "amount": 1310000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-10-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-10-01",
+   "amount": 1380000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-11-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-11-01",
+   "amount": 1430000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2025-12-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2025-12-01",
+   "amount": 1140000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-01-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-01-01",
+   "amount": 930000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-02-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-02-01",
+   "amount": 0.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-03-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-03-01",
+   "amount": 800000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-04-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-04-01",
+   "amount": 650000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-05-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-05-01",
+   "amount": 600000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-06-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-06-01",
+   "amount": 600000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-07-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-07-01",
+   "amount": 980000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  },
+  {
+   "date": "2026-08-01",
+   "amount": 1000000.0,
+   "desc": "Tiền quỹ công ty cấp",
+   "cat": "Tiền quỹ công ty hàng tháng"
+  },
+  {
+   "date": "2026-08-01",
+   "amount": 480000.0,
+   "desc": "Tiền quỹ thu thành viên",
+   "cat": "Tiền quỹ thành viên hàng tháng"
+  }
+ ],
+ "months": [
+  {
+   "month": "2024-12",
+   "label": "Tháng 12/2024",
+   "total": 240000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 240000.0
+  },
+  {
+   "month": "2025-01",
+   "label": "Tháng 01/2025",
+   "total": 240000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 240000.0
+  },
+  {
+   "month": "2025-02",
+   "label": "Tháng 02/2025",
+   "total": 240000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 240000.0
+  },
+  {
+   "month": "2025-03",
+   "label": "Tháng 03/2025",
+   "total": 240000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 240000.0
+  },
+  {
+   "month": "2025-04",
+   "label": "Tháng 04/2025",
+   "total": 270000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 270000.0
+  },
+  {
+   "month": "2025-05",
+   "label": "Tháng 05/2025",
+   "total": 540000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Vũ Duy",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Phi Hoàng",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Huỳnh Châu",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Hoàng Mỹ",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 540000.0
+  },
+  {
+   "month": "2025-06",
+   "label": "Tháng 06/2025",
+   "total": 710000.0,
+   "members": [
+    {
+     "name": "Văn Khánh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Vũ Duy",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Phi Hoàng",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Huỳnh Châu",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Hoàng Mỹ",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Trường",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 710000.0
+  },
+  {
+   "month": "2025-07",
+   "label": "Tháng 07/2025",
+   "total": 1040000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Phi Hoàng",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hoàng Mỹ",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Huỳnh Châu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Trường",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nhóm bạn Lại Phước",
+     "paid": 60000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1090000.0
+  },
+  {
+   "month": "2025-08",
+   "label": "Tháng 08/2025",
+   "total": 1250000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Phi Hoàng",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hoàng Mỹ",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Trường",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Khoa",
+     "paid": 80000.0,
+     "note": "+ 1 buổi"
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 60000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1250000.0
+  },
+  {
+   "month": "2025-09",
+   "label": "Tháng 09/2025",
+   "total": 1310000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Khoa",
+     "paid": 150000.0,
+     "note": "+ vợ"
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Tín",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Mạnh",
+     "paid": 90000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 90000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1310000.0
+  },
+  {
+   "month": "2025-10",
+   "label": "Tháng 10/2025",
+   "total": 1380000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Khoa",
+     "paid": 150000.0,
+     "note": "+ Vợ"
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Ngọc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Vũ",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Tín",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Chỉ",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Mạnh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 120000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 60000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Trường",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1380000.0
+  },
+  {
+   "month": "2025-11",
+   "label": "Tháng 11/2025",
+   "total": 1430000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Thư",
+     "paid": 80000.0,
+     "note": "1 lượt phạt"
+    },
+    {
+     "name": "Minh Ngọc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Vũ",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Tín",
+     "paid": 80000.0,
+     "note": "1 lượt phạt"
+    },
+    {
+     "name": "Thành Nguyên",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 60000.0,
+     "note": ""
+    },
+    {
+     "name": "Bạn Phước",
+     "paid": 200000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 60000.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1430000.0
+  },
+  {
+   "month": "2025-12",
+   "label": "Tháng 12/2025",
+   "total": 1140000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 50000.0,
+     "note": "Phạt 1 lần"
+    },
+    {
+     "name": "Anh Thư",
+     "paid": 80000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Ngọc",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Vũ",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Đức Tín",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Thành Nguyên",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Hoàng Phúc",
+     "paid": 110000.0,
+     "note": "Phạt 1 lần 60"
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Bạn Phước",
+     "paid": 200000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 1140000.0
+  },
+  {
+   "month": "2026-01",
+   "label": "Tháng 01/2026",
+   "total": 930000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Quốc Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Nguyên Hào",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Anh Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thành Nguyên",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Hiếu",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Đình Phúc",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Bạn Phước",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Thúy",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Quang Đồng",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 30000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 930000.0
+  },
+  {
+   "month": "2026-02",
+   "label": "Tháng 02/2026",
+   "total": 0,
+   "members": [],
+   "calc_total": 0
+  },
+  {
+   "month": "2026-03",
+   "label": "Tháng 03/2026",
+   "total": 800000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Diểm Thoa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thanh Trúc",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 100000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 800000.0
+  },
+  {
+   "month": "2026-04",
+   "label": "Tháng 04/2026",
+   "total": 650000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thành Nguyên",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Kim Trinh",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 650000.0
+  },
+  {
+   "month": "2026-05",
+   "label": "Tháng 05/2026",
+   "total": 600000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Tiến Đạt",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Em",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 600000.0
+  },
+  {
+   "month": "2026-06",
+   "label": "Tháng 06/2026",
+   "total": 600000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Em",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 100000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 600000.0
+  },
+  {
+   "month": "2026-07",
+   "label": "Tháng 07/2026",
+   "total": 980000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Em",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 80000.0,
+     "note": "+1 buổi vãng lai"
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thái Sơn",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Phúc Hưng",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nhật",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 100000.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 980000.0
+  },
+  {
+   "month": "2026-08",
+   "label": "Tháng 08/2026",
+   "total": 630000.0,
+   "members": [
+    {
+     "name": "Minh Nghĩa",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Uyên Thư",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Lai Phước",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Anh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Khánh",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Văn Quang",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Thị Thảo",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Em",
+     "paid": 80000.0,
+     "note": "+1 buổi vãng lai"
+    },
+    {
+     "name": "Võ Lâm",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Ngọc Anh",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Hùng Thuận",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Thái Sơn",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Phúc Hưng",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Minh Nhật",
+     "paid": 50000.0,
+     "note": ""
+    },
+    {
+     "name": "Chị Lu",
+     "paid": 100000.0,
+     "note": ""
+    },
+    {
+     "name": "Như Nguyệt",
+     "paid": 0.0,
+     "note": ""
+    },
+    {
+     "name": "Kỳ Tường",
+     "paid": 0.0,
+     "note": ""
+    }
+   ],
+   "calc_total": 630000.0
+  }
+ ]
+}

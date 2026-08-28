@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nhập liệu — Quỹ CLB Cầu Lông Arito</title>
+<style>
+:root{color-scheme:light;--bg:#f6f5f2;--surface:#fcfcfb;--surface-2:#f0efec;--border:#e2e0da;--border-strong:#c9c6bd;
+  --text:#0b0b0b;--text-2:#52514e;--text-3:#82807a;--s1:#2a78d6;--good:#0ca30c;--crit:#d03b3b;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#131312;--surface:#1a1a19;--surface-2:#232322;
+  --border:#2f2f2d;--border-strong:#43433f;--text:#fff;--text-2:#c3c2b7;--text-3:#8d8c84;--s1:#3987e5;--shadow:0 1px 2px rgba(0,0,0,.3)}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,Arial,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:20px;font-weight:650;margin:0 0 4px;letter-spacing:-.015em}
+.sub{color:var(--text-3);font-size:13.5px;margin-bottom:22px}
+a{color:var(--s1)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.card h2{font-size:14px;font-weight:620;margin:0 0 14px}
+label{display:block;font-size:12.5px;color:var(--text-2);font-weight:550;margin-bottom:5px}
+input,select,textarea{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;border-radius:9px;
+  border:1px solid var(--border);background:var(--bg);color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--s1);outline-offset:-1px}
+.row{display:grid;gap:12px;grid-template-columns:1fr 1fr;margin-bottom:12px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:2px;gap:2px;margin-bottom:14px}
+.seg button{flex:1;background:none;border:none;color:var(--text-3);font-family:inherit;font-size:13.5px;font-weight:550;padding:8px;border-radius:7px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+button.go{background:var(--s1);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+button.go:hover{filter:brightness(1.08)}
+button.ghost{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);border-radius:9px;padding:10px 16px;font-family:inherit;font-size:14px;font-weight:550;cursor:pointer}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;overflow-x:auto;
+  font-size:12.5px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--text);margin:0 0 12px;white-space:pre-wrap;word-break:break-all}
+ol{padding-left:20px;color:var(--text-2);font-size:13.5px;margin:0}
+ol li{margin-bottom:7px}
+ol code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:12.5px}
+.ok{color:var(--good);font-size:13px;font-weight:600;margin-left:10px}
+.hint{font-size:12.5px;color:var(--text-3);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Nhập liệu nhanh</h1>
+  <div class="sub">Điền thông tin → sao chép dòng JSON → dán vào <code>data.json</code> trên GitHub. <a href="index.html">← Về trang thống kê</a></div>
+
+  <div class="card">
+    <h2>1. Khoản thu / chi</h2>
+    <div class="seg" id="seg">
+      <button data-t="chi" aria-pressed="true">Khoản CHI</button>
+      <button data-t="thu" aria-pressed="false">Khoản THU</button>
+    </div>
+    <div class="row">
+      <div><label>Ngày</label><input type="date" id="d"></div>
+      <div><label>Số tiền (đồng)</label><input type="number" id="a" placeholder="200000" step="1000"></div>
+    </div>
+    <div class="row">
+      <div><label>Nội dung</label><input type="text" id="s" placeholder="Thuê sân 2 tiếng"></div>
+      <div><label>Danh mục</label><select id="c"></select></div>
+    </div>
+    <button class="go" id="gen">Tạo JSON</button>
+    <span class="ok" id="ok1" style="display:none">Đã sao chép ✓</span>
+    <div class="hint">Có thể tạo nhiều dòng liên tiếp — mỗi lần bấm sẽ cộng dồn vào ô kết quả bên dưới.</div>
+  </div>
+
+  <div class="card">
+    <h2>2. Kết quả — dán vào <code>data.json</code></h2>
+    <pre id="out">Chưa có dòng nào.</pre>
+    <button class="go" id="copy">Sao chép JSON</button>
+    <button class="ghost" id="clear">Xoá hết</button>
+  </div>
+
+  <div class="card">
+    <h2>3. Cách dán lên GitHub</h2>
+    <ol>
+      <li>Mở repo → bấm vào file <code>data.json</code>.</li>
+      <li>Bấm biểu tượng bút chì ✏️ ở góc phải để chỉnh sửa.</li>
+      <li>Tìm mục <code>"expenses": [</code> (khoản chi) hoặc <code>"incomes": [</code> (khoản thu).</li>
+      <li>Kéo xuống dòng cuối cùng của danh sách, thêm dấu phẩy <code>,</code> sau dấu <code>}</code> rồi dán nội dung vừa sao chép.</li>
+      <li>Sửa luôn dòng <code>"updated": "…"</code> ở đầu file thành ngày hôm nay.</li>
+      <li>Bấm <b>Commit changes</b>. Chờ khoảng 1 phút rồi tải lại trang thống kê.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Ghi nhận đóng quỹ tháng</h2>
+    <div class="row">
+      <div><label>Tháng</label><input type="month" id="mm"></div>
+      <div><label>Mức đóng chuẩn</label><input type="number" id="std" value="50000" step="10000"></div>
+    </div>
+    <label>Danh sách thành viên — mỗi dòng một người, theo mẫu <code>Tên | số tiền | ghi chú</code></label>
+    <textarea id="mtxt" rows="8" placeholder="Văn Khánh | 50000&#10;Thị Thảo | 0&#10;Ngọc Em | 80000 | +1 buổi vãng lai"></textarea>
+    <div class="hint" style="margin-bottom:12px">Bỏ trống số tiền sẽ tự lấy mức chuẩn. Ghi chú không bắt buộc.</div>
+    <button class="go" id="gen2">Tạo khối tháng</button>
+    <span class="ok" id="ok2" style="display:none">Đã sao chép ✓</span>
+    <div class="hint">Dán khối này vào cuối danh sách <code>"months": [ … ]</code> (nhớ dấu phẩy ở khối trước).</div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const CATS={chi:['Tiền thuê sân','Tiền cầu lông','Tiền nước','Tiền khác'],
+            thu:['Tiền quỹ công ty hàng tháng','Tiền quỹ thành viên hàng tháng']};
+let type='chi', lines=[];
+function fillCats(){$('#c').innerHTML=CATS[type].map(c=>`<option>${c}</option>`).join('')}
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  type=b.dataset.t; fillCats();
+});
+fillCats();
+$('#d').value=new Date().toISOString().slice(0,10);
+$('#mm').value=new Date().toISOString().slice(0,7);
+
+function render(){$('#out').textContent=lines.length?lines.join(',\n'):'Chưa có dòng nào.'}
+function copy(txt,el){
+  navigator.clipboard.writeText(txt).then(()=>{el.style.display='inline';setTimeout(()=>el.style.display='none',1800)})
+  .catch(()=>{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();
+    document.execCommand('copy');t.remove();el.style.display='inline';setTimeout(()=>el.style.display='none',1800)});
+}
+$('#gen').onclick=()=>{
+  const d=$('#d').value, a=+$('#a').value, s=$('#s').value.trim(), c=$('#c').value;
+  if(!d||!a||!s){alert('Vui lòng điền đủ ngày, số tiền và nội dung.');return}
+  lines.push(`  { "date": "${d}", "amount": ${a}, "desc": ${JSON.stringify(s)}, "cat": "${c}" }`);
+  render(); copy(lines.join(',\n'),$('#ok1'));
+  $('#a').value='';$('#s').value='';$('#s').focus();
+};
+$('#copy').onclick=()=>{if(lines.length)copy(lines.join(',\n'),$('#ok1'))};
+$('#clear').onclick=()=>{lines=[];render()};
+$('#gen2').onclick=()=>{
+  const mm=$('#mm').value, std=+$('#std').value;
+  if(!mm){alert('Chọn tháng.');return}
+  const rows=$('#mtxt').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+    const p=l.split('|').map(x=>x.trim());
+    const paid=p[1]===''||p[1]===undefined?std:(+p[1]||0);
+    return `      { "name": ${JSON.stringify(p[0])}, "paid": ${paid}, "note": ${JSON.stringify(p[2]||'')} }`;
+  });
+  const tot=rows.reduce((s,r)=>s+ +r.match(/"paid": (\d+)/)[1],0);
+  const [y,m]=mm.split('-');
+  const blk=`  {\n   "month": "${mm}",\n   "label": "Tháng ${m}/${y}",\n   "total": ${tot},\n   "members": [\n${rows.join(',\n')}\n    ]\n  }`;
+  $('#out').textContent=blk; lines=[]; copy(blk,$('#ok2'));
+};
+render();
+</script>
+</body>
+</html>
