@@ -1,0 +1,213 @@
+/**
+ * Nghiệp vụ đóng quỹ theo tháng.
+ *
+ * Nguyên tắc quan trọng: tháng đã ghi trong data.json KHÔNG bao giờ bị sinh lại
+ * từ danh sách hiện tại — làm vậy sẽ phá lịch sử (tháng 12/2024 vốn chỉ có 8
+ * người). Chỉ tháng chưa có mới được tự sinh, hoặc tháng cũ được bổ sung thủ
+ * công qua duesFilledMonths.
+ */
+
+import { FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
+import { buildDuesKey, store } from '../state/store.js';
+import { getFollowingMonthKeys } from '../utils/date.js';
+import { readJson, writeJson } from './storage-service.js';
+
+/** Nạp mọi ghi đè đóng quỹ đã lưu trên máy. */
+export function loadLocalDuesChanges() {
+  store.duesPaidOverrides = readJson(STORAGE_KEYS.DUES_PAID, {});
+  store.duesNoteOverrides = readJson(STORAGE_KEYS.DUES_NOTES, {});
+  store.duesFilledMonths = readJson(STORAGE_KEYS.DUES_FILL, {});
+}
+
+/** Lưu mọi ghi đè đóng quỹ xuống máy. */
+export function persistLocalDuesChanges() {
+  writeJson(STORAGE_KEYS.DUES_PAID, store.duesPaidOverrides);
+  writeJson(STORAGE_KEYS.DUES_NOTES, store.duesNoteOverrides);
+  writeJson(STORAGE_KEYS.DUES_FILL, store.duesFilledMonths);
+}
+
+/**
+ * Số tiền đang hiệu lực của một thành viên trong tháng.
+ * @param {string} monthKey
+ * @param {{name: string, paid: number}} member
+ * @returns {number}
+ */
+export function getEffectivePaid(monthKey, member) {
+  const key = buildDuesKey(monthKey, member.name);
+  return key in store.duesPaidOverrides ? store.duesPaidOverrides[key] : member.paid;
+}
+
+/**
+ * Ghi chú đang hiệu lực của một thành viên trong tháng.
+ * @param {string} monthKey
+ * @param {{name: string, note?: string}} member
+ * @returns {string}
+ */
+export function getEffectiveNote(monthKey, member) {
+  const key = buildDuesKey(monthKey, member.name);
+  return key in store.duesNoteOverrides ? store.duesNoteOverrides[key] : (member.note ?? '');
+}
+
+/** Tên các thành viên đang ở trạng thái hoạt động. */
+export function getActiveMemberNames() {
+  return store.members.filter((member) => store.activeMembers[member.name]).map((member) => member.name);
+}
+
+/** Các tháng chưa có trong data.json, được đề xuất sẵn để đánh dấu trước. */
+export function getFutureMonthKeys() {
+  const lastRecorded = store.months[store.months.length - 1]?.month;
+  return lastRecorded ? getFollowingMonthKeys(lastRecorded, FUTURE_MONTH_COUNT) : [];
+}
+
+/**
+ * Tháng này đã có trong data.json chưa.
+ * @param {string} monthKey
+ */
+export function isVirtualMonth(monthKey) {
+  return !store.months.some((month) => month.month === monthKey);
+}
+
+/**
+ * Danh sách đóng quỹ của một tháng.
+ * - Tháng đã ghi: giữ nguyên danh sách gốc, chỉ bổ sung khi bật duesFilledMonths.
+ * - Tháng chưa có: tự sinh toàn bộ từ danh sách thành viên đang hoạt động.
+ * @param {string} monthKey
+ * @returns {Array<{name: string, paid: number, note: string, added?: boolean}>}
+ */
+export function getMonthMembers(monthKey) {
+  const recorded = store.months.find((month) => month.month === monthKey);
+  const rows = recorded ? recorded.members.map((member) => ({ ...member })) : [];
+  const shouldFill = !recorded || store.duesFilledMonths[monthKey];
+  if (!shouldFill) return rows;
+
+  const present = new Set(rows.map((row) => row.name));
+  const activeNames = getActiveMemberNames();
+
+  // Giữ thứ tự quen mắt: theo tháng gần nhất trước, người mới xếp theo bảng chữ cái.
+  const previousOrder = recorded
+    ? null
+    : (store.months[store.months.length - 1]?.members ?? []).map((m) => m.name);
+  const orderedNames = previousOrder
+    ? [
+        ...previousOrder.filter((name) => activeNames.includes(name)),
+        ...activeNames
+          .filter((name) => !previousOrder.includes(name))
+          .sort((a, b) => a.localeCompare(b, 'vi')),
+      ]
+    : activeNames;
+
+  orderedNames.forEach((name) => {
+    if (present.has(name)) return;
+    rows.push({ name, paid: 0, note: '', added: true });
+    present.add(name);
+  });
+  return rows;
+}
+
+/**
+ * Mức đóng quen thuộc của một người, dùng khi đánh dấu "Đã đóng".
+ * Chị Lu đóng 100k thì gợi ý 100k chứ không cào bằng 50k.
+ * @param {string} memberName
+ * @param {string} untilMonthKey
+ * @returns {number}
+ */
+export function getUsualAmount(memberName, untilMonthKey) {
+  let amount = 0;
+  for (const month of store.months) {
+    if (month.month > untilMonthKey) break;
+    const member = month.members.find((item) => item.name === memberName);
+    if (!member) continue;
+    const paid = getEffectivePaid(month.month, member);
+    if (paid > 0) amount = paid;
+  }
+  if (amount) return amount;
+
+  for (const month of store.months) {
+    const member = month.members.find((item) => item.name === memberName);
+    if (member?.paid > 0) return member.paid;
+  }
+  return STANDARD_DUES;
+}
+
+/**
+ * Đặt số tiền đóng quỹ, tự bỏ ghi đè nếu trùng với bản gốc.
+ * @param {string} monthKey
+ * @param {string} memberName
+ * @param {number} amount
+ */
+export function setPaidAmount(monthKey, memberName, amount) {
+  const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? { paid: 0 };
+  const key = buildDuesKey(monthKey, memberName);
+  if (amount === original.paid) delete store.duesPaidOverrides[key];
+  else store.duesPaidOverrides[key] = amount;
+  persistLocalDuesChanges();
+}
+
+/**
+ * Đặt ghi chú, tự bỏ ghi đè nếu trùng với bản gốc.
+ * @param {string} monthKey
+ * @param {string} memberName
+ * @param {string} note
+ */
+export function setNote(monthKey, memberName, note) {
+  const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? { note: '' };
+  const key = buildDuesKey(monthKey, memberName);
+  if (note === (original.note ?? '')) delete store.duesNoteOverrides[key];
+  else store.duesNoteOverrides[key] = note;
+  persistLocalDuesChanges();
+}
+
+/**
+ * Bổ sung thành viên đang hoạt động còn thiếu vào một tháng đã ghi.
+ * @param {string} monthKey
+ */
+export function fillMonthWithActiveMembers(monthKey) {
+  store.duesFilledMonths[monthKey] = true;
+  persistLocalDuesChanges();
+}
+
+/**
+ * Bỏ mọi thay đổi chưa lưu chung của một tháng.
+ * @param {string} monthKey
+ */
+export function resetMonth(monthKey) {
+  Object.keys(store.duesPaidOverrides)
+    .filter((key) => key.startsWith(`${monthKey}|`))
+    .forEach((key) => delete store.duesPaidOverrides[key]);
+  Object.keys(store.duesNoteOverrides)
+    .filter((key) => key.startsWith(`${monthKey}|`))
+    .forEach((key) => delete store.duesNoteOverrides[key]);
+  delete store.duesFilledMonths[monthKey];
+  persistLocalDuesChanges();
+}
+
+/**
+ * Tên các thành viên có thay đổi chưa lưu chung trong một tháng.
+ * @param {string} monthKey
+ * @returns {string[]}
+ */
+export function getChangedMemberNames(monthKey) {
+  return getMonthMembers(monthKey)
+    .filter((member) => {
+      const key = buildDuesKey(monthKey, member.name);
+      return member.added || key in store.duesPaidOverrides || key in store.duesNoteOverrides;
+    })
+    .map((member) => member.name);
+}
+
+/** Mọi tháng đang có thay đổi chưa lưu chung. */
+export function getMonthsWithChanges() {
+  const monthOf = (key) => key.split('|')[0];
+  const keys = [
+    ...Object.keys(store.duesPaidOverrides).map(monthOf),
+    ...Object.keys(store.duesNoteOverrides).map(monthOf),
+    ...Object.keys(store.duesFilledMonths).filter((key) => store.duesFilledMonths[key]),
+    ...getFutureMonthKeys().filter((key) =>
+      getMonthMembers(key).some((member) => {
+        const duesKey = buildDuesKey(key, member.name);
+        return duesKey in store.duesPaidOverrides || duesKey in store.duesNoteOverrides;
+      }),
+    ),
+  ];
+  return [...new Set(keys)].sort();
+}
