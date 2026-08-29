@@ -1,0 +1,170 @@
+/* ============================================================
+   layout.css — khung trang: header, thanh tab, lưới, footer
+   ============================================================ */
+
+.page-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 64px;
+}
+
+/* ---------- Header ---------- */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.app-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 20px;
+}
+
+.app-header__logo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: var(--series-1);
+  border-radius: 10px;
+}
+
+.app-header__logo svg {
+  width: 22px;
+  height: 22px;
+}
+
+.app-header__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.app-header__subtitle {
+  margin-top: 1px;
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.app-header__spacer {
+  flex: 1;
+}
+
+/* ---------- Thanh tab ---------- */
+
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+  overflow-x: auto;
+}
+
+.tab-nav__item {
+  padding: 11px 14px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab-nav__item:hover {
+  color: var(--text);
+}
+
+.tab-nav__item[aria-selected='true'] {
+  font-weight: 600;
+  color: var(--text);
+  border-bottom-color: var(--series-1);
+}
+
+/* ---------- Trang nội dung ---------- */
+
+.tab-panel {
+  display: none;
+  padding-top: 24px;
+}
+
+.tab-panel.is-active {
+  display: block;
+}
+
+/* ---------- Lưới ---------- */
+
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+.grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid--dues {
+  grid-template-columns: 1.35fr 1fr;
+}
+
+@media (max-width: 960px) {
+  .grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid--3,
+  .grid--2,
+  .grid--dues {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Khoảng cách ---------- */
+
+.mt-lg {
+  margin-top: 22px;
+}
+
+.mt-sm {
+  margin-top: 14px;
+}
+
+/* ---------- Footer ---------- */
+
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 40px;
+  padding-top: 18px;
+  font-size: 12.5px;
+  color: var(--text-3);
+  border-top: 1px solid var(--border);
+}

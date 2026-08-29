@@ -1,0 +1,121 @@
+/* ============================================================
+   base.css — biến thiết kế, reset và kiểu chữ nền tảng
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  /* Nền và bề mặt */
+  --bg: #f6f5f2;
+  --surface: #fcfcfb;
+  --surface-2: #f0efec;
+
+  /* Đường viền */
+  --border: #e2e0da;
+  --border-strong: #c9c6bd;
+
+  /* Chữ */
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #82807a;
+
+  /* Màu chuỗi dữ liệu cho biểu đồ và danh mục */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+
+  /* Màu trạng thái */
+  --good: #0ca30c;
+  --warn: #fab219;
+  --crit: #d03b3b;
+
+  /* Hiệu ứng và bo góc */
+  --shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 4px 16px rgb(0 0 0 / 4%);
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: #131312;
+    --surface: #1a1a19;
+    --surface-2: #232322;
+    --border: #2f2f2d;
+    --border-strong: #43433f;
+    --text: #ffffff;
+    --text-2: #c3c2b7;
+    --text-3: #8d8c84;
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 16px rgb(0 0 0 / 25%);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #131312;
+  --surface: #1a1a19;
+  --surface-2: #232322;
+  --border: #2f2f2d;
+  --border-strong: #43433f;
+  --text: #ffffff;
+  --text-2: #c3c2b7;
+  --text-3: #8d8c84;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 4px 16px rgb(0 0 0 / 25%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family:
+    'Inter',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--series-1);
+}
+
+code {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.text-muted {
+  font-size: 12.5px;
+  color: var(--text-3);
+}
+
+.is-hidden {
+  display: none !important;
+}
