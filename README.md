@@ -94,6 +94,38 @@ Khối này nằm ngay đầu tab **Tổng quan**. Sửa mục `"rules"` trong `
 thêm / bớt phần tử trong `items` (mỗi ô là một mức đóng), đổi `title`, `subtitle`, `footer` tuỳ ý.
 Nếu xoá hẳn `"rules"`, trang sẽ tự quay về hiển thị các dòng trong `"notes"`.
 
+## Sửa một khoản thu / chi đã có
+
+Tab **Sổ thu chi**, cần đăng nhập Admin:
+
+1. Tick chọn dòng cần sửa ở cột đầu bảng (tick ô trên tiêu đề để chọn hết những dòng đang hiện theo bộ lọc)
+2. Bấm **Cập nhật** cạnh nút "+ Nhập khoản mới"
+3. **Chọn 1 dòng** → sửa được cả 4 ô: ngày, số tiền, nội dung, danh mục
+   **Chọn nhiều dòng** → chỉ đổi được **Ngày** và **Danh mục** cho cả nhóm (số tiền và nội dung phải sửa từng dòng)
+4. Bấm **Lưu thay đổi**
+
+Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản gốc** trả dòng đang chọn về đúng như trong `data.json`.
+
+> Khi có dòng cũ bị sửa, khối JSON xuất ra sẽ là **thay toàn bộ** danh sách `expenses` / `incomes`
+> chứ không phải dán thêm — vì không thể mô tả "sửa dòng thứ mấy" một cách an toàn.
+> Đọc kỹ ghi chú trên từng khối trước khi dán.
+
+## Mã QR chuyển khoản
+
+Hiện ở tab **Đóng quỹ theo tháng**, ngay trên bảng Chi tiêu trong tháng. Sửa mục `"qr"` trong `data.json`:
+
+```jsonc
+"qr": {
+  "image": "qr-chuyen-khoan.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
+  "name": "NGUYEN MINH NGHIA",
+  "account": "1905 0021 1080 12",
+  "bank": "Techcombank · VietQR / Napas 247",
+  "note": "Quét mã bằng app ngân hàng · chuyển xong nhắn Zalo cho thủ quỹ"
+},
+```
+
+Xoá hẳn mục `"qr"` thì khối này tự ẩn đi.
+
 ## Nhập khoản thu / chi mới
 
 Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:

@@ -143,6 +143,20 @@ h2.sec{font-size:15px;font-weight:640;margin:0 0 12px;letter-spacing:-.01em}
 .authbtn:hover{border-color:var(--border-strong);color:var(--text)}
 body.admin .authbtn{color:var(--good);border-color:color-mix(in srgb,var(--good) 38%,transparent);
   background:color-mix(in srgb,var(--good) 10%,transparent)}
+.qrbox{display:flex;align-items:center;gap:18px;padding:16px;border-radius:12px;
+  border:1px solid color-mix(in srgb,var(--s3) 32%,var(--border));
+  background:color-mix(in srgb,var(--s3) 8%,var(--surface))}
+.qrtxt{flex:1;min-width:0}
+.qrlb{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--s3)}
+.qrname{font-size:16px;font-weight:700;color:var(--text);margin-top:5px;letter-spacing:-.01em}
+.qracc{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;
+  letter-spacing:.04em;margin-top:2px}
+.qrbank{font-size:13px;color:var(--text-2);margin-top:3px}
+.qrnote{font-size:12.5px;color:var(--text-3);margin-top:9px;line-height:1.45}
+.qrimg{flex:none;display:block;width:132px;padding:8px;border-radius:10px;background:#fff;
+  border:1px solid var(--border);box-shadow:var(--shadow)}
+.qrimg img{display:block;width:100%;height:auto;border-radius:4px}
+@media(max-width:520px){.qrbox{flex-direction:column;align-items:flex-start}.qrimg{width:150px;align-self:center}}
 .autobar{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:11px 15px;border-radius:11px;font-size:13.5px;color:var(--text-2);
   border:1px solid color-mix(in srgb,var(--s1) 34%,var(--border));
   background:color-mix(in srgb,var(--s1) 9%,var(--surface))}
@@ -226,6 +240,9 @@ select.stsel option{background:var(--surface);color:var(--text);font-weight:500}
 .txgrid label{display:block;font-size:12.5px;color:var(--text-2);font-weight:550}
 .txgrid input,.txgrid select{width:100%;margin-top:5px;font-family:inherit;font-size:14px;padding:9px 11px;
   border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.pill.p-fix{color:var(--s4);background:color-mix(in srgb,var(--s4) 16%,transparent);border-color:color-mix(in srgb,var(--s4) 36%,transparent)}
+tr.sel td{background:color-mix(in srgb,var(--s1) 10%,transparent)}
+body:not(.admin) td.selcell,body:not(.admin) th.editonly{display:none}
 .pill.p-new{color:var(--s1);background:color-mix(in srgb,var(--s1) 14%,transparent);border-color:color-mix(in srgb,var(--s1) 32%,transparent)}
 .delbtn{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;line-height:1;padding:3px 7px;border-radius:6px}
 .delbtn:hover{color:var(--crit);background:color-mix(in srgb,var(--crit) 12%,transparent)}
@@ -371,6 +388,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
       <div class="ch" style="display:flex;align-items:center;gap:12px;padding-bottom:0">
         <div style="flex:1"><h3>Thêm giao dịch</h3><p>Nhập một khoản thu hoặc chi — hiện ngay trên biểu đồ và số dư</p></div>
         <button class="mbtn" id="tx-toggle" aria-expanded="false">+ Nhập khoản mới</button>
+        <button class="mbtn ghost" id="tx-edit" disabled>Cập nhật</button>
       </div>
       <div class="cb" id="tx-form" style="display:none">
         <div class="seg" id="tx-typeseg" style="margin-bottom:12px;max-width:320px">
@@ -388,6 +406,22 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
           <span class="muted" id="tx-msg"></span>
         </div>
       </div>
+
+      <div class="cb" id="txe-form" style="display:none;border-top:1px solid var(--border)">
+        <div class="note" style="margin-bottom:14px" id="txe-head"></div>
+        <div class="txgrid">
+          <label>Ngày<input type="date" id="txe-date"></label>
+          <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="txe-amt"></label>
+          <label>Nội dung<input type="text" id="txe-desc"></label>
+          <label>Danh mục<select id="txe-cat"></select></label>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px">
+          <button class="mbtn" id="txe-save">Lưu thay đổi</button>
+          <button class="mbtn ghost" id="txe-cancel">Huỷ</button>
+          <button class="mbtn ghost" id="txe-revert" style="display:none">Khôi phục bản gốc</button>
+          <span class="muted" id="txe-msg"></span>
+        </div>
+      </div>
     </div>
 
     <div class="note editonly" id="tx-savebar" style="display:none;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
@@ -396,11 +430,11 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
         <span class="muted">Đang lưu trên máy bạn. Bấm "Lưu chung lên GitHub" để cả nhóm cùng thấy.</span>
       </div>
       <button class="mbtn" id="tx-export">Lưu chung lên GitHub</button>
-      <button class="mbtn ghost" id="tx-clear">Xoá hết khoản mới</button>
+      <button class="mbtn ghost" id="tx-clear">Bỏ hết thay đổi</button>
     </div>
     <div class="card editonly" id="tx-exportbox" style="display:none;margin-bottom:16px">
       <div class="ch"><h3>Dán vào <code>data.json</code> trên GitHub</h3>
-        <p>Mở <code>data.json</code> → bấm ✏️ → với mỗi khối dưới đây, bấm <b>Sao chép</b> rồi dán vào <b>cuối</b> danh sách tương ứng (nhớ thêm dấu phẩy <code>,</code> sau dấu <code>}</code> của dòng cuối cũ) → Commit changes.</p></div>
+        <p>Mở <code>data.json</code> → bấm ✏️ → làm theo đúng ghi chú của <b>từng khối</b> bên dưới (bấm <b>Sao chép</b> rồi dán) → Commit changes. Khi dán thêm vào cuối một danh sách, nhớ thêm dấu phẩy <code>,</code> sau dấu <code>}</code> của dòng cuối cũ.</p></div>
       <div class="cb" id="tx-exportbody"></div>
     </div>
 
@@ -422,6 +456,7 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
     <div class="tblwrap">
       <table>
         <thead><tr>
+          <th class="editonly" style="width:40px;text-align:center"><input type="checkbox" class="actchk" id="tx-selall" title="Chọn tất cả đang hiện" aria-label="Chọn tất cả"></th>
           <th data-sort="date" style="cursor:pointer">Ngày ⇅</th>
           <th>Loại</th><th>Nội dung</th><th>Danh mục</th>
           <th class="num" data-sort="amount" style="cursor:pointer">Số tiền ⇅</th>
@@ -517,7 +552,21 @@ footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-
         </div>
       </div>
       <div class="card">
-        <div class="ch"><h3>Chi tiêu trong tháng</h3><p id="mo-sub2"></p></div>
+        <div class="cb" style="padding-bottom:0">
+          <div class="qrbox">
+            <div class="qrtxt">
+              <div class="qrlb">Chuyển khoản đóng quỹ</div>
+              <div class="qrname" id="qr-name"></div>
+              <div class="qracc" id="qr-acc"></div>
+              <div class="qrbank" id="qr-bank"></div>
+              <div class="qrnote">Quét mã bằng app ngân hàng · chuyển xong nhắn Zalo cho thủ quỹ</div>
+            </div>
+            <a class="qrimg" id="qr-link" target="_blank" rel="noopener" title="Bấm để xem mã lớn">
+              <img id="qr-img" alt="Mã QR chuyển khoản đóng quỹ">
+            </a>
+          </div>
+        </div>
+        <div class="ch" style="padding-top:16px"><h3>Chi tiêu trong tháng</h3><p id="mo-sub2"></p></div>
         <div class="cb"><div class="tblwrap"><table><thead><tr><th>Ngày</th><th>Nội dung</th><th>Danh mục</th><th class="num">Số tiền</th></tr></thead><tbody id="mochi"></tbody></table></div></div>
       </div>
     </div>
@@ -588,6 +637,7 @@ function readAuth(){
   return false;
 }
 function applyAuth(){
+  if(!isAdmin) SEL.clear();
   document.body.classList.toggle('admin',isAdmin);
   $('#authicon').textContent = isAdmin?'✓':'🔒';
   $('#authlabel').textContent = isAdmin?'Admin':'Đăng nhập';
@@ -629,8 +679,12 @@ let FILL={};   // tháng nào được bổ sung thêm DS thành viên đang ho�
 let NOTES={};
 const effNote=(mo,x)=> (pkey(mo,x.name) in NOTES) ? NOTES[pkey(mo,x.name)] : (x.note||'');
 let EXTRA={incomes:[],expenses:[]};
-const allIncomes =()=>DATA.incomes.concat(EXTRA.incomes);
-const allExpenses=()=>DATA.expenses.concat(EXTRA.expenses);
+let TXEDIT={};                 // 'chi#12' -> {date,amount,desc,cat} : sửa dòng vốn có trong data.json
+let SEL=new Set();             // các dòng đang được tick chọn ở sổ thu chi
+const LSTXEDIT='clb-txedit-v1';
+const withId=(arr,pre)=>arr.map((x,i)=>({...x, ...(TXEDIT[pre+'#'+i]||{}), id:pre+'#'+i, edited:(pre+'#'+i) in TXEDIT}));
+const allIncomes =()=>withId(DATA.incomes ,'thu').concat(EXTRA.incomes);
+const allExpenses=()=>withId(DATA.expenses,'chi').concat(EXTRA.expenses);
 const CATS={chi:['Tiền thuê sân','Tiền cầu lông','Tiền nước','Tiền khác'],
             thu:['Tiền quỹ công ty hàng tháng','Tiền quỹ thành viên hàng tháng']};
 const STD=50000;                              // mức đóng chuẩn 50k/tháng
@@ -651,6 +705,7 @@ function init(){
   $('#p-dash').classList.add('on');
 
   try{ const e=JSON.parse(localStorage.getItem(LSTX)||'null'); if(e&&e.incomes&&e.expenses) EXTRA=e; }catch(e){}
+  try{ TXEDIT=JSON.parse(localStorage.getItem(LSTXEDIT)||'{}')||{} }catch(e){ TXEDIT={} }
   rebuildTX();
   MONTHS=DATA.months;
 
@@ -724,7 +779,7 @@ function renderDash(){
     <td class="name">${esc(t.desc)}</td><td>${esc(t.cat)}</td>
     <td class="num" style="color:${t.type==='thu'?'var(--good)':'var(--crit)'}">${t.type==='thu'?'+':'−'}${fmt(t.amount)}</td></tr>`).join('');
 
-  renderRules();
+  renderRules(); renderQR();
 }
 
 /* monthly aggregation */
@@ -878,20 +933,43 @@ function renderLedger(){
   $('#l-chi').textContent=fmt(chi); $('#l-chi').style.color='var(--crit)';
   $('#l-net').textContent=(thu-chi>=0?'+':'−')+fmt(Math.abs(thu-chi));
   $('#l-net').style.color=thu-chi>=0?'var(--good)':'var(--crit)';
-  $('#ledger').innerHTML=rows.length?rows.map(t=>`<tr>
+  $('#ledger').innerHTML=rows.length?rows.map(t=>`<tr class="${SEL.has(t.id)?'sel':''}">
+    <td class="selcell" style="text-align:center"><input type="checkbox" class="actchk rowchk" data-id="${t.id}" ${SEL.has(t.id)?'checked':''} ${isAdmin?'':'disabled'} aria-label="Chọn ${esc(t.desc)}"></td>
     <td>${dLabel(t.date)}</td>
     <td><span class="pill ${t.type==='thu'?'p-thu':'p-chi'}">${t.type==='thu'?'Thu':'Chi'}</span></td>
-    <td class="name">${esc(t.desc)} ${t.isNew?'<span class="pill p-new">mới</span>':''}</td>
+    <td class="name">${esc(t.desc)} ${t.isNew?'<span class="pill p-new">mới</span>':''}${t.edited?'<span class="pill p-fix">đã sửa</span>':''}</td>
     <td><span style="display:inline-flex;align-items:center;gap:7px"><i class="dot" style="background:${catColor(t.cat)}"></i>${esc(t.cat)}</span></td>
     <td class="num" style="color:${t.type==='thu'?'var(--good)':'var(--crit)'}">${t.type==='thu'?'+':'−'}${fmt(t.amount)}</td>
     <td>${t.isNew&&isAdmin?`<button class="delbtn" data-id="${t.id}" title="Xoá khoản vừa thêm" aria-label="Xoá khoản ${esc(t.desc)}">×</button>`:''}</td>
-  </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:28px" class="muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
+  </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:28px" class="muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
   $$('#ledger .delbtn').forEach(b=>b.onclick=()=>delTx(b.dataset.id));
+  $$('#ledger .rowchk').forEach(c=>c.onchange=()=>{
+    c.checked? SEL.add(c.dataset.id) : SEL.delete(c.dataset.id);
+    c.closest('tr').classList.toggle('sel',c.checked);
+    syncEditBtn();
+  });
+  VISIBLE=rows.map(t=>t.id);
+  const allOn = rows.length>0 && rows.every(t=>SEL.has(t.id));
+  $('#tx-selall').checked=allOn; $('#tx-selall').disabled=!isAdmin||!rows.length;
+  syncEditBtn();
   $('#l-count').textContent=rows.length+' giao dịch';
   renderTxBar();
 }
 
 /* ================= khối quy định ================= */
+function renderQR(){
+  const q=DATA.qr;
+  const box=$('#qr-img').closest('.qrbox');
+  if(!q||!q.image){ box.style.display='none'; return; }
+  box.style.display='';
+  $('#qr-img').src=q.image;
+  $('#qr-link').href=q.image;
+  $('#qr-name').textContent=q.name||'';
+  $('#qr-acc').textContent=q.account||'';
+  $('#qr-bank').textContent=q.bank||'';
+  if(q.note) $('.qrnote').textContent=q.note;
+}
+
 function renderRules(){
   const r=DATA.rules;
   const items = r && r.items && r.items.length ? r.items : null;
@@ -922,7 +1000,10 @@ function rebuildTX(){
 }
 function saveTX(){ try{localStorage.setItem(LSTX,JSON.stringify(EXTRA))}catch(e){} }
 function refreshAll(){
-  rebuildTX(); saveTX(); buildFilters(); renderDash(); renderLedger(); renderMonths(); renderCharts();
+  rebuildTX(); saveTX();
+  const ids=new Set(TX.map(t=>t.id));
+  [...SEL].forEach(id=>{ if(!ids.has(id)) SEL.delete(id) });
+  buildFilters(); renderDash(); renderLedger(); renderMonths(); renderCharts();
 }
 function delTx(id){
   EXTRA.incomes=EXTRA.incomes.filter(x=>x.id!==id);
@@ -930,11 +1011,105 @@ function delTx(id){
   refreshAll();
 }
 function renderTxBar(){
-  const n=EXTRA.incomes.length+EXTRA.expenses.length;
-  $('#tx-savebar').style.display = (n && isAdmin)? 'flex':'none';
-  if(n) $('#tx-count').textContent = `${n} khoản mới chưa lưu chung `
-    + `(${EXTRA.incomes.length} thu, ${EXTRA.expenses.length} chi)`;
+  const n=EXTRA.incomes.length+EXTRA.expenses.length, e=Object.keys(TXEDIT).length;
+  $('#tx-savebar').style.display = ((n||e) && isAdmin)? 'flex':'none';
+  const parts=[];
+  if(n) parts.push(`${n} khoản mới (${EXTRA.incomes.length} thu, ${EXTRA.expenses.length} chi)`);
+  if(e) parts.push(`${e} dòng đã sửa`);
+  $('#tx-count').textContent = parts.join(' · ') + ' — chưa lưu chung';
 }
+
+let VISIBLE=[];
+function saveTxEdit(){ try{localStorage.setItem(LSTXEDIT,JSON.stringify(TXEDIT))}catch(e){} }
+function selectedRows(){ return TX.filter(t=>SEL.has(t.id)) }
+function syncEditBtn(){
+  const n=SEL.size, b=$('#tx-edit');
+  b.disabled = !isAdmin || n===0;
+  b.style.opacity = b.disabled? .45 : 1;
+  b.textContent = n? `Cập nhật (${n})` : 'Cập nhật';
+  b.title = !isAdmin ? 'Đăng nhập để chỉnh sửa'
+          : n===0 ? 'Tick chọn dòng cần sửa ở bảng bên dưới' : `Sửa ${n} dòng đang chọn`;
+}
+$('#tx-selall').onchange=()=>{
+  if($('#tx-selall').checked) VISIBLE.forEach(id=>SEL.add(id));
+  else VISIBLE.forEach(id=>SEL.delete(id));
+  renderLedger();
+};
+
+/* --- form Cập nhật --- */
+const UNCHANGED='__giữ nguyên__';
+function openEdit(){
+  const rows=selectedRows(); if(!rows.length) return;
+  const one=rows.length===1, r=rows[0];
+  $('#tx-form').style.display='none';
+  $('#tx-toggle').textContent='+ Nhập khoản mới'; $('#tx-toggle').setAttribute('aria-expanded','false');
+  $('#txe-form').style.display='block';
+  $('#txe-msg').textContent='';
+
+  const types=[...new Set(rows.map(t=>t.type))];
+  const cats = types.length===1 ? CATS[types[0]] : [...CATS.chi,...CATS.thu];
+  $('#txe-cat').innerHTML=(one?'':`<option value="${UNCHANGED}">— giữ nguyên —</option>`)
+    + cats.map(c=>`<option>${esc(c)}</option>`).join('');
+
+  if(one){
+    $('#txe-head').innerHTML=`Đang sửa: <b>${esc(r.desc)}</b> · ${dLabel(r.date)} · ${r.type==='thu'?'Thu':'Chi'} ${fmt(r.amount)}`;
+    $('#txe-date').value=r.date;
+    $('#txe-amt').value=new Intl.NumberFormat('vi-VN').format(r.amount);
+    $('#txe-desc').value=r.desc; $('#txe-desc').disabled=false;
+    $('#txe-amt').disabled=false;
+    $('#txe-cat').value=r.cat;
+    $('#txe-revert').style.display = (r.edited)? 'inline-block':'none';
+  }else{
+    $('#txe-head').innerHTML=`Đang sửa <b>${rows.length} dòng</b> cùng lúc. Chỉ <b>Ngày</b> và <b>Danh mục</b> áp dụng cho tất cả — để trống Ngày và chọn "giữ nguyên" ở Danh mục thì ô đó không đổi. Số tiền và nội dung phải sửa từng dòng một.`;
+    $('#txe-date').value='';
+    $('#txe-amt').value=''; $('#txe-amt').disabled=true;
+    $('#txe-desc').value=''; $('#txe-desc').disabled=true;
+    $('#txe-cat').value=UNCHANGED;
+    $('#txe-revert').style.display = rows.some(x=>x.edited)? 'inline-block':'none';
+  }
+  $('#txe-form').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeEdit(){ $('#txe-form').style.display='none' }
+
+function applyEdit(id,patch){
+  if(id.startsWith('n')){                       // dòng mới nhập trên máy
+    ['incomes','expenses'].forEach(k=>{
+      const x=EXTRA[k].find(y=>y.id===id); if(x) Object.assign(x,patch);
+    });
+  }else{
+    const cur=TXEDIT[id]||{};
+    TXEDIT[id]={...cur,...patch};
+    const [pre,i]=id.split('#');
+    const src=(pre==='thu'?DATA.incomes:DATA.expenses)[+i];
+    if(src && ['date','amount','desc','cat'].every(k=>TXEDIT[id][k]===undefined||TXEDIT[id][k]===src[k]))
+      delete TXEDIT[id];                        // sửa về đúng bản gốc thì bỏ ghi đè
+  }
+}
+$('#tx-edit').onclick=openEdit;
+$('#txe-cancel').onclick=closeEdit;
+$('#txe-amt').oninput=()=>{
+  const v=String($('#txe-amt').value).replace(/[^0-9]/g,'');
+  $('#txe-amt').value = v? new Intl.NumberFormat('vi-VN').format(+v) : '';
+};
+$('#txe-save').onclick=()=>{
+  const rows=selectedRows(); if(!rows.length) return;
+  const one=rows.length===1;
+  const d=$('#txe-date').value, c=$('#txe-cat').value;
+  if(one){
+    const a=+String($('#txe-amt').value).replace(/[^0-9]/g,''), de=$('#txe-desc').value.trim();
+    if(!d||!a||!de){ $('#txe-msg').textContent='Cần đủ ngày, số tiền và nội dung.'; $('#txe-msg').style.color='var(--crit)'; return; }
+    applyEdit(rows[0].id,{date:d,amount:a,desc:de,cat:c});
+  }else{
+    const patch={}; if(d) patch.date=d; if(c!==UNCHANGED) patch.cat=c;
+    if(!Object.keys(patch).length){ $('#txe-msg').textContent='Chưa chọn gì để đổi.'; $('#txe-msg').style.color='var(--crit)'; return; }
+    rows.forEach(r=>applyEdit(r.id,patch));
+  }
+  saveTxEdit(); saveTX(); closeEdit(); SEL.clear(); refreshAll();
+};
+$('#txe-revert').onclick=()=>{
+  selectedRows().forEach(r=>{ if(!r.id.startsWith('n')) delete TXEDIT[r.id] });
+  saveTxEdit(); closeEdit(); SEL.clear(); refreshAll();
+};
 
 let txType='chi';
 function fillTxCats(){ $('#tx-cat').innerHTML=CATS[txType].map(c=>`<option>${esc(c)}</option>`).join('') }
@@ -943,6 +1118,7 @@ $$('#tx-typeseg button').forEach(b=>b.onclick=()=>{
   txType=b.dataset.t; fillTxCats();
 });
 $('#tx-toggle').onclick=()=>{
+  closeEdit();
   const f=$('#tx-form'), open=f.style.display!=='none';
   f.style.display=open?'none':'block';
   $('#tx-toggle').setAttribute('aria-expanded',String(!open));
@@ -965,8 +1141,9 @@ $('#tx-add').onclick=()=>{
   $('#tx-amt').value=''; $('#tx-desc').value=''; $('#tx-desc').focus();
 };
 $('#tx-clear').onclick=()=>{
-  if(!confirm('Xoá toàn bộ khoản mới chưa lưu chung?')) return;
-  EXTRA={incomes:[],expenses:[]}; $('#tx-exportbox').style.display='none'; refreshAll();
+  if(!confirm('Bỏ toàn bộ khoản mới và các chỉnh sửa chưa lưu chung?')) return;
+  EXTRA={incomes:[],expenses:[]}; TXEDIT={}; SEL.clear(); saveTxEdit();
+  $('#tx-exportbox').style.display='none'; refreshAll();
 };
 function copyText(txt,btn){
   const t=btn.textContent, done=()=>{btn.textContent='Đã sao chép ✓';setTimeout(()=>btn.textContent=t,1800)};
@@ -978,8 +1155,19 @@ function copyText(txt,btn){
 $('#tx-export').onclick=()=>{
   const fm=x=>`  { "date": ${JSON.stringify(x.date)}, "amount": ${x.amount}, "desc": ${JSON.stringify(x.desc)}, "cat": ${JSON.stringify(x.cat)} }`;
   const blocks=[];
-  if(EXTRA.expenses.length) blocks.push(['Dán vào cuối danh sách <code>"expenses"</code> (khoản chi)', EXTRA.expenses.map(fm).join(',\n')]);
-  if(EXTRA.incomes.length)  blocks.push(['Dán vào cuối danh sách <code>"incomes"</code> (khoản thu)',  EXTRA.incomes.map(fm).join(',\n')]);
+  const editedIn = pre => Object.keys(TXEDIT).some(k=>k.startsWith(pre+'#'));
+  /* Có sửa dòng cũ thì phải thay cả danh sách — không thể chỉ dán thêm.
+     Không có sửa thì chỉ cần dán thêm cho gọn. */
+  [['chi','expenses','khoản chi'],['thu','incomes','khoản thu']].forEach(([pre,key,vn])=>{
+    const add = pre==='chi'? EXTRA.expenses : EXTRA.incomes;
+    if(editedIn(pre)){
+      const full = (pre==='chi'? allExpenses() : allIncomes());
+      blocks.push([`Thay <b>TOÀN BỘ</b> nội dung trong ngoặc vuông của <code>"${key}"</code> (${vn} — có dòng đã sửa)`,
+                   full.map(fm).join(',\n')]);
+    }else if(add.length){
+      blocks.push([`Dán vào <b>cuối</b> danh sách <code>"${key}"</code> (${vn})`, add.map(fm).join(',\n')]);
+    }
+  });
   blocks.push(['Sửa dòng <code>"updated"</code> ở đầu file thành', ' "updated": '+JSON.stringify(TX.reduce((a,b)=>a.date>b.date?a:b).date)+',']);
   $('#tx-exportbody').innerHTML=blocks.map((b,i)=>`
     <div style="${i?'margin-top:18px':''}">

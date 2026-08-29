@@ -28,6 +28,13 @@
   ],
   "footer": "Chuyển khoản xong nhắn Zalo cho thủ quỹ để được ghi nhận."
  },
+ "qr": {
+  "image": "qr-chuyen-khoan.png",
+  "name": "NGUYEN MINH NGHIA",
+  "account": "1905 0021 1080 12",
+  "bank": "Techcombank · VietQR / Napas 247",
+  "note": "Quét mã bằng app ngân hàng · chuyển xong nhắn Zalo cho thủ quỹ"
+ },
  "roster": [
   {
    "name": "Anh Mạnh",
