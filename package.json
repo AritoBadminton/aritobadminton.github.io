@@ -1,0 +1,26 @@
+{
+  "name": "arito-badminton-fund",
+  "version": "1.0.0",
+  "description": "Trang thống kê và quản lý thu chi quỹ câu lạc bộ cầu lông công ty Arito",
+  "private": true,
+  "type": "module",
+  "homepage": "https://aritobadminton.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AritoBadminton/aritobadminton.github.io.git"
+  },
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0"
+  }
+}
