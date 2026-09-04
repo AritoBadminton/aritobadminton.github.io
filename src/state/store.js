@@ -45,6 +45,9 @@ export const store = {
   /** Id các dòng đang được tick chọn ở sổ thu chi. */
   selectedTransactionIds: new Set(),
 
+  /** Quy định đóng quỹ do admin sửa tại chỗ; null nghĩa là dùng nguyên data.json. */
+  ruleItemsOverride: null,
+
   /** Ô lọc tháng ở sổ thu chi đang mở đầy đủ hay chỉ 5 tháng gần nhất. */
   showAllLedgerMonths: false,
 
