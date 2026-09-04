@@ -7,7 +7,7 @@
  * công qua duesFilledMonths.
  */
 
-import { FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
+import { DUES_STATUS, FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
 import { getFollowingMonthKeys } from '../utils/date.js';
 import { readJson, writeJson } from './storage-service.js';
@@ -17,6 +17,7 @@ export function loadLocalDuesChanges() {
   store.duesPaidOverrides = readJson(STORAGE_KEYS.DUES_PAID, {});
   store.duesNoteOverrides = readJson(STORAGE_KEYS.DUES_NOTES, {});
   store.duesFilledMonths = readJson(STORAGE_KEYS.DUES_FILL, {});
+  store.duesSkipOverrides = readJson(STORAGE_KEYS.DUES_SKIP, {});
 }
 
 /** Lưu mọi ghi đè đóng quỹ xuống máy. */
@@ -24,6 +25,7 @@ export function persistLocalDuesChanges() {
   writeJson(STORAGE_KEYS.DUES_PAID, store.duesPaidOverrides);
   writeJson(STORAGE_KEYS.DUES_NOTES, store.duesNoteOverrides);
   writeJson(STORAGE_KEYS.DUES_FILL, store.duesFilledMonths);
+  writeJson(STORAGE_KEYS.DUES_SKIP, store.duesSkipOverrides);
 }
 
 /**
@@ -46,6 +48,28 @@ export function getEffectivePaid(monthKey, member) {
 export function getEffectiveNote(monthKey, member) {
   const key = buildDuesKey(monthKey, member.name);
   return key in store.duesNoteOverrides ? store.duesNoteOverrides[key] : (member.note ?? '');
+}
+
+/**
+ * Tháng này thành viên có đánh dấu "Không chơi" hay không.
+ * @param {string} monthKey
+ * @param {{name: string, skip?: boolean}} member
+ * @returns {boolean}
+ */
+export function getEffectiveSkip(monthKey, member) {
+  const key = buildDuesKey(monthKey, member.name);
+  return key in store.duesSkipOverrides ? store.duesSkipOverrides[key] : Boolean(member.skip);
+}
+
+/**
+ * Trạng thái đóng quỹ đang hiệu lực của một thành viên trong tháng.
+ * @param {string} monthKey
+ * @param {object} member
+ * @returns {'paid'|'unpaid'|'skipped'}
+ */
+export function getDuesStatus(monthKey, member) {
+  if (getEffectiveSkip(monthKey, member)) return DUES_STATUS.SKIPPED;
+  return getEffectivePaid(monthKey, member) > 0 ? DUES_STATUS.PAID : DUES_STATUS.UNPAID;
 }
 
 /** Tên các thành viên đang ở trạng thái hoạt động. */
@@ -144,6 +168,33 @@ export function setPaidAmount(monthKey, memberName, amount) {
 }
 
 /**
+ * Đặt trạng thái "Không chơi", tự bỏ ghi đè nếu trùng với bản gốc.
+ * @param {string} monthKey
+ * @param {string} memberName
+ * @param {boolean} isSkipped
+ */
+export function setSkipped(monthKey, memberName, isSkipped) {
+  const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? {};
+  const key = buildDuesKey(monthKey, memberName);
+  if (isSkipped === Boolean(original.skip)) delete store.duesSkipOverrides[key];
+  else store.duesSkipOverrides[key] = isSkipped;
+  persistLocalDuesChanges();
+}
+
+/**
+ * Đổi trạng thái đóng quỹ của một thành viên trong tháng.
+ * Chọn "Đã đóng" tự điền mức người đó vẫn đóng; hai trạng thái còn lại đưa số tiền về 0.
+ * @param {string} monthKey
+ * @param {string} memberName
+ * @param {'paid'|'unpaid'|'skipped'} status
+ */
+export function setDuesStatus(monthKey, memberName, status) {
+  setSkipped(monthKey, memberName, status === DUES_STATUS.SKIPPED);
+  const amount = status === DUES_STATUS.PAID ? getUsualAmount(memberName, monthKey) : 0;
+  setPaidAmount(monthKey, memberName, amount);
+}
+
+/**
  * Đặt ghi chú, tự bỏ ghi đè nếu trùng với bản gốc.
  * @param {string} monthKey
  * @param {string} memberName
@@ -177,6 +228,9 @@ export function resetMonth(monthKey) {
   Object.keys(store.duesNoteOverrides)
     .filter((key) => key.startsWith(`${monthKey}|`))
     .forEach((key) => delete store.duesNoteOverrides[key]);
+  Object.keys(store.duesSkipOverrides)
+    .filter((key) => key.startsWith(`${monthKey}|`))
+    .forEach((key) => delete store.duesSkipOverrides[key]);
   delete store.duesFilledMonths[monthKey];
   persistLocalDuesChanges();
 }
@@ -190,7 +244,12 @@ export function getChangedMemberNames(monthKey) {
   return getMonthMembers(monthKey)
     .filter((member) => {
       const key = buildDuesKey(monthKey, member.name);
-      return member.added || key in store.duesPaidOverrides || key in store.duesNoteOverrides;
+      return (
+        member.added ||
+        key in store.duesPaidOverrides ||
+        key in store.duesNoteOverrides ||
+        key in store.duesSkipOverrides
+      );
     })
     .map((member) => member.name);
 }
@@ -201,11 +260,16 @@ export function getMonthsWithChanges() {
   const keys = [
     ...Object.keys(store.duesPaidOverrides).map(monthOf),
     ...Object.keys(store.duesNoteOverrides).map(monthOf),
+    ...Object.keys(store.duesSkipOverrides).map(monthOf),
     ...Object.keys(store.duesFilledMonths).filter((key) => store.duesFilledMonths[key]),
     ...getFutureMonthKeys().filter((key) =>
       getMonthMembers(key).some((member) => {
         const duesKey = buildDuesKey(key, member.name);
-        return duesKey in store.duesPaidOverrides || duesKey in store.duesNoteOverrides;
+        return (
+          duesKey in store.duesPaidOverrides ||
+          duesKey in store.duesNoteOverrides ||
+          duesKey in store.duesSkipOverrides
+        );
       }),
     ),
   ];

@@ -2,14 +2,17 @@
 
 import { STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
-import { getEffectivePaid, getFutureMonthKeys, getMonthMembers } from './dues-service.js';
+import { getEffectivePaid, getEffectiveSkip, getFutureMonthKeys, getMonthMembers } from './dues-service.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
 
 /**
  * Gom số liệu từng thành viên qua mọi tháng.
  *
- * Tháng tự sinh chỉ được tính khi đã thực sự có đánh dấu — nếu không, việc chỉ
- * xem trước tháng 9 sẽ làm tỷ lệ đóng đủ của cả câu lạc bộ tụt oan.
+ * Hai điều quan trọng:
+ * - Tháng tự sinh chỉ được tính khi đã thực sự có đánh dấu — nếu không, việc chỉ
+ *   xem trước tháng 9 sẽ làm tỷ lệ đóng đủ của cả câu lạc bộ tụt oan.
+ * - Tháng đánh dấu "Không chơi" không tính vào mẫu số của tỷ lệ đóng đủ, vì
+ *   tháng đó người ta không được kỳ vọng phải đóng.
  */
 export function aggregateMembers() {
   const monthKeys = store.months.map((month) => month.month);
@@ -31,16 +34,24 @@ export function aggregateMembers() {
           total: 0,
           months: 0,
           paidMonths: 0,
+          skippedMonths: 0,
           lastMonth: null,
           lastPaid: 0,
+          lastSkipped: false,
         });
       }
       const stats = byName.get(member.name);
+      const isSkipped = getEffectiveSkip(monthKey, member);
+
       stats.total += paid;
-      stats.months += 1;
-      if (paid > 0) stats.paidMonths += 1;
+      if (isSkipped) stats.skippedMonths += 1;
+      else {
+        stats.months += 1;
+        if (paid > 0) stats.paidMonths += 1;
+      }
       stats.lastMonth = monthKey;
       stats.lastPaid = paid;
+      stats.lastSkipped = isSkipped;
     });
   });
 
@@ -104,7 +115,9 @@ export function getChangedActiveNames() {
 export function countUnpaidActive(lastMonthKey) {
   return store.members.filter(
     (member) =>
-      store.activeMembers[member.name] && !(member.lastMonth === lastMonthKey && member.lastPaid > 0),
+      store.activeMembers[member.name] &&
+      !member.lastSkipped &&
+      !(member.lastMonth === lastMonthKey && member.lastPaid > 0),
   ).length;
 }
 
