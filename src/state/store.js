@@ -57,6 +57,9 @@ export const store = {
   /** Phiên đăng nhập do máy chủ lưu trữ cấp: { user, token, expiresAt }. */
   apiSession: null,
 
+  /** Email của người đang đăng nhập ở chế độ Firebase. */
+  authEmail: '',
+
   /** Người dùng đã đăng nhập quản trị hay chưa. */
   isAdmin: false,
 };
