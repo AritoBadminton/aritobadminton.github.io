@@ -30,6 +30,9 @@ export const store = {
   /** Ghi đè ghi chú đóng quỹ, cùng dạng khoá với duesPaidOverrides. */
   duesNoteOverrides: {},
 
+  /** Đánh dấu không chơi trong tháng: { "2026-08|Văn Khánh": true }. */
+  duesSkipOverrides: {},
+
   /** Tháng nào được bổ sung thành viên đang hoạt động: { "2026-08": true }. */
   duesFilledMonths: {},
 
