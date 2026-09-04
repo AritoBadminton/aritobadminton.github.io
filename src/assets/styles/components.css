@@ -613,3 +613,28 @@ td.cell-name {
   text-align: center;
   color: var(--text-3);
 }
+
+/* ---------- Thanh phân trang ---------- */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
+.pager__status {
+  min-width: 200px;
+  color: var(--text-3);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pager__button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
