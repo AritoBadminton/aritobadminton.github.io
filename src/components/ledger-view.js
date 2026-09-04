@@ -1,6 +1,6 @@
 /** Trang Sổ thu chi: bộ lọc, bảng giao dịch, form thêm mới và form cập nhật. */
 
-import { CATEGORIES, KEEP_UNCHANGED } from '../config/constants.js';
+import { CATEGORIES, KEEP_UNCHANGED, MONTH_OPTION_LIMIT, MONTH_OPTION_MORE } from '../config/constants.js';
 import {
   addTransaction,
   countPendingLedgerChanges,
@@ -15,7 +15,15 @@ import {
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { getTodayIso } from '../utils/date.js';
-import { copyToClipboard, escapeHtml, flashButtonLabel, qs, qsa, setVisible } from '../utils/dom.js';
+import {
+  buildMoreOption,
+  copyToClipboard,
+  escapeHtml,
+  flashButtonLabel,
+  qs,
+  qsa,
+  setVisible,
+} from '../utils/dom.js';
 import {
   formatCurrency,
   formatDateLabel,
@@ -28,6 +36,9 @@ import {
 /* ---------- Trạng thái riêng của trang ---------- */
 
 let filterType = 'all';
+
+/** Tháng đang lọc, giữ lại khi mở rộng danh sách tháng. */
+let selectedMonthFilter = '';
 let sortField = 'date';
 let sortDirection = -1;
 let newEntryType = 'chi';
@@ -303,15 +314,32 @@ function handleExport() {
 
 /* ---------- Vẽ giao diện ---------- */
 
+/** Chọn "Xem thêm" thì mở đầy đủ danh sách tháng và giữ nguyên tháng đang lọc. */
+function handleMonthFilterChange() {
+  const picked = qs('#filter-month').value;
+  if (picked !== MONTH_OPTION_MORE) {
+    selectedMonthFilter = picked;
+    renderLedger();
+    return;
+  }
+  store.showAllLedgerMonths = true;
+  renderLedgerFilters();
+  qs('#filter-month').value = selectedMonthFilter;
+  renderLedger();
+}
+
 /** Dựng lại các ô chọn tháng và danh mục, giữ nguyên lựa chọn của người dùng. */
 export function renderLedgerFilters() {
-  const keptMonth = qs('#filter-month').value;
+  const keptMonth = qs('#filter-month').value || selectedMonthFilter;
   const keptCategory = qs('#filter-category').value;
 
   const months = [...new Set(store.transactions.map((item) => item.date.slice(0, 7)))].sort().reverse();
+  // Chỉ admin mới xem được toàn bộ sổ; người dùng thường xem từng tháng một.
+  const shownMonths = store.showAllLedgerMonths ? months : months.slice(0, MONTH_OPTION_LIMIT);
   qs('#filter-month').innerHTML =
-    '<option value="">Tất cả các tháng</option>' +
-    months.map((month) => `<option value="${month}">${formatMonthLabel(month)}</option>`).join('');
+    (store.isAdmin ? '<option value="">Tất cả các tháng</option>' : '') +
+    shownMonths.map((month) => `<option value="${month}">${formatMonthLabel(month)}</option>`).join('') +
+    buildMoreOption(months.length - shownMonths.length, MONTH_OPTION_MORE);
 
   const categories = [...new Set(store.transactions.map((item) => item.cat))].sort();
   qs('#filter-category').innerHTML =
@@ -320,7 +348,10 @@ export function renderLedgerFilters() {
       .map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`)
       .join('');
 
-  if (months.includes(keptMonth)) qs('#filter-month').value = keptMonth;
+  if (shownMonths.includes(keptMonth)) qs('#filter-month').value = keptMonth;
+  else if (!store.isAdmin) qs('#filter-month').value = shownMonths[0] ?? '';
+  else qs('#filter-month').value = '';
+  selectedMonthFilter = qs('#filter-month').value;
   if (categories.includes(keptCategory)) qs('#filter-category').value = keptCategory;
 }
 
@@ -408,7 +439,8 @@ export function initLedgerView() {
     });
   });
 
-  ['#filter-month', '#filter-category', '#filter-keyword'].forEach((selector) => {
+  qs('#filter-month').addEventListener('change', handleMonthFilterChange);
+  ['#filter-category', '#filter-keyword'].forEach((selector) => {
     qs(selector).addEventListener('input', renderLedger);
   });
 

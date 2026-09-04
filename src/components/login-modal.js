@@ -3,6 +3,7 @@
 import { login, logout, restoreSession } from '../services/auth-service.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
+import { enforceVisibleTab } from './tab-nav.js';
 import { qs } from '../utils/dom.js';
 
 /** Cập nhật giao diện theo trạng thái đăng nhập hiện tại. */
@@ -12,6 +13,7 @@ export function applyAuthState() {
   qs('#auth-icon').textContent = store.isAdmin ? '✓' : '🔒';
   qs('#auth-label').textContent = store.isAdmin ? 'Admin' : 'Đăng nhập';
   qs('#auth-toggle').title = store.isAdmin ? 'Bấm để đăng xuất' : 'Đăng nhập để chỉnh sửa';
+  enforceVisibleTab();
   if (store.data) requestRender('ledger', 'members', 'months');
 }
 

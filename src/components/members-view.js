@@ -1,5 +1,6 @@
 /** Trang Thành viên: thống kê đóng góp và phân loại đang / ngừng hoạt động. */
 
+import { MEMBER_PAGE_SIZE } from '../config/constants.js';
 import {
   aggregateMembers,
   countUnpaidActive,
@@ -14,6 +15,9 @@ import { formatCurrency, formatMonthLabel } from '../utils/format.js';
 
 /** Bộ lọc trạng thái hiện tại: 'all' | 'active' | 'inactive'. */
 let statusFilter = 'all';
+
+/** Trang đang xem của bảng thành viên, đếm từ 1. */
+let currentPage = 1;
 
 /** Các cách sắp xếp danh sách thành viên. */
 const SORT_COMPARATORS = {
@@ -60,6 +64,28 @@ function handleReset() {
   requestRender('members');
 }
 
+/** Chuyển trang bảng thành viên. */
+function handleChangePage(step) {
+  currentPage += step;
+  renderMembers();
+}
+
+/**
+ * Cập nhật thanh phân trang dưới bảng thành viên.
+ * @param {number} totalRows tổng số dòng sau khi lọc
+ * @param {number} pageCount tổng số trang
+ * @param {number} pageStart vị trí dòng đầu của trang hiện tại
+ * @param {number} pageRowCount số dòng đang hiện
+ */
+function renderPager(totalRows, pageCount, pageStart, pageRowCount) {
+  setVisible(qs('#members-pager'), pageCount > 1, 'flex');
+  qs('#members-pager-status').textContent = totalRows
+    ? `${pageStart + 1}–${pageStart + pageRowCount} trên ${totalRows} người · trang ${currentPage}/${pageCount}`
+    : '';
+  qs('#members-prev').disabled = currentPage <= 1;
+  qs('#members-next').disabled = currentPage >= pageCount;
+}
+
 /** Vẽ lại trang Thành viên. */
 export function renderMembers() {
   const lastMonthKey = store.months[store.months.length - 1].month;
@@ -74,6 +100,11 @@ export function renderMembers() {
       return matchesKeyword && matchesStatus;
     })
     .sort(SORT_COMPARATORS[sortKey]);
+
+  const pageCount = Math.max(1, Math.ceil(rows.length / MEMBER_PAGE_SIZE));
+  currentPage = Math.min(currentPage, pageCount);
+  const pageStart = (currentPage - 1) * MEMBER_PAGE_SIZE;
+  const pageRows = rows.slice(pageStart, pageStart + MEMBER_PAGE_SIZE);
 
   const activeMembers = store.members.filter((member) => store.activeMembers[member.name]);
   const inactiveCount = store.members.length - activeMembers.length;
@@ -90,8 +121,8 @@ export function renderMembers() {
   qs('#members-unpaid').style.color = unpaidCount ? 'var(--crit)' : 'var(--good)';
   qs('#members-unpaid-note').textContent = `trong nhóm đang hoạt động · ${formatMonthLabel(lastMonthKey)}`;
 
-  qs('#members-table').innerHTML = rows.length
-    ? rows
+  qs('#members-table').innerHTML = pageRows.length
+    ? pageRows
         .map((member, index) => {
           const rate = member.paidMonths / member.months;
           const isActive = Boolean(store.activeMembers[member.name]);
@@ -101,7 +132,7 @@ export function renderMembers() {
             ${isActive ? 'checked' : ''} ${store.isAdmin ? '' : 'disabled'}
             aria-label="Đánh dấu ${escapeHtml(member.name)} còn hoạt động">
         </td>
-        <td class="cell-num" style="color:var(--text-3)">${index + 1}</td>
+        <td class="cell-num" style="color:var(--text-3)">${pageStart + index + 1}</td>
         <td class="cell-name">${escapeHtml(member.name)}</td>
         <td class="cell-num" style="color:var(--text);font-weight:550">${formatCurrency(member.total)}</td>
         <td class="cell-num">${member.months}</td>
@@ -126,6 +157,8 @@ export function renderMembers() {
     checkbox.addEventListener('change', () => handleToggleActive(checkbox.dataset.name, checkbox.checked));
   });
 
+  renderPager(rows.length, pageCount, pageStart, pageRows.length);
+
   const changed = getChangedActiveNames();
   qs('#members-pending-state').textContent = changed.length
     ? `Đang có ${changed.length} thay đổi chưa lưu chung: ${changed.slice(0, 6).join(', ')}${changed.length > 6 ? '…' : ''}`
@@ -138,8 +171,14 @@ export function renderMembers() {
 /** Gắn sự kiện cho trang Thành viên. */
 export function initMembersView() {
   ['#members-keyword', '#members-sort'].forEach((selector) => {
-    qs(selector).addEventListener('input', renderMembers);
+    qs(selector).addEventListener('input', () => {
+      currentPage = 1;
+      renderMembers();
+    });
   });
+
+  qs('#members-prev').addEventListener('click', () => handleChangePage(-1));
+  qs('#members-next').addEventListener('click', () => handleChangePage(1));
 
   qsa('#members-status-toggle .segmented__item').forEach((button) => {
     button.addEventListener('click', () => {
@@ -147,6 +186,7 @@ export function initMembersView() {
         item.setAttribute('aria-pressed', String(item === button));
       });
       statusFilter = button.dataset.status;
+      currentPage = 1;
       renderMembers();
     });
   });

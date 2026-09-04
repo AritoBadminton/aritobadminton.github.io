@@ -1,7 +1,6 @@
 /** Nút chuyển giao diện sáng/tối, ghi nhớ lựa chọn trên máy người dùng. */
 
 import { STORAGE_KEYS } from '../config/constants.js';
-import { requestRender } from '../state/render-bus.js';
 import { readRaw, writeRaw } from '../services/storage-service.js';
 import { qs } from '../utils/dom.js';
 
@@ -18,7 +17,6 @@ function handleToggleClick() {
   const next = isDark ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   writeRaw(STORAGE_KEYS.THEME, next);
-  requestRender('charts');
 }
 
 /** Gắn sự kiện cho nút chuyển giao diện. */

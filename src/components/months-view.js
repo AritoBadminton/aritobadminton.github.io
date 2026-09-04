@@ -1,7 +1,11 @@
 /** Trang Đóng quỹ theo tháng: danh sách đóng quỹ, mã QR và chi tiêu của tháng. */
 
-import { DUES_STATUS, DUES_STATUS_LABELS } from '../config/constants.js';
-import { getAllExpenses } from '../services/ledger-service.js';
+import {
+  DUES_STATUS,
+  DUES_STATUS_LABELS,
+  MONTH_OPTION_LIMIT,
+  MONTH_OPTION_MORE,
+} from '../config/constants.js';
 import {
   fillMonthWithActiveMembers,
   getActiveMemberNames,
@@ -22,14 +26,16 @@ import {
 import { aggregateMembers } from '../services/member-service.js';
 import { requestRender } from '../state/render-bus.js';
 import { buildDuesKey, store } from '../state/store.js';
-import { copyToClipboard, escapeHtml, flashButtonLabel, qs, qsa, setVisible } from '../utils/dom.js';
 import {
-  formatCurrency,
-  formatDateLabel,
-  formatMonthLabel,
-  getCategoryColor,
-  parseAmount,
-} from '../utils/format.js';
+  buildMoreOption,
+  copyToClipboard,
+  escapeHtml,
+  flashButtonLabel,
+  qs,
+  qsa,
+  setVisible,
+} from '../utils/dom.js';
+import { formatCurrency, formatMonthLabel, parseAmount } from '../utils/format.js';
 
 /** Lớp CSS tô màu cho ô trạng thái. */
 const STATUS_CLASS = {
@@ -37,6 +43,9 @@ const STATUS_CLASS = {
   [DUES_STATUS.UNPAID]: 'status-select--unpaid',
   [DUES_STATUS.SKIPPED]: 'status-select--skipped',
 };
+
+/** Tháng đang xem, giữ lại khi mở rộng danh sách tháng. */
+let lastMonthKey = '';
 
 /* ---------- Xử lý sự kiện ---------- */
 
@@ -104,6 +113,19 @@ async function handleExport() {
   qs('#month-export').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+/** Chọn "Xem thêm" thì mở đầy đủ danh sách tháng và giữ nguyên tháng đang xem. */
+function handleMonthPickerChange() {
+  setVisible(qs('#month-export'), false);
+  if (qs('#month-picker').value !== MONTH_OPTION_MORE) {
+    renderMonths();
+    return;
+  }
+  store.showAllDuesMonths = true;
+  qs('#month-picker').value = lastMonthKey;
+  renderMonthPicker();
+  renderMonths();
+}
+
 /* ---------- Vẽ giao diện ---------- */
 
 /** Dựng lại ô chọn tháng, gồm cả các tháng tự tạo. */
@@ -111,8 +133,13 @@ export function renderMonthPicker() {
   const kept = qs('#month-picker').value;
   const activeCount = getActiveMemberNames().length;
 
+  // Mặc định chỉ hiện 5 tháng gần nhất cho gọn; tháng tự tạo luôn giữ lại.
+  const hiddenCount = store.showAllDuesMonths ? 0 : Math.max(0, store.months.length - MONTH_OPTION_LIMIT);
+  const shownMonths = store.months.slice(hiddenCount);
+
   qs('#month-picker').innerHTML =
-    store.months
+    buildMoreOption(hiddenCount, MONTH_OPTION_MORE) +
+    shownMonths
       .map(
         (month) =>
           `<option value="${month.month}">${formatMonthLabel(month.month)} — ${month.members.length} thành viên</option>`,
@@ -132,6 +159,7 @@ export function renderMonthPicker() {
 /** Vẽ lại toàn bộ trang Đóng quỹ theo tháng. */
 export function renderMonths() {
   const monthKey = getSelectedMonthKey();
+  lastMonthKey = monthKey;
   const isVirtual = isVirtualMonth(monthKey);
 
   const rows = getMonthMembers(monthKey).map((member) => ({
@@ -147,9 +175,6 @@ export function renderMonths() {
   const skippedRows = rows.filter((row) => row.status === DUES_STATUS.SKIPPED);
   const expectedCount = rows.length - skippedRows.length;
   const collected = rows.reduce((sum, row) => sum + row.amount, 0);
-  const expenses = getAllExpenses().filter((item) => item.date.startsWith(monthKey));
-  const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
-
   const unpaidCount = expectedCount - paidRows.length;
   qs('#month-collected').textContent = formatCurrency(collected);
   qs('#month-paid-count').textContent = `${paidRows.length}/${expectedCount}`;
@@ -158,14 +183,11 @@ export function renderMonths() {
     : '';
   qs('#month-unpaid-count').textContent = `${unpaidCount} người`;
   qs('#month-unpaid-count').style.color = unpaidCount ? 'var(--crit)' : 'var(--good)';
-  qs('#month-expense').textContent = formatCurrency(expenseTotal);
 
   qs('#month-subtitle').textContent =
     `${formatMonthLabel(monthKey)} · ${rows.length} thành viên` +
     (store.isAdmin ? ' · chọn ở cột Trạng thái để đánh dấu' : '');
   qs('#month-note-hint').textContent = store.isAdmin ? '(sửa được)' : '';
-  qs('#month-expense-subtitle').textContent =
-    `${expenses.length} khoản chi trong ${formatMonthLabel(monthKey).toLowerCase()}`;
 
   /* Thanh báo tháng tự sinh / đã bổ sung */
   const addedCount = rows.filter((row) => row.isNewRow).length;
@@ -249,24 +271,6 @@ export function renderMonths() {
     });
   });
 
-  /* Bảng chi tiêu trong tháng */
-  qs('#month-expense-table').innerHTML = expenses.length
-    ? expenses
-        .map(
-          (item) => `<tr>
-        <td>${formatDateLabel(item.date)}</td>
-        <td class="cell-name">${escapeHtml(item.desc)}</td>
-        <td><span style="display:inline-flex;align-items:center;gap:7px">
-          <i class="color-dot" style="background:${getCategoryColor(item.cat)}"></i>${escapeHtml(item.cat)}
-        </span></td>
-        <td class="cell-num">${formatCurrency(item.amount)}</td>
-      </tr>`,
-        )
-        .join('') +
-      `<tr><td colspan="3" style="font-weight:600;color:var(--text)">Tổng chi</td>
-       <td class="cell-num" style="font-weight:650;color:var(--crit)">${formatCurrency(expenseTotal)}</td></tr>`
-    : '<tr><td colspan="4" class="table-empty text-muted">Không có khoản chi nào</td></tr>';
-
   /* Thanh lưu chung */
   const changedNames = getChangedMemberNames(monthKey);
   const markedNames = rows.filter((row) => hasOverride(monthKey, row.name)).map((row) => row.name);
@@ -301,10 +305,7 @@ export function renderMonths() {
 
 /** Gắn sự kiện cho trang Đóng quỹ theo tháng. */
 export function initMonthsView() {
-  qs('#month-picker').addEventListener('change', () => {
-    setVisible(qs('#month-export'), false);
-    renderMonths();
-  });
+  qs('#month-picker').addEventListener('change', handleMonthPickerChange);
   qs('#month-fill').addEventListener('click', handleFillMonth);
   qs('#month-export-toggle').addEventListener('click', handleExport);
   qs('#month-reset').addEventListener('click', handleResetMonth);
