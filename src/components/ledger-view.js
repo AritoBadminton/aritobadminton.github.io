@@ -278,7 +278,11 @@ function buildExportBlocks() {
     }
   });
 
-  const latestDate = store.transactions.reduce((a, b) => (a.date > b.date ? a : b)).date;
+  const latestDate =
+    store.transactions
+      .map((item) => item.date)
+      .sort()
+      .at(-1) ?? '';
   blocks.push([
     'Sửa dòng <code>"updated"</code> ở đầu file thành',
     ` "updated": ${JSON.stringify(latestDate)},`,
@@ -292,7 +296,11 @@ function buildLedgerPayload() {
   return {
     incomes: getAllIncomes().map(clean),
     expenses: getAllExpenses().map(clean),
-    updated: store.transactions.reduce((a, b) => (a.date > b.date ? a : b)).date,
+    updated:
+      store.transactions
+        .map((item) => item.date)
+        .sort()
+        .at(-1) ?? '',
   };
 }
 

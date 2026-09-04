@@ -188,7 +188,8 @@ export function renderMonthPicker() {
       .join('');
 
   const options = [...qs('#month-picker').options].map((option) => option.value);
-  qs('#month-picker').value = options.includes(kept) ? kept : store.months[store.months.length - 1].month;
+  const fallback = store.months[store.months.length - 1]?.month ?? getFutureMonthKeys()[0] ?? '';
+  qs('#month-picker').value = options.includes(kept) ? kept : fallback;
 }
 
 /** Vẽ lại toàn bộ trang Đóng quỹ theo tháng. */
@@ -350,7 +351,7 @@ export function initMonthsView() {
 
 /** Tháng đang được chọn trong ô lọc. */
 function getSelectedMonthKey() {
-  return qs('#month-picker').value || store.months[store.months.length - 1].month;
+  return qs('#month-picker').value || store.months[store.months.length - 1]?.month || '';
 }
 
 /** Một dòng có ghi đè số tiền, ghi chú hay trạng thái không chơi hay không. */

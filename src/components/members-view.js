@@ -109,7 +109,7 @@ function renderPager(totalRows, pageCount, pageStart, pageRowCount) {
 
 /** Vẽ lại trang Thành viên. */
 export function renderMembers() {
-  const lastMonthKey = store.months[store.months.length - 1].month;
+  const lastMonthKey = store.months[store.months.length - 1]?.month ?? '';
   const keyword = qs('#members-keyword').value.trim().toLowerCase();
   const sortKey = qs('#members-sort').value;
 

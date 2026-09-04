@@ -193,13 +193,14 @@ export function renderDashboard() {
   const balance = totalIncome - totalExpense;
   const monthCount = store.months.length;
 
-  const firstDate = store.transactions.reduce((a, b) => (a.date < b.date ? a : b)).date;
-  const lastDate = store.transactions.reduce((a, b) => (a.date > b.date ? a : b)).date;
+  const dates = store.transactions.map((item) => item.date).sort();
+  const firstDate = dates[0] ?? '';
+  const lastDate = dates[dates.length - 1] ?? '';
 
   const balanceValue = qs('#kpi-balance');
   balanceValue.textContent = formatCurrency(balance);
   balanceValue.classList.toggle('stat-tile__value--negative', balance < 0);
-  qs('#kpi-balance-note').textContent = `Cập nhật ${formatDateLabel(lastDate)}`;
+  qs('#kpi-balance-note').textContent = lastDate ? `Cập nhật ${formatDateLabel(lastDate)}` : '';
 
   qs('#kpi-income').textContent = formatCurrency(totalIncome);
   qs('#kpi-income-note').textContent =
@@ -209,12 +210,15 @@ export function renderDashboard() {
     `${expenses.length} khoản chi · TB ${formatCurrency(totalExpense / monthCount)}/tháng`;
 
   const lastMonth = store.months[store.months.length - 1];
-  qs('#kpi-members').textContent = String(lastMonth.members.length);
-  qs('#kpi-members-note').textContent =
-    `${formatMonthLabel(lastMonth.month)} · ${store.members.length} người từng tham gia`;
+  qs('#kpi-members').textContent = String(lastMonth?.members.length ?? 0);
+  qs('#kpi-members-note').textContent = lastMonth
+    ? `${formatMonthLabel(lastMonth.month)} · ${store.members.length} người từng tham gia`
+    : 'Chưa có tháng nào';
 
-  qs('#app-subtitle').textContent = `Từ ${formatDateLabel(firstDate)} đến ${formatDateLabel(lastDate)}`;
-  qs('#footer-updated').textContent = `Cập nhật lần cuối: ${formatDateLabel(lastDate)}`;
+  qs('#app-subtitle').textContent = firstDate
+    ? `Từ ${formatDateLabel(firstDate)} đến ${formatDateLabel(lastDate)}`
+    : 'Chưa có giao dịch nào';
+  qs('#footer-updated').textContent = lastDate ? `Cập nhật lần cuối: ${formatDateLabel(lastDate)}` : '';
 
   const recent = [...store.transactions]
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
