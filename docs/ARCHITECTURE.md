@@ -30,6 +30,8 @@ src/
 │   ├── member-service.js     Thành viên và trạng thái hoạt động
 │   ├── rules-service.js      Quy định đóng quỹ admin sửa tại chỗ
 │   ├── api-service.js        Gọi Cloudflare Worker: đăng nhập và lưu chung
+│   ├── firebase-service.js   Firestore: đăng nhập, lắng nghe realtime, ghi
+│   ├── data-source.js        Chọn nguồn dữ liệu: Firebase hay data.json
 │   └── sync-service.js       Dựng lại trạng thái sau khi dữ liệu chung đổi
 ├── components/               Giao diện — nơi duy nhất chạm vào DOM
 │   ├── dashboard-view.js
