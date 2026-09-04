@@ -27,7 +27,8 @@ src/
 │   ├── auth-service.js       Đăng nhập quản trị
 │   ├── ledger-service.js     Sổ thu chi: thêm, sửa, gộp, xuất
 │   ├── dues-service.js       Đóng quỹ theo tháng (đã đóng / chưa đóng / không chơi)
-│   └── member-service.js     Thành viên và trạng thái hoạt động
+│   ├── member-service.js     Thành viên và trạng thái hoạt động
+│   └── rules-service.js      Quy định đóng quỹ admin sửa tại chỗ
 ├── components/               Giao diện — nơi duy nhất chạm vào DOM
 │   ├── dashboard-view.js
 │   ├── ledger-view.js
