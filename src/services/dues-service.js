@@ -10,6 +10,8 @@
 import { DUES_STATUS, FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
 import { getFollowingMonthKeys } from '../utils/date.js';
+import { formatMonthLabel } from '../utils/format.js';
+import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
 
 /** Nạp mọi ghi đè đóng quỹ đã lưu trên máy. */
@@ -154,12 +156,30 @@ export function getUsualAmount(memberName, untilMonthKey) {
 }
 
 /**
+ * Ghi một ô của bảng đóng quỹ lên Firestore, giữ nguyên các trường không đổi.
+ * @param {string} monthKey
+ * @param {string} memberName
+ * @param {object} changes phần cần đổi, ví dụ { paid: 50000 }
+ */
+function writeDuesEntry(monthKey, memberName, changes) {
+  const current = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? {};
+  const entry = {
+    paid: current.paid ?? 0,
+    note: current.note ?? '',
+    skip: Boolean(current.skip),
+    ...changes,
+  };
+  return firebaseApi().saveDuesEntry(monthKey, memberName, entry, formatMonthLabel(monthKey));
+}
+
+/**
  * Đặt số tiền đóng quỹ, tự bỏ ghi đè nếu trùng với bản gốc.
  * @param {string} monthKey
  * @param {string} memberName
  * @param {number} amount
  */
 export function setPaidAmount(monthKey, memberName, amount) {
+  if (isFirebaseMode()) return writeDuesEntry(monthKey, memberName, { paid: amount });
   const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? { paid: 0 };
   const key = buildDuesKey(monthKey, memberName);
   if (amount === original.paid) delete store.duesPaidOverrides[key];
@@ -174,6 +194,7 @@ export function setPaidAmount(monthKey, memberName, amount) {
  * @param {boolean} isSkipped
  */
 export function setSkipped(monthKey, memberName, isSkipped) {
+  if (isFirebaseMode()) return writeDuesEntry(monthKey, memberName, { skip: isSkipped });
   const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? {};
   const key = buildDuesKey(monthKey, memberName);
   if (isSkipped === Boolean(original.skip)) delete store.duesSkipOverrides[key];
@@ -189,9 +210,12 @@ export function setSkipped(monthKey, memberName, isSkipped) {
  * @param {'paid'|'unpaid'|'skipped'} status
  */
 export function setDuesStatus(monthKey, memberName, status) {
-  setSkipped(monthKey, memberName, status === DUES_STATUS.SKIPPED);
-  const amount = status === DUES_STATUS.PAID ? getUsualAmount(memberName, monthKey) : 0;
-  setPaidAmount(monthKey, memberName, amount);
+  const paid = status === DUES_STATUS.PAID ? getUsualAmount(memberName, monthKey) : 0;
+  const skip = status === DUES_STATUS.SKIPPED;
+  // Ghi một lần cho cả hai trường, tránh hai lượt ghi cho một thao tác.
+  if (isFirebaseMode()) return writeDuesEntry(monthKey, memberName, { paid, skip });
+  setSkipped(monthKey, memberName, skip);
+  setPaidAmount(monthKey, memberName, paid);
 }
 
 /**
@@ -201,6 +225,7 @@ export function setDuesStatus(monthKey, memberName, status) {
  * @param {string} note
  */
 export function setNote(monthKey, memberName, note) {
+  if (isFirebaseMode()) return writeDuesEntry(monthKey, memberName, { note });
   const original = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? { note: '' };
   const key = buildDuesKey(monthKey, memberName);
   if (note === (original.note ?? '')) delete store.duesNoteOverrides[key];
@@ -213,6 +238,18 @@ export function setNote(monthKey, memberName, note) {
  * @param {string} monthKey
  */
 export function fillMonthWithActiveMembers(monthKey) {
+  if (isFirebaseMode()) {
+    const rows = getMonthMembers(monthKey).map((member) => ({
+      name: member.name,
+      paid: getEffectivePaid(monthKey, member),
+      note: getEffectiveNote(monthKey, member),
+      skip: getEffectiveSkip(monthKey, member),
+    }));
+    const activeRows = getActiveMemberNames()
+      .filter((name) => !rows.some((row) => row.name === name))
+      .map((name) => ({ name, paid: 0, note: '', skip: false }));
+    return firebaseApi().saveDuesRows(monthKey, formatMonthLabel(monthKey), [...rows, ...activeRows]);
+  }
   store.duesFilledMonths[monthKey] = true;
   persistLocalDuesChanges();
 }

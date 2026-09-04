@@ -2,6 +2,7 @@
 
 import { STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
+import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { getEffectivePaid, getEffectiveSkip, getFutureMonthKeys, getMonthMembers } from './dues-service.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
 
@@ -91,6 +92,7 @@ export function initActiveMembers() {
  * @param {boolean} isActive
  */
 export function setMemberActive(name, isActive) {
+  if (isFirebaseMode()) return firebaseApi().saveMemberActive(name, isActive);
   store.activeMembers[name] = isActive;
   writeJson(STORAGE_KEYS.ACTIVE_MEMBERS, store.activeMembers);
 }

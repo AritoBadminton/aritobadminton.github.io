@@ -9,6 +9,7 @@
 
 import { STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
+import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
 
 const INCOME_PREFIX = 'thu';
@@ -29,11 +30,13 @@ function withOverrides(source, prefix) {
 
 /** Toàn bộ khoản thu đang hiệu lực. */
 export function getAllIncomes() {
+  if (isFirebaseMode()) return store.data.incomes;
   return withOverrides(store.data.incomes, INCOME_PREFIX).concat(store.addedTransactions.incomes);
 }
 
 /** Toàn bộ khoản chi đang hiệu lực. */
 export function getAllExpenses() {
+  if (isFirebaseMode()) return store.data.expenses;
   return withOverrides(store.data.expenses, EXPENSE_PREFIX).concat(store.addedTransactions.expenses);
 }
 
@@ -78,6 +81,9 @@ function commitLedgerChange() {
  * @param {{date: string, amount: number, desc: string, cat: string}} fields
  */
 export function addTransaction(type, fields) {
+  if (isFirebaseMode()) {
+    return firebaseApi().addTransaction({ type, ...fields });
+  }
   const record = {
     id: `n${Date.now()}${Math.random().toString(36).slice(2, 6)}`,
     ...fields,
@@ -93,6 +99,7 @@ export function addTransaction(type, fields) {
  * @param {string} id
  */
 export function removeAddedTransaction(id) {
+  if (isFirebaseMode()) return firebaseApi().deleteTransaction(id);
   store.addedTransactions.incomes = store.addedTransactions.incomes.filter((item) => item.id !== id);
   store.addedTransactions.expenses = store.addedTransactions.expenses.filter((item) => item.id !== id);
   commitLedgerChange();
@@ -104,6 +111,9 @@ export function removeAddedTransaction(id) {
  * @param {object} patch các trường cần đổi
  */
 export function updateTransaction(id, patch) {
+  if (isFirebaseMode()) {
+    return firebaseApi().updateTransaction(id, patch);
+  }
   if (id.startsWith('n')) {
     ['incomes', 'expenses'].forEach((bucket) => {
       const target = store.addedTransactions[bucket].find((item) => item.id === id);
@@ -147,6 +157,7 @@ export function discardAllLedgerChanges() {
 
 /** Số lượng thay đổi chưa lưu chung. */
 export function countPendingLedgerChanges() {
+  if (isFirebaseMode()) return 0;
   return {
     added: store.addedTransactions.incomes.length + store.addedTransactions.expenses.length,
     addedIncomes: store.addedTransactions.incomes.length,

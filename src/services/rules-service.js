@@ -7,6 +7,7 @@
 
 import { STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
+import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
 
 /** Các trường của một mức đóng, theo đúng thứ tự hiển thị. */
@@ -76,13 +77,16 @@ export function setRuleField(index, field, value) {
   const items = getEffectiveRuleItems().map(normalizeItem);
   if (!items[index]) return;
   items[index][field] = value;
+  if (isFirebaseMode()) return firebaseApi().saveRuleItems(items);
   store.ruleItemsOverride = items;
   persistLocalRuleChanges();
 }
 
 /** Thêm một mức đóng trống vào cuối danh sách. */
 export function addRuleItem() {
-  store.ruleItemsOverride = [...getEffectiveRuleItems().map(normalizeItem), { ...EMPTY_RULE_ITEM }];
+  const items = [...getEffectiveRuleItems().map(normalizeItem), { ...EMPTY_RULE_ITEM }];
+  if (isFirebaseMode()) return firebaseApi().saveRuleItems(items);
+  store.ruleItemsOverride = items;
   persistLocalRuleChanges();
 }
 
@@ -94,6 +98,7 @@ export function removeRuleItem(index) {
   const items = getEffectiveRuleItems().map(normalizeItem);
   if (!items[index]) return;
   items.splice(index, 1);
+  if (isFirebaseMode()) return firebaseApi().saveRuleItems(items);
   store.ruleItemsOverride = items;
   persistLocalRuleChanges();
 }

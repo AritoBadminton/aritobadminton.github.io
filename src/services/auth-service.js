@@ -9,6 +9,7 @@
 import { ADMIN_PASSWORD_HASH, ADMIN_USERNAME, STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
 import { apiLogin, clearApiSession, isApiConfigured, loadApiSession } from './api-service.js';
+import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readRaw, readSessionRaw, removeKey, writeRaw } from './storage-service.js';
 
 /**
@@ -27,6 +28,8 @@ async function hashText(text) {
  * @returns {boolean}
  */
 export function restoreSession() {
+  // Chế độ Firebase: phiên do Firebase khôi phục, watchAuth sẽ báo lại.
+  if (isFirebaseMode()) return store.isAdmin;
   if (isApiConfigured()) {
     store.isAdmin = Boolean(loadApiSession());
     return store.isAdmin;
@@ -46,6 +49,11 @@ export function restoreSession() {
 export async function login(username, password, remember) {
   const normalizedUser = username.trim().toLowerCase();
 
+  if (isFirebaseMode()) {
+    // Firebase tự giữ phiên; trạng thái isAdmin do watchAuth cập nhật.
+    return firebaseApi().firebaseLogin(username, password);
+  }
+
   if (isApiConfigured()) {
     const result = await apiLogin(normalizedUser, password);
     store.isAdmin = result.ok;
@@ -63,6 +71,10 @@ export async function login(username, password, remember) {
 
 /** Đóng phiên đăng nhập và xoá dấu vết đã lưu. */
 export function logout() {
+  if (isFirebaseMode()) {
+    store.selectedTransactionIds.clear();
+    return firebaseApi().firebaseLogout();
+  }
   store.isAdmin = false;
   store.selectedTransactionIds.clear();
   removeKey(STORAGE_KEYS.AUTH);
