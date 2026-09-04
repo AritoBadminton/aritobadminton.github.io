@@ -44,6 +44,7 @@ export const STORAGE_KEYS = {
   DUES_SKIP: 'clb-skip-v1',
   LEDGER_ADDED: 'clb-tx-v1',
   LEDGER_EDITED: 'clb-txedit-v1',
+  RULES: 'clb-rules-v1',
 };
 
 /**
