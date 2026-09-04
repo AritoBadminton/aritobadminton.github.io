@@ -31,17 +31,6 @@ import {
   parseAmount,
 } from '../utils/format.js';
 
-/** Tháng đang được chọn trong ô lọc. */
-function getSelectedMonthKey() {
-  return qs('#month-picker').value || store.months[store.months.length - 1].month;
-}
-
-/** Một dòng có ghi đè số tiền, ghi chú hay trạng thái không chơi hay không. */
-function hasOverride(monthKey, memberName) {
-  const key = buildDuesKey(monthKey, memberName);
-  return key in store.duesPaidOverrides || key in store.duesNoteOverrides || key in store.duesSkipOverrides;
-}
-
 /** Lớp CSS tô màu cho ô trạng thái. */
 const STATUS_CLASS = {
   [DUES_STATUS.PAID]: 'status-select--paid',
@@ -319,4 +308,17 @@ export function initMonthsView() {
   qs('#month-fill').addEventListener('click', handleFillMonth);
   qs('#month-export-toggle').addEventListener('click', handleExport);
   qs('#month-reset').addEventListener('click', handleResetMonth);
+}
+
+/* ---------- Hàm phụ trợ ---------- */
+
+/** Tháng đang được chọn trong ô lọc. */
+function getSelectedMonthKey() {
+  return qs('#month-picker').value || store.months[store.months.length - 1].month;
+}
+
+/** Một dòng có ghi đè số tiền, ghi chú hay trạng thái không chơi hay không. */
+function hasOverride(monthKey, memberName) {
+  const key = buildDuesKey(monthKey, memberName);
+  return key in store.duesPaidOverrides || key in store.duesNoteOverrides || key in store.duesSkipOverrides;
 }
