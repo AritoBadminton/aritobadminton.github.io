@@ -28,7 +28,9 @@ src/
 │   ├── ledger-service.js     Sổ thu chi: thêm, sửa, gộp, xuất
 │   ├── dues-service.js       Đóng quỹ theo tháng (đã đóng / chưa đóng / không chơi)
 │   ├── member-service.js     Thành viên và trạng thái hoạt động
-│   └── rules-service.js      Quy định đóng quỹ admin sửa tại chỗ
+│   ├── rules-service.js      Quy định đóng quỹ admin sửa tại chỗ
+│   ├── api-service.js        Gọi Cloudflare Worker: đăng nhập và lưu chung
+│   └── sync-service.js       Dựng lại trạng thái sau khi dữ liệu chung đổi
 ├── components/               Giao diện — nơi duy nhất chạm vào DOM
 │   ├── dashboard-view.js
 │   ├── ledger-view.js
@@ -36,6 +38,7 @@ src/
 │   ├── months-view.js
 │   ├── login-modal.js
 │   ├── tab-nav.js
+│   ├── save-bar.js
 │   └── theme-toggle.js
 ├── utils/                    Hàm bổ trợ thuần, không phụ thuộc trạng thái
 │   ├── dom.js                qs, qsa, escapeHtml, copyToClipboard
