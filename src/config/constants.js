@@ -41,6 +41,7 @@ export const STORAGE_KEYS = {
   DUES_PAID: 'clb-paid-v1',
   DUES_NOTES: 'clb-note-v1',
   DUES_FILL: 'clb-fill-v1',
+  DUES_SKIP: 'clb-skip-v1',
   LEDGER_ADDED: 'clb-tx-v1',
   LEDGER_EDITED: 'clb-txedit-v1',
 };
@@ -55,6 +56,23 @@ export const STORAGE_KEYS = {
  */
 export const ADMIN_USERNAME = 'admin';
 export const ADMIN_PASSWORD_HASH = '0f52167b7f8d9dd7a4cb1f59cfd855acf53021f3168cae3bc9c5085a4d1afab5';
+
+/**
+ * Trạng thái đóng quỹ của một thành viên trong tháng.
+ * SKIPPED nghĩa là tháng đó không chơi, nên không bị tính là còn nợ quỹ.
+ */
+export const DUES_STATUS = {
+  PAID: 'paid',
+  UNPAID: 'unpaid',
+  SKIPPED: 'skipped',
+};
+
+/** Nhãn hiển thị cho từng trạng thái đóng quỹ. */
+export const DUES_STATUS_LABELS = {
+  [DUES_STATUS.PAID]: 'Đã đóng',
+  [DUES_STATUS.UNPAID]: 'Chưa đóng',
+  [DUES_STATUS.SKIPPED]: 'Không chơi',
+};
 
 /** Giá trị đại diện cho lựa chọn "giữ nguyên" khi sửa nhiều dòng cùng lúc. */
 export const KEEP_UNCHANGED = '__keep-unchanged__';
