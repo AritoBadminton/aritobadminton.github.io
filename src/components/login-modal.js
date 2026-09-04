@@ -14,7 +14,7 @@ export function applyAuthState() {
   qs('#auth-label').textContent = store.isAdmin ? 'Admin' : 'Đăng nhập';
   qs('#auth-toggle').title = store.isAdmin ? 'Bấm để đăng xuất' : 'Đăng nhập để chỉnh sửa';
   enforceVisibleTab();
-  if (store.data) requestRender('ledger', 'members', 'months');
+  if (store.data) requestRender('dashboard', 'ledger', 'members', 'months');
 }
 
 /** Mở hộp thoại đăng nhập với ô mật khẩu trống. */
