@@ -70,3 +70,14 @@ export function flashButtonLabel(button, message = 'Đã sao chép ✓') {
     button.textContent = original;
   }, 1800);
 }
+
+/**
+ * Dựng dòng "Xem thêm" cho ô chọn tháng khi danh sách bị rút gọn.
+ * @param {number} hiddenCount số tháng đang bị ẩn bớt
+ * @param {string} moreValue giá trị gán cho dòng "Xem thêm"
+ * @returns {string} chuỗi HTML của một <option>, rỗng nếu không cần
+ */
+export function buildMoreOption(hiddenCount, moreValue) {
+  if (hiddenCount <= 0) return '';
+  return `<option value="${moreValue}">▾ Xem thêm ${hiddenCount} tháng cũ hơn…</option>`;
+}
