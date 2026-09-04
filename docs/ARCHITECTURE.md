@@ -26,7 +26,7 @@ src/
 │   ├── storage-service.js    Bọc localStorage/sessionStorage an toàn
 │   ├── auth-service.js       Đăng nhập quản trị
 │   ├── ledger-service.js     Sổ thu chi: thêm, sửa, gộp, xuất
-│   ├── dues-service.js       Đóng quỹ theo tháng
+│   ├── dues-service.js       Đóng quỹ theo tháng (đã đóng / chưa đóng / không chơi)
 │   └── member-service.js     Thành viên và trạng thái hoạt động
 ├── components/               Giao diện — nơi duy nhất chạm vào DOM
 │   ├── dashboard-view.js
