@@ -37,9 +37,17 @@ async function handleSubmit() {
   const password = qs('#login-password').value;
   const remember = qs('#login-remember').checked;
 
-  const success = await login(username, password, remember);
-  if (!success) {
-    qs('#login-error').textContent = 'Sai tài khoản hoặc mật khẩu.';
+  const submitButton = qs('#login-submit');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Đang kiểm tra…';
+
+  const result = await login(username, password, remember);
+
+  submitButton.disabled = false;
+  submitButton.textContent = 'Đăng nhập';
+
+  if (!result.ok) {
+    qs('#login-error').textContent = result.error ?? 'Sai tài khoản hoặc mật khẩu.';
     qs('#login-password').select();
     return;
   }
@@ -55,7 +63,6 @@ function handleLogout() {
 
 /** Gắn toàn bộ sự kiện cho luồng đăng nhập. */
 export function initLoginModal() {
-  restoreSession();
   applyAuthState();
 
   qs('#auth-toggle').addEventListener('click', () => {
@@ -76,4 +83,13 @@ export function initLoginModal() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !qs('#login-modal').hidden) closeLoginModal();
   });
+}
+
+/**
+ * Khôi phục phiên đăng nhập sau khi đã tải xong data.json.
+ * Phải chờ tới lúc này vì địa chỉ máy chủ lưu trữ nằm trong data.json.
+ */
+export function restoreAuthState() {
+  restoreSession();
+  applyAuthState();
 }

@@ -24,6 +24,7 @@ import {
   setPaidAmount,
 } from '../services/dues-service.js';
 import { aggregateMembers } from '../services/member-service.js';
+import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { buildDuesKey, store } from '../state/store.js';
 import {
@@ -84,7 +85,41 @@ function handleResetMonth() {
   requestRender('months', 'members');
 }
 
-/** Xuất khối JSON của tháng đang xem. */
+/** Nội dung tháng đang xem, dùng cho cả lưu thẳng lẫn dán tay. */
+function buildMonthPayload(monthKey) {
+  const members = getMonthMembers(monthKey).map((member) => {
+    const entry = {
+      name: member.name,
+      paid: getEffectivePaid(monthKey, member),
+      note: getEffectiveNote(monthKey, member),
+    };
+    if (getEffectiveSkip(monthKey, member)) entry.skip = true;
+    return entry;
+  });
+  return {
+    month: {
+      month: monthKey,
+      label: formatMonthLabel(monthKey),
+      total: members.reduce((sum, item) => sum + item.paid, 0),
+      members,
+    },
+  };
+}
+
+/** Lưu tháng đang xem lên dữ liệu chung. */
+function handleSaveMonth() {
+  const monthKey = getSelectedMonthKey();
+  return saveSection({
+    buttonSelector: '#month-export-toggle',
+    statusSelector: '#month-pending-state',
+    section: 'month',
+    monthKey,
+    buildPayload: () => buildMonthPayload(monthKey),
+    showManualBlock: handleExport,
+  });
+}
+
+/** Hiện khối JSON của tháng đang xem để dán tay. */
 async function handleExport() {
   const monthKey = getSelectedMonthKey();
   const isVirtual = isVirtualMonth(monthKey);
@@ -307,7 +342,7 @@ export function renderMonths() {
 export function initMonthsView() {
   qs('#month-picker').addEventListener('change', handleMonthPickerChange);
   qs('#month-fill').addEventListener('click', handleFillMonth);
-  qs('#month-export-toggle').addEventListener('click', handleExport);
+  qs('#month-export-toggle').addEventListener('click', handleSaveMonth);
   qs('#month-reset').addEventListener('click', handleResetMonth);
 }
 

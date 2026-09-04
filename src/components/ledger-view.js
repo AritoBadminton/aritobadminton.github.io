@@ -12,6 +12,7 @@ import {
   revertTransactions,
   updateTransaction,
 } from '../services/ledger-service.js';
+import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { getTodayIso } from '../utils/date.js';
@@ -285,7 +286,28 @@ function buildExportBlocks() {
   return blocks;
 }
 
-/** Hiện khối JSON kèm nút sao chép cho từng phần. */
+/** Toàn bộ sổ thu chi hiện tại, dùng khi lưu thẳng lên dữ liệu chung. */
+function buildLedgerPayload() {
+  const clean = (item) => ({ date: item.date, amount: item.amount, desc: item.desc, cat: item.cat });
+  return {
+    incomes: getAllIncomes().map(clean),
+    expenses: getAllExpenses().map(clean),
+    updated: store.transactions.reduce((a, b) => (a.date > b.date ? a : b)).date,
+  };
+}
+
+/** Lưu sổ thu chi lên dữ liệu chung. */
+function handleSave() {
+  return saveSection({
+    buttonSelector: '#ledger-export-toggle',
+    statusSelector: '#ledger-pending-state',
+    section: 'ledger',
+    buildPayload: buildLedgerPayload,
+    showManualBlock: handleExport,
+  });
+}
+
+/** Hiện khối JSON kèm nút sao chép cho từng phần, để dán tay. */
 function handleExport() {
   const blocks = buildExportBlocks();
   qs('#ledger-export-body').innerHTML = blocks
@@ -491,7 +513,7 @@ export function initLedgerView() {
   qs('#update-save').addEventListener('click', handleSaveUpdate);
   qs('#update-cancel').addEventListener('click', closeUpdateForm);
   qs('#update-revert').addEventListener('click', handleRevert);
-  qs('#ledger-export-toggle').addEventListener('click', handleExport);
+  qs('#ledger-export-toggle').addEventListener('click', handleSave);
   qs('#ledger-discard').addEventListener('click', () => {
     if (!window.confirm('Bỏ toàn bộ khoản mới và các chỉnh sửa chưa lưu chung?')) return;
     discardAllLedgerChanges();

@@ -11,9 +11,10 @@ import {
   resetRuleItems,
   setRuleField,
 } from '../services/rules-service.js';
+import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
-import { copyToClipboard, escapeHtml, flashButtonLabel, qs, qsa, setVisible } from '../utils/dom.js';
+import { copyToClipboard, escapeHtml, qs, qsa, setVisible } from '../utils/dom.js';
 import { formatCurrency, formatDateLabel, formatMonthLabel } from '../utils/format.js';
 
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>`;
@@ -47,14 +48,24 @@ function handleResetRules() {
   requestRender('dashboard');
 }
 
-/** Xuất khối "rules" để dán vào data.json. */
-async function handleExportRules() {
+/** Hiện khối "rules" để dán tay vào data.json. */
+async function showRulesManualBlock() {
   const block = buildRulesJson();
   qs('#rules-export-code').textContent = block;
   setVisible(qs('#rules-export'), true);
   await copyToClipboard(block);
-  flashButtonLabel(qs('#rules-export-toggle'));
   qs('#rules-export').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/** Lưu quy định lên dữ liệu chung. */
+function handleSaveRules() {
+  return saveSection({
+    buttonSelector: '#rules-export-toggle',
+    statusSelector: '#rules-pending-state',
+    section: 'rules',
+    buildPayload: () => ({ items: getEffectiveRuleItems() }),
+    showManualBlock: showRulesManualBlock,
+  });
 }
 
 /* ---------- Vẽ giao diện ---------- */
@@ -228,6 +239,6 @@ export function renderDashboard() {
 
 /** Gắn sự kiện cho các nút lưu chung của khối quy định. */
 export function initDashboardView() {
-  qs('#rules-export-toggle').addEventListener('click', handleExportRules);
+  qs('#rules-export-toggle').addEventListener('click', handleSaveRules);
   qs('#rules-reset').addEventListener('click', handleResetRules);
 }

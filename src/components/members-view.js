@@ -8,6 +8,7 @@ import {
   resetActiveMembers,
   setMemberActive,
 } from '../services/member-service.js';
+import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { copyToClipboard, escapeHtml, flashButtonLabel, qs, qsa, setVisible } from '../utils/dom.js';
@@ -40,7 +41,27 @@ function handleToggleActive(name, isActive) {
   requestRender('members');
 }
 
-/** Xuất khối "roster" để dán vào data.json. */
+/** Danh sách thành viên hiện tại, dùng cho cả lưu thẳng lẫn dán tay. */
+function buildRosterPayload() {
+  return {
+    roster: [...store.members]
+      .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
+      .map((member) => ({ name: member.name, active: Boolean(store.activeMembers[member.name]) })),
+  };
+}
+
+/** Lưu danh sách thành viên lên dữ liệu chung. */
+function handleSave() {
+  return saveSection({
+    buttonSelector: '#members-export-toggle',
+    statusSelector: '#members-pending-state',
+    section: 'roster',
+    buildPayload: buildRosterPayload,
+    showManualBlock: handleExport,
+  });
+}
+
+/** Hiện khối "roster" để dán tay vào data.json. */
 async function handleExport() {
   const entries = [...store.members]
     .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
@@ -191,7 +212,7 @@ export function initMembersView() {
     });
   });
 
-  qs('#members-export-toggle').addEventListener('click', handleExport);
+  qs('#members-export-toggle').addEventListener('click', handleSave);
   qs('#members-reset').addEventListener('click', handleReset);
 }
 
