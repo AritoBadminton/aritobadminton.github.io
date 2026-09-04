@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quỹ CLB Cầu Lông Arito</title>
     <meta name="description" content="Trang thống kê và quản lý thu chi quỹ câu lạc bộ cầu lông công ty Arito." />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fed'/%3E%3Cpath d='M9 22l7-13 3 6 4-3' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
 
     <link rel="stylesheet" href="src/assets/styles/base.css" />
     <link rel="stylesheet" href="src/assets/styles/layout.css" />
@@ -42,7 +46,7 @@
       <nav class="tab-nav" role="tablist" aria-label="Khu vực nội dung">
         <button class="tab-nav__item" role="tab" aria-selected="true" data-panel="dashboard" type="button">Tổng quan</button>
         <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="ledger" type="button">Sổ thu chi</button>
-        <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="members" type="button">Thành viên</button>
+        <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="members" type="button">Thành viên</button>
         <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="months" type="button">Đóng quỹ theo tháng</button>
       </nav>
     </header>
@@ -80,18 +84,18 @@
 
       <!-- ==================== Tổng quan ==================== -->
       <section class="tab-panel" id="panel-dashboard" role="tabpanel" aria-label="Tổng quan">
-        <div class="grid grid--4">
+        <div class="grid grid--auto">
           <div class="card stat-tile">
             <div class="stat-tile__label">Số dư quỹ hiện tại</div>
             <div class="stat-tile__value stat-tile__value--positive" id="kpi-balance">—</div>
             <div class="stat-tile__footnote" id="kpi-balance-note"></div>
           </div>
-          <div class="card stat-tile">
+          <div class="card stat-tile admin-only">
             <div class="stat-tile__label"><i class="color-dot" style="background: var(--series-1)"></i>Tổng thu</div>
             <div class="stat-tile__value" id="kpi-income">—</div>
             <div class="stat-tile__footnote" id="kpi-income-note"></div>
           </div>
-          <div class="card stat-tile">
+          <div class="card stat-tile admin-only">
             <div class="stat-tile__label"><i class="color-dot" style="background: var(--series-2)"></i>Tổng chi</div>
             <div class="stat-tile__value" id="kpi-expense">—</div>
             <div class="stat-tile__footnote" id="kpi-expense-note"></div>
@@ -104,51 +108,6 @@
         </div>
 
         <section class="rules-panel mt-lg" id="rules-panel" aria-labelledby="rules-heading"></section>
-
-        <div class="card mt-lg">
-          <div class="card__header">
-            <h3>Thu và chi theo tháng</h3>
-            <p>Đơn vị: nghìn đồng. Di chuột vào cột để xem chi tiết.</p>
-          </div>
-          <div class="card__body">
-            <div class="toolbar" style="margin-bottom: 10px">
-              <div class="segmented" id="chart-range-toggle">
-                <button class="segmented__item" data-range="12" aria-pressed="true" type="button">12 tháng gần nhất</button>
-                <button class="segmented__item" data-range="0" aria-pressed="false" type="button">Toàn bộ</button>
-              </div>
-            </div>
-            <div id="chart-monthly"></div>
-            <div class="chart-legend">
-              <span><i class="color-dot" style="background: var(--series-1)"></i>Thu</span>
-              <span><i class="color-dot" style="background: var(--series-2)"></i>Chi</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="grid grid--2 mt-lg">
-          <div class="card">
-            <div class="card__header">
-              <h3>Cơ cấu chi phí</h3>
-              <p>Toàn bộ thời gian</p>
-            </div>
-            <div class="card__body"><div id="chart-expense-categories"></div></div>
-          </div>
-          <div class="card">
-            <div class="card__header">
-              <h3>Nguồn thu</h3>
-              <p>Toàn bộ thời gian</p>
-            </div>
-            <div class="card__body"><div id="chart-income-categories"></div></div>
-          </div>
-        </div>
-
-        <div class="card mt-lg">
-          <div class="card__header">
-            <h3>Diễn biến số dư quỹ</h3>
-            <p>Số dư luỹ kế sau mỗi tháng, đơn vị nghìn đồng</p>
-          </div>
-          <div class="card__body"><div id="chart-balance"></div></div>
-        </div>
 
         <div class="card mt-lg">
           <div class="card__header">
@@ -351,6 +310,12 @@
           </table>
         </div>
 
+        <nav class="pager" id="members-pager" aria-label="Phân trang danh sách thành viên">
+          <button class="btn btn--ghost pager__button" id="members-prev" type="button">‹ Trước</button>
+          <span class="pager__status" id="members-pager-status"></span>
+          <button class="btn btn--ghost pager__button" id="members-next" type="button">Sau ›</button>
+        </nav>
+
         <div class="callout callout--bar mt-sm admin-only" id="members-pending-bar">
           <div style="flex: 1; min-width: 220px">
             <b>Đánh dấu đang lưu trên máy bạn.</b><br />
@@ -388,7 +353,7 @@
           <span id="month-auto-text"></span>
         </div>
 
-        <div class="grid grid--4" style="margin-bottom: 14px">
+        <div class="grid grid--3" style="margin-bottom: 14px">
           <div class="card stat-tile">
             <div class="stat-tile__label">Thu được</div>
             <div class="stat-tile__value stat-tile__value--compact" id="month-collected">—</div>
@@ -401,10 +366,6 @@
           <div class="card stat-tile">
             <div class="stat-tile__label">Chưa đóng</div>
             <div class="stat-tile__value stat-tile__value--compact" id="month-unpaid-count">—</div>
-          </div>
-          <div class="card stat-tile">
-            <div class="stat-tile__label">Chi trong tháng</div>
-            <div class="stat-tile__value stat-tile__value--compact" id="month-expense">—</div>
           </div>
         </div>
 
@@ -455,7 +416,7 @@
           </div>
 
           <div class="card">
-            <div class="card__body" style="padding-bottom: 0">
+            <div class="card__body">
               <div class="qr-panel" id="qr-panel">
                 <div class="qr-panel__text">
                   <div class="qr-panel__label">Chuyển khoản đóng quỹ</div>
@@ -469,25 +430,6 @@
                 </a>
               </div>
             </div>
-            <div class="card__header" style="padding-top: 16px">
-              <h3>Chi tiêu trong tháng</h3>
-              <p id="month-expense-subtitle"></p>
-            </div>
-            <div class="card__body">
-              <div class="table-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Ngày</th>
-                      <th>Nội dung</th>
-                      <th>Danh mục</th>
-                      <th class="cell-num">Số tiền</th>
-                    </tr>
-                  </thead>
-                  <tbody id="month-expense-table"></tbody>
-                </table>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -498,8 +440,6 @@
         <span>Dữ liệu lưu tại <code>data.json</code> — sửa file này trên GitHub để cập nhật</span>
       </footer>
     </div>
-
-    <div class="tooltip" id="chart-tooltip"></div>
 
     <script type="module" src="src/main.js"></script>
   </body>

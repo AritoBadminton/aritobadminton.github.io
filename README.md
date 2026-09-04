@@ -6,12 +6,39 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 
 ## Có gì trong trang
 
-| Tab                     | Nội dung                                                                                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Tổng quan**           | Số dư quỹ, tổng thu, tổng chi, **khối Quy định đóng quỹ nổi bật**, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
-| **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                           |
-| **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                           |
-| **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó       |
+| Tab                     | Nội dung                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tổng quan**           | Số dư quỹ, số thành viên, **khối Quy định đóng quỹ nổi bật**, giao dịch gần đây. Tổng thu và tổng chi chỉ hiện với admin                    |
+| **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                     |
+| **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
+| **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
+
+## Ai xem được gì
+
+Trang chia hai mức: **khách** (mặc định) và **admin** (đã đăng nhập).
+
+| Nội dung                             | Khách | Admin |
+| ------------------------------------ | :---: | :---: |
+| Số dư quỹ, số thành viên             |  ✅   |  ✅   |
+| Quy định đóng quỹ, giao dịch gần đây |  ✅   |  ✅   |
+| Bảng đóng quỹ theo tháng, mã QR      |  ✅   |  ✅   |
+| **Tổng thu, tổng chi**               |  ❌   |  ✅   |
+| **Tab Thành viên**                   |  ❌   |  ✅   |
+| **Sổ thu chi: "Tất cả các tháng"**   |  ❌   |  ✅   |
+| Nhập, sửa, đánh dấu đóng quỹ         |  ❌   |  ✅   |
+
+Khách vào Sổ thu chi sẽ được lọc sẵn theo tháng gần nhất và chỉ đổi được sang từng tháng một.
+
+Đây **không phải bảo mật thật** — trang chạy tĩnh trên GitHub Pages nên phần kiểm tra nằm ngay
+trong trình duyệt. Nó chỉ để tránh người ngoài bấm nhầm và bớt lộ số liệu tổng. Thứ bảo vệ dữ
+liệu chung thật sự là quyền ghi vào repo GitHub.
+
+## Danh sách dài thì rút gọn thế nào
+
+- **Ô chọn tháng** (cả hai tab) chỉ hiện **5 tháng gần nhất**; các tháng cũ hơn nằm sau dòng
+  `▾ Xem thêm N tháng cũ hơn…`. Chọn dòng đó thì danh sách mở đầy đủ và vẫn giữ nguyên tháng đang xem.
+- **Bảng Thành viên** phân trang **15 người mỗi trang**, có nút Trước / Sau và dòng trạng thái
+  `1–15 trên 43 người · trang 1/3`. Đổi bộ lọc hay ô tìm kiếm thì tự về trang 1.
 
 ## Cấu trúc dự án
 
@@ -131,7 +158,7 @@ Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản 
 
 ## Mã QR chuyển khoản
 
-Hiện ở tab **Đóng quỹ theo tháng**, ngay trên bảng Chi tiêu trong tháng. Sửa mục `"qr"` trong `data.json`:
+Hiện ở tab **Đóng quỹ theo tháng**, cột bên phải bảng đóng quỹ. Sửa mục `"qr"` trong `data.json`:
 
 ```jsonc
 "qr": {
@@ -153,7 +180,7 @@ Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:
 2. Điền ngày, số tiền, nội dung, chọn danh mục
 3. Bấm **Thêm vào sổ**
 
-Khoản mới hiện ngay trong sổ (có nhãn **mới**) và cộng luôn vào số dư, biểu đồ, thống kê tháng.
+Khoản mới hiện ngay trong sổ (có nhãn **mới**) và cộng luôn vào số dư và thống kê tháng.
 Bấm dấu **×** cuối dòng nếu nhập nhầm.
 
 Lúc này khoản mới chỉ nằm trên máy bạn. Để cả nhóm cùng thấy, bấm **Lưu chung lên GitHub**:
