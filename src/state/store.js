@@ -45,6 +45,12 @@ export const store = {
   /** Id các dòng đang được tick chọn ở sổ thu chi. */
   selectedTransactionIds: new Set(),
 
+  /** Ô lọc tháng ở sổ thu chi đang mở đầy đủ hay chỉ 5 tháng gần nhất. */
+  showAllLedgerMonths: false,
+
+  /** Ô chọn tháng ở trang đóng quỹ đang mở đầy đủ hay chỉ 5 tháng gần nhất. */
+  showAllDuesMonths: false,
+
   /** Người dùng đã đăng nhập quản trị hay chưa. */
   isAdmin: false,
 };
