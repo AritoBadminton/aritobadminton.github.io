@@ -11,7 +11,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Tổng quan**           | Số dư quỹ, tổng thu, tổng chi, **khối Quy định đóng quỹ nổi bật**, biểu đồ thu-chi theo tháng, cơ cấu chi phí, diễn biến số dư, giao dịch gần đây |
 | **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                           |
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                           |
-| **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng cho từng người**, sửa được số tiền, + các khoản chi của tháng đó                                                   |
+| **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó       |
 
 ## Cấu trúc dự án
 
@@ -55,13 +55,63 @@ Bấm nút **Đăng nhập** ở góc phải trên cùng.
 >
 > **Đừng dùng lại mật khẩu này cho email, ngân hàng hay bất kỳ tài khoản nào khác.**
 > Muốn đổi mật khẩu: tính SHA-256 của mật khẩu mới (ví dụ trên trang emn178.github.io/online-tools/sha256.html)
-> rồi thay giá trị `hash` trong biến `AUTH` ở `index.html`.
+> rồi thay `ADMIN_PASSWORD_HASH` trong `src/config/constants.js`.
 
 ## Sửa khối Quy định đóng quỹ
 
 Khối này nằm ngay đầu tab **Tổng quan**. Sửa mục `"rules"` trong `data.json`:
 thêm / bớt phần tử trong `items` (mỗi ô là một mức đóng), đổi `title`, `subtitle`, `footer` tuỳ ý.
 Nếu xoá hẳn `"rules"`, trang sẽ tự quay về hiển thị các dòng trong `"notes"`.
+
+## Đánh dấu đóng quỹ theo tháng
+
+Vào tab **Đóng quỹ theo tháng**, chọn tháng ở ô trên cùng (cần đăng nhập Admin).
+
+Cột **Trạng thái** là dropdown 3 lựa chọn:
+
+| Trạng thái     | Màu     | Ý nghĩa                                                                                     |
+| -------------- | ------- | ------------------------------------------------------------------------------------------- |
+| **Đã đóng**    | xanh lá | Tự điền đúng mức người đó vẫn đóng — Chị Lu 100k, Ngọc Em 80k, còn lại 50k. Không cào bằng. |
+| **Chưa đóng**  | đỏ      | Còn nợ quỹ tháng này                                                                        |
+| **Không chơi** | vàng    | Tháng đó nghỉ, **không bị tính là còn nợ**                                                  |
+
+Khi chọn **Không chơi**, người đó bị trừ khỏi mẫu số ô "Đã đóng x/y", khỏi ô "Chưa đóng",
+và khỏi tỷ lệ đóng đủ ở tab Thành viên. Ô số tiền cũng khoá lại. Nhờ vậy người nghỉ hẳn một
+tháng không làm số liệu trông như đang nợ quỹ.
+
+Ngoài ra:
+
+- Số tiền khác thường thì bấm thẳng vào ô **Số tiền** gõ lại
+- Cột **Ghi chú** sửa được: bấm vào ô, gõ nội dung ("đã chuyển khoản 29/8", "+1 buổi vãng lai"), Enter là xong
+- Dòng nào có sửa được tô nền xanh nhạt
+
+Đánh dấu và ghi chú lưu ngay trên trình duyệt của bạn. Muốn cả nhóm cùng thấy, bấm
+**Lưu chung lên GitHub** — nó sao chép sẵn khối tháng đó để bạn dán đè vào `data.json`.
+Sửa nhiều tháng thì chọn từng tháng rồi lưu từng khối. Nút **Đặt lại tháng này** huỷ mọi
+đánh dấu chưa lưu của tháng đang xem.
+
+## Tháng mới tự sinh danh sách
+
+Ô chọn tháng có sẵn **3 tháng kế tiếp** chưa có trong dữ liệu, ghi "— tự tạo".
+Chọn một tháng như vậy, bảng **Danh sách đóng quỹ** tự dựng từ **danh sách thành viên đang
+hoạt động** (cột tick ở tab Thành viên), tất cả để "Chưa đóng". Đánh dấu ai đã đóng rồi bấm
+**Tạo tháng này trên GitHub** — nó sinh sẵn khối JSON để bạn _thêm vào cuối_ mục `"months"`.
+
+**Các tháng đã có trong `data.json` không bị sinh lại** — lịch sử giữ nguyên (tháng 12/2024 vẫn
+là 8 người, tháng 05/2025 vẫn 18 người). Nếu giữa tháng có người mới vào và bạn muốn thêm họ,
+bấm **+ Bổ sung thành viên đang hoạt động** — nút này chỉ thêm những người còn thiếu, các dòng
+cũ không đụng tới, và những dòng vừa thêm có nhãn **mới**.
+
+Tháng tự tạo chỉ được tính vào thống kê ở tab Thành viên **sau khi bạn đánh dấu ít nhất một
+người** — xem trước thôi thì không làm lệch số liệu.
+
+## Phân loại thành viên đang / ngưng hoạt động
+
+Trong tab **Thành viên**, cột **Hoạt động** có ô tick ở mỗi dòng. Tick = đang hoạt động,
+bỏ tick = ngưng hoạt động (dòng đó mờ đi). Ba nút lọc phía trên: **Tất cả / Đang hoạt động /
+Ngừng hoạt động**. Ô "Chưa đóng tháng gần nhất" chỉ đếm trong nhóm đang hoạt động.
+
+Bấm **Lưu chung lên GitHub** để lấy khối `"roster"` dán đè vào `data.json`.
 
 ## Sửa một khoản thu / chi đã có
 
@@ -85,7 +135,7 @@ Hiện ở tab **Đóng quỹ theo tháng**, ngay trên bảng Chi tiêu trong t
 
 ```jsonc
 "qr": {
-  "image": "qr-chuyen-khoan.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
+  "image": "src/assets/images/qr-transfer.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
   "name": "NGUYEN MINH NGHIA",
   "account": "1905 0021 1080 12",
   "bank": "Techcombank · VietQR / Napas 247",
@@ -171,7 +221,7 @@ sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web 
 **Danh mục thu** (`cat`): `Tiền quỹ công ty hàng tháng`, `Tiền quỹ thành viên hàng tháng`
 
 > Mức đóng chuẩn đang tính là **50.000đ/tháng**. Người ngoài công ty: 30k/buổi hoặc 100k/tháng.
-> Muốn đổi mức chuẩn, sửa dòng `const std=50000;` trong `index.html`.
+> Muốn đổi mức chuẩn, sửa hằng số `STANDARD_DUES` trong `src/config/constants.js`.
 
 ## Thêm tháng mới
 
