@@ -5,7 +5,6 @@
  * Mọi nghiệp vụ nằm ở services/, mọi thao tác DOM nằm ở components/.
  */
 
-import { initCharts, renderCharts } from './components/charts.js';
 import { renderDashboard } from './components/dashboard-view.js';
 import { initLedgerView, renderLedger, renderLedgerFilters } from './components/ledger-view.js';
 import { initLoginModal } from './components/login-modal.js';
@@ -39,7 +38,6 @@ function registerRenderers() {
   registerRenderer('ledger', renderLedgerWithFilters);
   registerRenderer('members', renderMembers);
   registerRenderer('months', renderMonthsWithPicker);
-  registerRenderer('charts', renderCharts);
 }
 
 /** Dựng toàn bộ trạng thái dẫn xuất từ dữ liệu vừa tải và bộ nhớ cục bộ. */
@@ -68,7 +66,6 @@ async function bootstrap() {
   initThemeToggle();
   initTabNav();
   initLoginModal();
-  initCharts();
   initLedgerView();
   initMembersView();
   initMonthsView();
