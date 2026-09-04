@@ -13,27 +13,29 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
 
-## Lưu thẳng lên GitHub (tuỳ chọn)
+## Nơi lưu dữ liệu
 
-Mặc định trang chỉ đọc `data.json`; muốn cập nhật dữ liệu chung thì admin copy khối JSON
-rồi dán vào `data.json` trên GitHub.
+Trang chạy được ở hai chế độ, đổi qua lại bằng một dòng cấu hình:
 
-Có thể bật chế độ **bấm một nút là lưu** bằng cách dựng một Cloudflare Worker miễn phí giữ
-token GitHub ở phía máy chủ — xem [docs/TRIEN-KHAI-WORKER.md](docs/TRIEN-KHAI-WORKER.md).
-Khi đó:
+|              | Nguồn dữ liệu          | Lưu chung bằng cách               | Người khác thấy khi nào |
+| ------------ | ---------------------- | --------------------------------- | ----------------------- |
+| **Mặc định** | `data.json` trong repo | copy JSON rồi dán vào `data.json` | sau khi commit          |
+| **Firebase** | Cloud Firestore        | sửa là lưu ngay                   | **ngay lập tức**        |
 
-- Mỗi admin có tài khoản riêng, máy chủ kiểm tra mật khẩu thật (không bịp bằng DevTools được).
-- Bấm **Lưu chung lên GitHub** ở bất kỳ phần nào là commit thẳng vào `data.json`.
-- Commit ghi tên người lưu, nhìn lịch sử biết ai sửa gì.
-- Worker chết hay mất mạng thì trang tự quay về cách dán tay, không mất thay đổi.
+Bật chế độ Firebase bằng cách điền `src/config/firebase-config.js` — xem
+[docs/TRIEN-KHAI-FIREBASE.md](docs/TRIEN-KHAI-FIREBASE.md). Khi đó:
 
-Bật/tắt bằng đúng một dòng trong `data.json`:
+- Mỗi thủ quỹ một tài khoản email riêng, Firebase kiểm tra mật khẩu thật.
+- Thu hồi quyền của ai thì xoá tài liệu `admins/<uid>` của người đó.
+- Người chỉ xem số liệu vẫn không cần đăng nhập.
+- Mọi thanh "Lưu chung lên GitHub" và khối dán JSON tự biến mất.
 
-```json
- "api": { "baseUrl": "https://arito-quy.<tên-bạn>.workers.dev" }
-```
+Xoá `projectId` về `''` là quay lại chế độ `data.json`, không phải sửa code.
 
-Để trống `""` là tắt, quay về luồng dán tay.
+Thư mục `worker/` chứa một hướng đi khác đã dựng xong nhưng không dùng tới: một Cloudflare
+Worker giữ token GitHub để commit thẳng vào `data.json`
+([docs/TRIEN-KHAI-WORKER.md](docs/TRIEN-KHAI-WORKER.md)). Giữ lại phòng khi cần quay về
+cách lưu bằng Git thay vì cơ sở dữ liệu.
 
 ## Sửa Quy định đóng quỹ
 

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chuyển dữ liệu sang Firebase — Quỹ CLB Arito</title>
+    <meta name="robots" content="noindex" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js"
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="src/assets/styles/base.css" />
+    <link rel="stylesheet" href="src/assets/styles/layout.css" />
+    <link rel="stylesheet" href="src/assets/styles/components.css" />
+    <style>
+      .wrap {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .log-line {
+        padding: 3px 0;
+        font-family: ui-monospace, monospace;
+        font-size: 13px;
+      }
+      .log-line.ok {
+        color: var(--good);
+      }
+      .log-line.bad {
+        color: var(--crit);
+      }
+      #log {
+        max-height: 360px;
+        margin-top: 12px;
+        padding: 12px;
+        overflow: auto;
+        background: var(--surface-2);
+        border-radius: 10px;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+      }
+      input[type='email'],
+      input[type='password'] {
+        width: 100%;
+        margin-top: 4px;
+        padding: 9px 11px;
+        font-family: inherit;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <div class="card__header">
+          <h3>Chuyển dữ liệu sang Firebase</h3>
+          <p>
+            Chạy <b>một lần duy nhất</b>: đọc <code>data.json</code> rồi ghi toàn bộ vào Firestore của dự án <b id="project">—</b>. Sau khi
+            xong, trang chính sẽ đọc dữ liệu từ Firebase.
+          </p>
+        </div>
+        <div class="card__body">
+          <p class="text-muted" id="state">Đang kiểm tra…</p>
+
+          <div id="login-box" hidden>
+            <label>Email<input type="email" id="email" autocomplete="username" /></label>
+            <label>Mật khẩu<input type="password" id="password" autocomplete="current-password" /></label>
+            <div class="modal__error" id="login-error"></div>
+            <button class="btn mt-sm" id="login" type="button">Đăng nhập</button>
+          </div>
+
+          <div id="run-box" hidden>
+            <label class="modal__remember"><input type="checkbox" id="force" /> Ghi đè nếu Firestore đã có dữ liệu</label>
+            <button class="btn mt-sm" id="run" type="button">Bắt đầu chuyển</button>
+          </div>
+
+          <div id="log"></div>
+        </div>
+      </div>
+      <p class="text-muted" style="margin-top: 14px">
+        Xong rồi thì quay lại <a href="index.html">trang chính</a>. Có thể xoá file này sau khi chuyển xong.
+      </p>
+    </div>
+
+    <script type="module" src="src/migrate.js"></script>
+  </body>
+</html>

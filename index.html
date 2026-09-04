@@ -10,6 +10,20 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fed'/%3E%3Cpath d='M9 22l7-13 3 6 4-3' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"
     />
 
+    <!--
+      Bản đồ import cho SDK Firebase. Chỉ được tải khi src/config/firebase-config.js
+      đã điền thông tin dự án; chưa điền thì trang không đụng tới Firebase.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js"
+        }
+      }
+    </script>
+
     <link rel="stylesheet" href="src/assets/styles/base.css" />
     <link rel="stylesheet" href="src/assets/styles/layout.css" />
     <link rel="stylesheet" href="src/assets/styles/components.css" />
@@ -57,7 +71,7 @@
         <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      <span class="readonly-bar__text">Đang ở <b>chế độ chỉ xem</b> — đăng nhập để nhập liệu và chỉnh sửa.</span>
+      <span class="readonly-bar__text" id="readonly-text">Đang ở <b>chế độ chỉ xem</b> — đăng nhập để nhập liệu và chỉnh sửa.</span>
       <button class="btn" id="readonly-login" type="button">Đăng nhập</button>
     </div>
 
@@ -66,7 +80,9 @@
       <div class="modal__box">
         <h3 id="login-heading">Đăng nhập quản trị</h3>
         <p class="text-muted" style="margin: 4px 0 16px">Chỉ người quản lý quỹ mới cần đăng nhập. Xem số liệu thì không cần.</p>
-        <label>Tài khoản<input type="text" id="login-username" autocomplete="username" placeholder="Admin" /></label>
+        <label id="login-username-label"
+          >Tài khoản<input type="text" id="login-username" autocomplete="username" placeholder="Admin"
+        /></label>
         <label style="margin-top: 12px">
           Mật khẩu<input type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" />
         </label>
@@ -77,6 +93,13 @@
           <button class="btn" id="login-submit" type="button">Đăng nhập</button>
         </div>
       </div>
+    </div>
+
+    <div class="callout callout--bar sync-error" id="sync-error" style="display: none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
+      </svg>
+      <span></span>
     </div>
 
     <div class="page-wrap">
@@ -109,7 +132,7 @@
 
         <section class="rules-panel mt-lg" id="rules-panel" aria-labelledby="rules-heading"></section>
 
-        <div class="callout callout--bar mt-sm admin-only" id="rules-pending-bar">
+        <div class="callout callout--bar mt-sm admin-only local-only" id="rules-pending-bar">
           <div style="flex: 1; min-width: 220px">
             <b>Quy định đang sửa trên máy bạn.</b><br />
             <span id="rules-pending-state">Chưa thay đổi gì so với dữ liệu chung.</span>
@@ -118,7 +141,7 @@
           <button class="btn btn--ghost" id="rules-reset" type="button">Đặt lại theo dữ liệu chung</button>
         </div>
 
-        <div class="card mt-sm admin-only" id="rules-export" style="display: none">
+        <div class="card mt-sm admin-only local-only" id="rules-export" style="display: none">
           <div class="card__header">
             <h3>Dán khối này vào <code>data.json</code></h3>
             <p>
@@ -199,7 +222,7 @@
           </div>
         </div>
 
-        <div class="callout callout--bar admin-only" id="ledger-pending-bar" style="display: none; margin-bottom: 16px">
+        <div class="callout callout--bar admin-only local-only" id="ledger-pending-bar" style="display: none; margin-bottom: 16px">
           <div style="flex: 1; min-width: 220px">
             <b id="ledger-pending-count"></b><br />
             <span class="text-muted" id="ledger-pending-state"
@@ -210,7 +233,7 @@
           <button class="btn btn--ghost" id="ledger-discard" type="button">Bỏ hết thay đổi</button>
         </div>
 
-        <div class="card admin-only" id="ledger-export" style="display: none; margin-bottom: 16px">
+        <div class="card admin-only local-only" id="ledger-export" style="display: none; margin-bottom: 16px">
           <div class="card__header">
             <h3>Dán vào <code>data.json</code> trên GitHub</h3>
             <p>
@@ -338,7 +361,7 @@
           <button class="btn btn--ghost pager__button" id="members-next" type="button">Sau ›</button>
         </nav>
 
-        <div class="callout callout--bar mt-sm admin-only" id="members-pending-bar">
+        <div class="callout callout--bar mt-sm admin-only local-only" id="members-pending-bar">
           <div style="flex: 1; min-width: 220px">
             <b>Đánh dấu đang lưu trên máy bạn.</b><br />
             <span id="members-pending-state">Chưa thay đổi gì so với dữ liệu chung.</span>
@@ -347,7 +370,7 @@
           <button class="btn btn--ghost" id="members-reset" type="button">Đặt lại theo dữ liệu chung</button>
         </div>
 
-        <div class="card mt-sm admin-only" id="members-export" style="display: none">
+        <div class="card mt-sm admin-only local-only" id="members-export" style="display: none">
           <div class="card__header">
             <h3>Dán khối này vào <code>data.json</code></h3>
             <p>
@@ -415,7 +438,7 @@
                 </table>
               </div>
 
-              <div class="callout callout--bar mt-sm admin-only" id="month-pending-bar">
+              <div class="callout callout--bar mt-sm admin-only local-only" id="month-pending-bar">
                 <div style="flex: 1; min-width: 200px">
                   <b>Đánh dấu đóng quỹ và ghi chú đang lưu trên máy bạn.</b><br />
                   <span id="month-pending-state">Chưa thay đổi gì so với dữ liệu chung.</span>
@@ -424,7 +447,7 @@
                 <button class="btn btn--ghost" id="month-reset" type="button">Đặt lại tháng này</button>
               </div>
 
-              <div class="card mt-sm admin-only" id="month-export" style="display: none">
+              <div class="card mt-sm admin-only local-only" id="month-export" style="display: none">
                 <div class="card__header">
                   <h3>Dán vào <code>data.json</code></h3>
                   <p>
