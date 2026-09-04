@@ -54,6 +54,9 @@ export const store = {
   /** Ô chọn tháng ở trang đóng quỹ đang mở đầy đủ hay chỉ 5 tháng gần nhất. */
   showAllDuesMonths: false,
 
+  /** Phiên đăng nhập do máy chủ lưu trữ cấp: { user, token, expiresAt }. */
+  apiSession: null,
+
   /** Người dùng đã đăng nhập quản trị hay chưa. */
   isAdmin: false,
 };
