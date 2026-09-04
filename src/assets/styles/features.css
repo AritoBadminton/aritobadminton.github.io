@@ -347,6 +347,24 @@ body:not(.is-admin) .admin-only {
   border-color: color-mix(in srgb, var(--crit) 32%, transparent);
 }
 
+.status-select--skipped {
+  color: #a06b00;
+  background: color-mix(in srgb, var(--warn) 26%, transparent);
+  border-color: color-mix(in srgb, var(--warn) 55%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .status-select--skipped {
+    color: var(--warn);
+    background: color-mix(in srgb, var(--warn) 18%, transparent);
+  }
+}
+
+:root[data-theme='dark'] .status-select--skipped {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 18%, transparent);
+}
+
 .status-select option {
   font-weight: 500;
   color: var(--text);
