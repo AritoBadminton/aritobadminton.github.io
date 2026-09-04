@@ -545,3 +545,8 @@ body:not(.is-admin) td.cell-select,
 body:not(.is-admin) th.admin-only {
   display: none;
 }
+
+/* Chế độ Firebase: sửa là lưu ngay, nên bỏ hết thanh "Lưu chung" và khối dán JSON. */
+body.is-live .local-only {
+  display: none !important;
+}

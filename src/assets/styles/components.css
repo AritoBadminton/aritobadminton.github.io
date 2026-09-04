@@ -638,3 +638,22 @@ td.cell-name {
   opacity: 0.4;
   cursor: default;
 }
+
+/* ---------- Thanh báo mất kết nối dữ liệu ---------- */
+
+.sync-error {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  gap: 10px;
+  color: #8a4b00;
+  background: color-mix(in srgb, var(--warn) 20%, var(--surface));
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+  border-radius: 0;
+}
+
+.sync-error svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+}
