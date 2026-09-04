@@ -13,6 +13,28 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
 
+## Lưu thẳng lên GitHub (tuỳ chọn)
+
+Mặc định trang chỉ đọc `data.json`; muốn cập nhật dữ liệu chung thì admin copy khối JSON
+rồi dán vào `data.json` trên GitHub.
+
+Có thể bật chế độ **bấm một nút là lưu** bằng cách dựng một Cloudflare Worker miễn phí giữ
+token GitHub ở phía máy chủ — xem [docs/TRIEN-KHAI-WORKER.md](docs/TRIEN-KHAI-WORKER.md).
+Khi đó:
+
+- Mỗi admin có tài khoản riêng, máy chủ kiểm tra mật khẩu thật (không bịp bằng DevTools được).
+- Bấm **Lưu chung lên GitHub** ở bất kỳ phần nào là commit thẳng vào `data.json`.
+- Commit ghi tên người lưu, nhìn lịch sử biết ai sửa gì.
+- Worker chết hay mất mạng thì trang tự quay về cách dán tay, không mất thay đổi.
+
+Bật/tắt bằng đúng một dòng trong `data.json`:
+
+```json
+ "api": { "baseUrl": "https://arito-quy.<tên-bạn>.workers.dev" }
+```
+
+Để trống `""` là tắt, quay về luồng dán tay.
+
 ## Sửa Quy định đóng quỹ
 
 Đăng nhập admin rồi bấm thẳng vào chữ trong khối **Quy định đóng quỹ** ở tab Tổng quan để sửa:

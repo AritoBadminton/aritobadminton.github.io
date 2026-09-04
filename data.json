@@ -1,5 +1,8 @@
 {
  "club": "CLB Cầu Lông Arito",
+ "api": {
+  "baseUrl": ""
+ },
  "updated": "2026-08-28",
  "notes": [
   "Ghi chú: Thu 50k/1tháng",
