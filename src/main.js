@@ -5,7 +5,7 @@
  * Mọi nghiệp vụ nằm ở services/, mọi thao tác DOM nằm ở components/.
  */
 
-import { renderDashboard } from './components/dashboard-view.js';
+import { initDashboardView, renderDashboard } from './components/dashboard-view.js';
 import { initLedgerView, renderLedger, renderLedgerFilters } from './components/ledger-view.js';
 import { initLoginModal } from './components/login-modal.js';
 import { initMembersView, renderMembers } from './components/members-view.js';
@@ -16,6 +16,7 @@ import { fetchClubData } from './services/data-service.js';
 import { loadLocalDuesChanges } from './services/dues-service.js';
 import { loadLocalLedgerChanges, rebuildTransactions } from './services/ledger-service.js';
 import { aggregateMembers, initActiveMembers } from './services/member-service.js';
+import { loadLocalRuleChanges } from './services/rules-service.js';
 import { registerRenderer, requestRender } from './state/render-bus.js';
 import { store } from './state/store.js';
 import { qs, setVisible } from './utils/dom.js';
@@ -42,6 +43,7 @@ function registerRenderers() {
 
 /** Dựng toàn bộ trạng thái dẫn xuất từ dữ liệu vừa tải và bộ nhớ cục bộ. */
 function buildDerivedState() {
+  loadLocalRuleChanges();
   loadLocalLedgerChanges();
   rebuildTransactions();
   store.months = store.data.months;
@@ -65,6 +67,7 @@ function showLoadError() {
 async function bootstrap() {
   initThemeToggle();
   initTabNav();
+  initDashboardView();
   initLoginModal();
   initLedgerView();
   initMembersView();
