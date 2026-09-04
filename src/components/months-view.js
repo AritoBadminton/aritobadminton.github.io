@@ -1,18 +1,21 @@
 /** Trang Đóng quỹ theo tháng: danh sách đóng quỹ, mã QR và chi tiêu của tháng. */
 
+import { DUES_STATUS, DUES_STATUS_LABELS } from '../config/constants.js';
 import { getAllExpenses } from '../services/ledger-service.js';
 import {
   fillMonthWithActiveMembers,
   getActiveMemberNames,
   getChangedMemberNames,
+  getDuesStatus,
   getEffectiveNote,
   getEffectivePaid,
+  getEffectiveSkip,
   getFutureMonthKeys,
   getMonthMembers,
   getMonthsWithChanges,
-  getUsualAmount,
   isVirtualMonth,
   resetMonth,
+  setDuesStatus,
   setNote,
   setPaidAmount,
 } from '../services/dues-service.js';
@@ -33,17 +36,31 @@ function getSelectedMonthKey() {
   return qs('#month-picker').value || store.months[store.months.length - 1].month;
 }
 
-/** Một dòng có ghi đè số tiền hoặc ghi chú hay không. */
+/** Một dòng có ghi đè số tiền, ghi chú hay trạng thái không chơi hay không. */
 function hasOverride(monthKey, memberName) {
   const key = buildDuesKey(monthKey, memberName);
-  return key in store.duesPaidOverrides || key in store.duesNoteOverrides;
+  return key in store.duesPaidOverrides || key in store.duesNoteOverrides || key in store.duesSkipOverrides;
 }
+
+/** Lớp CSS tô màu cho ô trạng thái. */
+const STATUS_CLASS = {
+  [DUES_STATUS.PAID]: 'status-select--paid',
+  [DUES_STATUS.UNPAID]: 'status-select--unpaid',
+  [DUES_STATUS.SKIPPED]: 'status-select--skipped',
+};
 
 /* ---------- Xử lý sự kiện ---------- */
 
 /** Đổi số tiền đóng quỹ rồi vẽ lại các vùng liên quan. */
 function handleSetPaid(monthKey, memberName, amount) {
   setPaidAmount(monthKey, memberName, amount);
+  aggregateMembers();
+  requestRender('months', 'members');
+}
+
+/** Đổi trạng thái đóng quỹ rồi vẽ lại các vùng liên quan. */
+function handleSetStatus(monthKey, memberName, status) {
+  setDuesStatus(monthKey, memberName, status);
   aggregateMembers();
   requestRender('months', 'members');
 }
@@ -75,11 +92,13 @@ async function handleExport() {
   const isVirtual = isVirtualMonth(monthKey);
   const members = getMonthMembers(monthKey);
 
-  const entries = members.map(
-    (member) =>
+  const entries = members.map((member) => {
+    const skipField = getEffectiveSkip(monthKey, member) ? ', "skip": true' : '';
+    return (
       `     { "name": ${JSON.stringify(member.name)}, "paid": ${getEffectivePaid(monthKey, member)}, ` +
-      `"note": ${JSON.stringify(getEffectiveNote(monthKey, member))} }`,
-  );
+      `"note": ${JSON.stringify(getEffectiveNote(monthKey, member))}${skipField} }`
+    );
+  });
   const total = members.reduce((sum, member) => sum + getEffectivePaid(monthKey, member), 0);
   const block =
     `  {\n   "month": ${JSON.stringify(monthKey)},\n` +
@@ -130,19 +149,26 @@ export function renderMonths() {
     ...member,
     amount: getEffectivePaid(monthKey, member),
     note: getEffectiveNote(monthKey, member),
+    status: getDuesStatus(monthKey, member),
     isNewRow: Boolean(member.added) && !isVirtual,
     isEdited: hasOverride(monthKey, member.name) || (Boolean(member.added) && !isVirtual),
   }));
 
-  const paidRows = rows.filter((row) => row.amount > 0);
+  const paidRows = rows.filter((row) => row.status === DUES_STATUS.PAID);
+  const skippedRows = rows.filter((row) => row.status === DUES_STATUS.SKIPPED);
+  const expectedCount = rows.length - skippedRows.length;
   const collected = rows.reduce((sum, row) => sum + row.amount, 0);
   const expenses = getAllExpenses().filter((item) => item.date.startsWith(monthKey));
   const expenseTotal = expenses.reduce((sum, item) => sum + item.amount, 0);
 
+  const unpaidCount = expectedCount - paidRows.length;
   qs('#month-collected').textContent = formatCurrency(collected);
-  qs('#month-paid-count').textContent = `${paidRows.length}/${rows.length}`;
-  qs('#month-unpaid-count').textContent = `${rows.length - paidRows.length} người`;
-  qs('#month-unpaid-count').style.color = rows.length - paidRows.length ? 'var(--crit)' : 'var(--good)';
+  qs('#month-paid-count').textContent = `${paidRows.length}/${expectedCount}`;
+  qs('#month-paid-note').textContent = skippedRows.length
+    ? `${skippedRows.length} người không chơi tháng này`
+    : '';
+  qs('#month-unpaid-count').textContent = `${unpaidCount} người`;
+  qs('#month-unpaid-count').style.color = unpaidCount ? 'var(--crit)' : 'var(--good)';
   qs('#month-expense').textContent = formatCurrency(expenseTotal);
 
   qs('#month-subtitle').textContent =
@@ -171,22 +197,29 @@ export function renderMonths() {
   /* Bảng danh sách đóng quỹ */
   qs('#dues-table').innerHTML = rows
     .map((row, index) => {
-      const isPaid = row.amount > 0;
+      const isPaid = row.status === DUES_STATUS.PAID;
+      const isSkipped = row.status === DUES_STATUS.SKIPPED;
+      const statusOptions = Object.values(DUES_STATUS)
+        .map(
+          (value) =>
+            `<option value="${value}" ${value === row.status ? 'selected' : ''}>${DUES_STATUS_LABELS[value]}</option>`,
+        )
+        .join('');
       return `<tr class="${row.isEdited ? 'row--edited' : ''} ${row.isNewRow ? 'row--added' : ''}">
         <td class="cell-num" style="color:var(--text-3)">${index + 1}</td>
         <td class="cell-name">${escapeHtml(row.name)}</td>
         <td class="cell-num">
           <input type="text" inputmode="numeric" class="amount-input ${isPaid ? 'amount-input--filled' : ''}"
-            value="${isPaid ? formatCurrency(row.amount) : '0 đ'}" placeholder="0 đ" ${store.isAdmin ? '' : 'disabled'}
+            value="${isSkipped ? '—' : isPaid ? formatCurrency(row.amount) : '0 đ'}" placeholder="0 đ"
+            ${store.isAdmin && !isSkipped ? '' : 'disabled'}
             data-name="${escapeHtml(row.name)}" data-raw="${row.amount}"
             aria-label="Số tiền ${escapeHtml(row.name)} đóng">
         </td>
         <td>
-          <select class="status-select ${isPaid ? 'status-select--paid' : 'status-select--unpaid'}"
+          <select class="status-select ${STATUS_CLASS[row.status]}"
             data-name="${escapeHtml(row.name)}" ${store.isAdmin ? '' : 'disabled'}
             aria-label="Trạng thái đóng quỹ ${escapeHtml(row.name)}">
-            <option value="1" ${isPaid ? 'selected' : ''}>Đã đóng</option>
-            <option value="0" ${isPaid ? '' : 'selected'}>Chưa đóng</option>
+            ${statusOptions}
           </select>
         </td>
         <td>
@@ -199,11 +232,7 @@ export function renderMonths() {
     .join('');
 
   qsa('#dues-table .status-select').forEach((select) => {
-    select.addEventListener('change', () => {
-      const name = select.dataset.name;
-      const amount = select.value === '1' ? getUsualAmount(name, monthKey) : 0;
-      handleSetPaid(monthKey, name, amount);
-    });
+    select.addEventListener('change', () => handleSetStatus(monthKey, select.dataset.name, select.value));
   });
 
   qsa('#dues-table .amount-input').forEach((input) => {
