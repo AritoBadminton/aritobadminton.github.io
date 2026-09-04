@@ -109,6 +109,26 @@
 
         <section class="rules-panel mt-lg" id="rules-panel" aria-labelledby="rules-heading"></section>
 
+        <div class="callout callout--bar mt-sm admin-only" id="rules-pending-bar">
+          <div style="flex: 1; min-width: 220px">
+            <b>Quy định đang sửa trên máy bạn.</b><br />
+            <span id="rules-pending-state">Chưa thay đổi gì so với dữ liệu chung.</span>
+          </div>
+          <button class="btn" id="rules-export-toggle" type="button">Lưu chung lên GitHub</button>
+          <button class="btn btn--ghost" id="rules-reset" type="button">Đặt lại theo dữ liệu chung</button>
+        </div>
+
+        <div class="card mt-sm admin-only" id="rules-export" style="display: none">
+          <div class="card__header">
+            <h3>Dán khối này vào <code>data.json</code></h3>
+            <p>
+              Mở <code>data.json</code> trên GitHub → bấm ✏️ → thay toàn bộ mục <code>"rules"</code>
+              bằng khối dưới (đã tự sao chép vào clipboard) → Commit changes.
+            </p>
+          </div>
+          <div class="card__body"><pre class="code-block" id="rules-export-code"></pre></div>
+        </div>
+
         <div class="card mt-lg">
           <div class="card__header">
             <h3>Giao dịch gần đây</h3>

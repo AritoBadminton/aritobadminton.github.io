@@ -13,6 +13,18 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
 
+## Sửa Quy định đóng quỹ
+
+Đăng nhập admin rồi bấm thẳng vào chữ trong khối **Quy định đóng quỹ** ở tab Tổng quan để sửa:
+số tiền, đối tượng áp dụng và đơn vị tính. Rê chuột vào một ô sẽ thấy nút 🗑 để xoá mức đó;
+ô cuối cùng là **+ Thêm mức đóng**.
+
+Thay đổi lưu trên máy bạn trước. Muốn cả nhóm cùng thấy thì bấm **Lưu chung lên GitHub**,
+khối `"rules"` sẽ tự sao chép vào clipboard — mở `data.json` trên GitHub, thay toàn bộ mục
+`"rules"` bằng khối đó rồi Commit. Bấm **Đặt lại theo dữ liệu chung** để bỏ hết thay đổi.
+
+Tiêu đề khối và dòng "Lưu ý" phía dưới vẫn sửa trực tiếp trong `data.json`.
+
 ## Ai xem được gì
 
 Trang chia hai mức: **khách** (mặc định) và **admin** (đã đăng nhập).
