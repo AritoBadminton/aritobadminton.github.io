@@ -33,11 +33,9 @@ src/
 │   ├── ledger-view.js
 │   ├── members-view.js
 │   ├── months-view.js
-│   ├── charts.js             Biểu đồ SVG nội tuyến, không dùng thư viện ngoài
 │   ├── login-modal.js
 │   ├── tab-nav.js
-│   ├── theme-toggle.js
-│   └── tooltip.js
+│   └── theme-toggle.js
 ├── utils/                    Hàm bổ trợ thuần, không phụ thuộc trạng thái
 │   ├── dom.js                qs, qsa, escapeHtml, copyToClipboard
 │   ├── format.js             Định dạng tiền, ngày, nhãn tháng
@@ -47,7 +45,7 @@ src/
     └── styles/
         ├── base.css          Biến thiết kế, reset, kiểu chữ
         ├── layout.css        Header, tab, lưới, footer
-        ├── components.css    Thẻ, nút, bảng, form, modal, biểu đồ
+        ├── components.css    Thẻ, nút, bảng, form, modal, phân trang
         └── features.css      Khối đặc thù: quy định, QR, chế độ chỉ xem
 ```
 
