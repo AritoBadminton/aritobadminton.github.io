@@ -362,6 +362,14 @@
             <button class="segmented__item" data-status="active" aria-pressed="false" type="button">Đang hoạt động</button>
             <button class="segmented__item" data-status="inactive" aria-pressed="false" type="button">Ngừng hoạt động</button>
           </div>
+          <button class="btn" id="members-add-toggle" type="button" style="display: none">+ Thêm thành viên</button>
+        </div>
+
+        <div class="add-member" id="members-add-form" style="display: none">
+          <input type="text" id="members-add-name" placeholder="Tên thành viên mới…" aria-label="Tên thành viên mới" maxlength="60" />
+          <button class="btn" id="members-add-submit" type="button">Thêm</button>
+          <button class="btn btn--ghost" id="members-add-cancel" type="button">Huỷ</button>
+          <span class="add-member__error" id="members-add-error"></span>
         </div>
 
         <div class="grid grid--4" style="margin-bottom: 14px">
