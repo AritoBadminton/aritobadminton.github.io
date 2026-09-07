@@ -28,6 +28,11 @@ export function getFollowingMonthKeys(startMonthKey, count) {
   return keys;
 }
 
+/** Tháng hiện tại theo lịch, dạng "YYYY-MM". */
+export function getCurrentMonthKey() {
+  return new Date().toISOString().slice(0, 7);
+}
+
 /** Ngày hôm nay theo định dạng ISO "YYYY-MM-DD". */
 export function getTodayIso() {
   return new Date().toISOString().slice(0, 10);
