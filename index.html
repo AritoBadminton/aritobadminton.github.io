@@ -46,6 +46,28 @@
           <p class="app-header__subtitle" id="app-subtitle">Thống kê thu chi quỹ câu lạc bộ</p>
         </div>
         <div class="app-header__spacer"></div>
+        <button
+          class="btn--icon live-only"
+          id="password-toggle"
+          type="button"
+          style="display: none"
+          title="Đổi mật khẩu"
+          aria-label="Đổi mật khẩu"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="4" y="10" width="16" height="10" rx="2" />
+            <path d="M8 10V7a4 4 0 018 0v3" />
+          </svg>
+        </button>
         <button class="btn--auth" id="auth-toggle" type="button">
           <span id="auth-icon">🔒</span><span id="auth-label">Đăng nhập</span>
         </button>
@@ -91,6 +113,33 @@
         <div class="modal__actions">
           <button class="btn btn--ghost" id="login-cancel" type="button">Huỷ</button>
           <button class="btn" id="login-submit" type="button">Đăng nhập</button>
+        </div>
+        <div class="modal__foot" id="login-forgot-row">
+          <button class="link-button" id="login-forgot" type="button">Quên mật khẩu?</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Hộp thoại đổi mật khẩu ==================== -->
+    <div class="modal" id="password-modal" role="dialog" aria-modal="true" aria-labelledby="password-heading" hidden>
+      <div class="modal__box">
+        <h3 id="password-heading">Đổi mật khẩu</h3>
+        <p class="text-muted" style="margin: 4px 0 16px">
+          Đổi mật khẩu của chính tài khoản <b id="password-email"></b>. Mật khẩu mới từ 6 ký tự trở lên.
+        </p>
+        <label>
+          Mật khẩu hiện tại<input type="password" id="password-current" autocomplete="current-password" placeholder="••••••••" />
+        </label>
+        <label style="margin-top: 12px">
+          Mật khẩu mới<input type="password" id="password-new" autocomplete="new-password" placeholder="••••••••" />
+        </label>
+        <label style="margin-top: 12px">
+          Nhập lại mật khẩu mới<input type="password" id="password-confirm" autocomplete="new-password" placeholder="••••••••" />
+        </label>
+        <div class="modal__error" id="password-error"></div>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" id="password-cancel" type="button">Huỷ</button>
+          <button class="btn" id="password-submit" type="button">Đổi mật khẩu</button>
         </div>
       </div>
     </div>
@@ -302,6 +351,7 @@
         <div class="toolbar">
           <input type="search" id="members-keyword" placeholder="Tìm tên thành viên…" aria-label="Tìm thành viên" />
           <select id="members-sort" aria-label="Sắp xếp thành viên">
+            <option value="stt">Sắp xếp: Số thứ tự</option>
             <option value="total">Sắp xếp: Tổng đóng góp</option>
             <option value="rate">Sắp xếp: Tỷ lệ đóng đủ</option>
             <option value="months">Sắp xếp: Số tháng tham gia</option>
@@ -342,7 +392,7 @@
             <thead>
               <tr>
                 <th style="width: 96px" title="Tick để đánh dấu thành viên còn sinh hoạt">Hoạt động</th>
-                <th>#</th>
+                <th style="width: 74px" title="Số thứ tự tự đặt — bảng đóng quỹ sắp theo số này">STT</th>
                 <th>Thành viên</th>
                 <th class="cell-num">Tổng đã đóng</th>
                 <th class="cell-num">Số tháng</th>
