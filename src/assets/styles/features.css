@@ -484,6 +484,37 @@ body:not(.is-admin) .admin-only {
   border-color: transparent;
 }
 
+.stt-input {
+  width: 52px;
+  padding: 5px 6px;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stt-input::placeholder {
+  color: var(--text-3);
+  opacity: 0.5;
+}
+
+.stt-input:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.stt-input:focus {
+  background: var(--surface-2);
+  border-color: transparent;
+}
+
+.stt-input:disabled {
+  color: var(--text-3);
+}
+
 .note-input {
   width: 100%;
   padding: 5px 8px;
