@@ -83,6 +83,35 @@ export function getDuesStatus(monthKey, member) {
   return getEffectivePaid(monthKey, member) > 0 ? DUES_STATUS.PAID : DUES_STATUS.UNPAID;
 }
 
+/**
+ * So sánh hai người theo số thứ tự admin đặt ở tab Thành viên.
+ * Người chưa có số xếp sau tất cả, và giữ nguyên thứ tự vốn có giữa họ với nhau.
+ * @param {{name: string}} a
+ * @param {{name: string}} b
+ * @returns {number}
+ */
+export function compareByOrder(a, b) {
+  const left = store.memberOrder[a.name];
+  const right = store.memberOrder[b.name];
+  if (left === undefined && right === undefined) return 0;
+  if (left === undefined) return 1;
+  if (right === undefined) return -1;
+  return left - right;
+}
+
+/**
+ * Sắp một danh sách theo số thứ tự, giữ nguyên thứ tự cũ giữa những người chưa có số.
+ * @template {{name: string}} T
+ * @param {T[]} rows
+ * @returns {T[]}
+ */
+export function sortByMemberOrder(rows) {
+  return rows
+    .map((row, index) => ({ row, index }))
+    .sort((a, b) => compareByOrder(a.row, b.row) || a.index - b.index)
+    .map((item) => item.row);
+}
+
 /** Tên các thành viên đang ở trạng thái hoạt động. */
 export function getActiveMemberNames() {
   return store.members.filter((member) => store.activeMembers[member.name]).map((member) => member.name);
@@ -113,7 +142,7 @@ export function getMonthMembers(monthKey) {
   const recorded = store.months.find((month) => month.month === monthKey);
   const rows = recorded ? recorded.members.map((member) => ({ ...member })) : [];
   const shouldFill = !recorded || store.duesFilledMonths[monthKey];
-  if (!shouldFill) return rows;
+  if (!shouldFill) return sortByMemberOrder(rows);
 
   const present = new Set(rows.map((row) => row.name));
   const activeNames = getActiveMemberNames();
@@ -136,7 +165,7 @@ export function getMonthMembers(monthKey) {
     rows.push({ name, paid: 0, note: '', added: true });
     present.add(name);
   });
-  return rows;
+  return sortByMemberOrder(rows);
 }
 
 /**
