@@ -231,6 +231,29 @@ function isBlankDuesRow(row) {
 }
 
 /**
+ * Thêm một người vào bảng đóng quỹ của các tháng từ tháng hiện tại trở đi.
+ * Tháng nào đã có tên rồi thì bỏ qua, không ghi đè số liệu sẵn có.
+ * @param {string} memberName
+ */
+export function addMemberToOpenMonths(memberName) {
+  if (!isFirebaseMode()) return Promise.resolve();
+  const fromMonth = getCurrentMonthKey();
+  const targets = store.months.filter(
+    (month) => month.month >= fromMonth && !month.members.some((member) => member.name === memberName),
+  );
+  return Promise.all(
+    targets.map((month) =>
+      firebaseApi().saveDuesEntry(
+        month.month,
+        memberName,
+        { paid: 0, note: '', skip: false },
+        formatMonthLabel(month.month),
+      ),
+    ),
+  );
+}
+
+/**
  * Gỡ một người khỏi bảng đóng quỹ của các tháng từ tháng hiện tại trở đi.
  *
  * Chỉ gỡ những tháng người đó chưa có số liệu nào — tháng đã đóng tiền, có ghi
