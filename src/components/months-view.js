@@ -23,6 +23,7 @@ import {
   setNote,
   setPaidAmount,
 } from '../services/dues-service.js';
+import { isFirebaseMode } from '../services/data-source.js';
 import { aggregateMembers } from '../services/member-service.js';
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
@@ -228,10 +229,12 @@ export function renderMonths() {
   /* Thanh báo tháng tự sinh / đã bổ sung */
   const addedCount = rows.filter((row) => row.isNewRow).length;
   setVisible(qs('#month-auto-bar'), isVirtual || Boolean(store.duesFilledMonths[monthKey]), 'flex');
+  const virtualHint = isFirebaseMode()
+    ? 'Đánh dấu người đầu tiên là tháng này được tạo thật, giữ nguyên cả bảng.'
+    : 'Đánh dấu xong bấm <b>Tạo tháng này trên GitHub</b> để tạo tháng này thật.';
   qs('#month-auto-text').innerHTML = isVirtual
     ? `<b>${formatMonthLabel(monthKey)} chưa có trong dữ liệu chung.</b> Bảng dưới được tự sinh từ ` +
-      `${getActiveMemberNames().length} thành viên đang hoạt động, tất cả để "Chưa đóng". ` +
-      `Đánh dấu xong bấm <b>Tạo tháng này trên GitHub</b> để tạo tháng này thật.`
+      `${getActiveMemberNames().length} thành viên đang hoạt động, tất cả để "Chưa đóng". ${virtualHint}`
     : `Đã bổ sung <b>${addedCount} người</b> đang hoạt động chưa có tên trong tháng này. Các dòng cũ giữ nguyên.`;
 
   const recorded = store.months.find((month) => month.month === monthKey);
