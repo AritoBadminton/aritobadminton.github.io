@@ -7,6 +7,7 @@ import {
   MONTH_OPTION_MORE,
 } from '../config/constants.js';
 import {
+  createNextMonth,
   fillMonthWithActiveMembers,
   getActiveMemberNames,
   getChangedMemberNames,
@@ -15,6 +16,7 @@ import {
   getEffectivePaid,
   getEffectiveSkip,
   getFutureMonthKeys,
+  getNextMonthToCreate,
   getMonthMembers,
   getMonthsWithChanges,
   isVirtualMonth,
@@ -75,6 +77,28 @@ function handleSetNote(monthKey, memberName, note) {
 function handleFillMonth() {
   fillMonthWithActiveMembers(getSelectedMonthKey());
   aggregateMembers();
+  requestRender('months', 'members');
+}
+
+/** Tạo tháng kế tiếp từ danh sách đang hoạt động rồi mở luôn tháng đó. */
+async function handleCreateMonth() {
+  const button = qs('#month-create');
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Đang tạo…';
+
+  const result = await createNextMonth();
+
+  button.disabled = false;
+  button.textContent = label;
+
+  if (!result.ok) {
+    window.alert(result.error ?? 'Không tạo được tháng mới.');
+    return;
+  }
+  // Snapshot của Firestore sẽ vẽ lại; đặt sẵn ô chọn để mở đúng tháng vừa tạo.
+  lastMonthKey = result.month;
+  qs('#month-picker').value = result.month;
   requestRender('months', 'members');
 }
 
@@ -244,6 +268,12 @@ export function renderMonths() {
     getActiveMemberNames().some((name) => !recorded.members.some((member) => member.name === name));
   setVisible(qs('#month-fill'), store.isAdmin && canFill, 'inline-block');
 
+  const nextMonth = getNextMonthToCreate();
+  qs('#month-create').textContent = `+ Tạo ${formatMonthLabel(nextMonth).toLowerCase()}`;
+  qs('#month-create').title =
+    `Tạo ${formatMonthLabel(nextMonth)} với ${getActiveMemberNames().length} người đang hoạt động, tất cả để "Chưa đóng"`;
+  setVisible(qs('#month-create'), store.isAdmin && isFirebaseMode(), 'inline-block');
+
   /* Bảng danh sách đóng quỹ */
   qs('#dues-table').innerHTML = rows
     .map((row, index) => {
@@ -346,6 +376,7 @@ export function renderMonths() {
 export function initMonthsView() {
   qs('#month-picker').addEventListener('change', handleMonthPickerChange);
   qs('#month-fill').addEventListener('click', handleFillMonth);
+  qs('#month-create').addEventListener('click', handleCreateMonth);
   qs('#month-export-toggle').addEventListener('click', handleSaveMonth);
   qs('#month-reset').addEventListener('click', handleResetMonth);
 }
