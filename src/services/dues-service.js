@@ -9,7 +9,7 @@
 
 import { DUES_STATUS, FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
-import { getFollowingMonthKeys } from '../utils/date.js';
+import { getCurrentMonthKey, getFollowingMonthKeys } from '../utils/date.js';
 import { formatMonthLabel } from '../utils/format.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
@@ -171,14 +171,53 @@ export function getUsualAmount(memberName, untilMonthKey) {
  * @param {object} changes phần cần đổi, ví dụ { paid: 50000 }
  */
 function writeDuesEntry(monthKey, memberName, changes) {
-  const current = getMonthMembers(monthKey).find((member) => member.name === memberName) ?? {};
+  const rows = getMonthMembers(monthKey);
+  const current = rows.find((member) => member.name === memberName) ?? {};
   const entry = {
     paid: current.paid ?? 0,
     note: current.note ?? '',
     skip: Boolean(current.skip),
     ...changes,
   };
+
+  // Tháng còn ảo: ghi luôn cả bảng đang hiện, không chỉ một dòng. Ghi mỗi một
+  // dòng sẽ tạo ra tài liệu tháng chỉ có đúng người vừa đánh dấu, những người
+  // còn lại biến mất khỏi bảng.
+  if (isVirtualMonth(monthKey)) {
+    const all = rows.map((member) => ({
+      name: member.name,
+      paid: member.name === memberName ? entry.paid : (member.paid ?? 0),
+      note: member.name === memberName ? entry.note : (member.note ?? ''),
+      skip: member.name === memberName ? entry.skip : Boolean(member.skip),
+    }));
+    return firebaseApi().saveDuesRows(monthKey, formatMonthLabel(monthKey), all);
+  }
+
   return firebaseApi().saveDuesEntry(monthKey, memberName, entry, formatMonthLabel(monthKey));
+}
+
+/** Dòng này chưa có số liệu gì: chưa đóng, không ghi chú, không "Không chơi". */
+function isBlankDuesRow(row) {
+  return !row.paid && !String(row.note ?? '').trim() && !row.skip;
+}
+
+/**
+ * Gỡ một người khỏi bảng đóng quỹ của các tháng từ tháng hiện tại trở đi.
+ *
+ * Chỉ gỡ những tháng người đó chưa có số liệu nào — tháng đã đóng tiền, có ghi
+ * chú hay đánh dấu "Không chơi" thì giữ nguyên, vì đó là lịch sử. Tháng trước
+ * tháng hiện tại cũng không đụng tới.
+ * @param {string} memberName
+ */
+export function removeMemberFromOpenMonths(memberName) {
+  if (!isFirebaseMode()) return Promise.resolve();
+  const fromMonth = getCurrentMonthKey();
+  const targets = store.months.filter((month) => {
+    if (month.month < fromMonth) return false;
+    const row = month.members.find((member) => member.name === memberName);
+    return row && isBlankDuesRow(row);
+  });
+  return Promise.all(targets.map((month) => firebaseApi().removeDuesEntry(month.month, memberName)));
 }
 
 /**
