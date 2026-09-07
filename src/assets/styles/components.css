@@ -657,3 +657,17 @@ td.cell-name {
   width: 18px;
   height: 18px;
 }
+
+/* Nút xoá đã bấm một lần, đang chờ xác nhận lần hai. */
+.btn--delete-armed {
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #fff;
+  background: var(--crit);
+}
+
+.btn--delete-armed:hover {
+  color: #fff;
+  background: var(--crit);
+}
