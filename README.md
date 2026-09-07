@@ -199,14 +199,15 @@ Hiện ở tab **Đóng quỹ theo tháng**, cột bên phải bảng đóng qu�
 ```jsonc
 "qr": {
   "image": "src/assets/images/qr-transfer.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
-  "name": "NGUYEN MINH NGHIA",
-  "account": "1905 0021 1080 12",
-  "bank": "Techcombank · VietQR / Napas 247",
+  "name": "TEN CHU TAI KHOAN",
+  "account": "0000 0000 0000 00",
+  "bank": "Ten ngan hang · VietQR / Napas 247",
   "note": "Quét mã bằng app ngân hàng · chuyển xong nhắn Zalo cho thủ quỹ"
 },
 ```
 
-Xoá hẳn mục `"qr"` thì khối này tự ẩn đi.
+Xoá hẳn mục `"qr"` thì khối này tự ẩn đi. Repo này công khai, nên số tài khoản thật để trong
+tài liệu `settings/qr` của Firestore chứ không để trong `data.json`.
 
 ## Nhập khoản thu / chi mới
 
