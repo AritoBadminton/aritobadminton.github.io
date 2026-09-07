@@ -79,8 +79,8 @@ async function startFirebaseMode() {
 
     if (!data.months.length && !store.transactions.length) {
       qs('#loading-state').innerHTML =
-        'Firestore chưa có dữ liệu.<br><span class="text-muted">Mở ' +
-        '<a href="migrate.html">migrate.html</a> để chuyển số liệu từ <code>data.json</code> sang.</span>';
+        'Firestore chưa có dữ liệu.<br><span class="text-muted">Đăng nhập rồi ' +
+        'nhập liệu để bắt đầu.</span>';
       setVisible(qs('#loading-state'), true);
       return;
     }
