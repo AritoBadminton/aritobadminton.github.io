@@ -14,12 +14,12 @@
 export const FIREBASE_SDK_VERSION = '12.18.0';
 
 export const FIREBASE_CONFIG = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: 'AIzaSyDUMos0_ZmHKOfhbSSCxYkK1ag37pnOwSo',
+  authDomain: 'aritobadminton.firebaseapp.com',
+  projectId: 'aritobadminton',
+  storageBucket: 'aritobadminton.firebasestorage.app',
+  messagingSenderId: '803612029661',
+  appId: '1:803612029661:web:0c694ca4cce0add43fa134',
 };
 
 /** Đã cấu hình Firebase hay chưa. */
