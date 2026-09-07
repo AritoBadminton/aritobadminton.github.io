@@ -4,6 +4,7 @@ import { STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
 import {
+  addMemberToOpenMonths,
   getEffectivePaid,
   getEffectiveSkip,
   getFutureMonthKeys,
@@ -11,6 +12,9 @@ import {
   removeMemberFromOpenMonths,
 } from './dues-service.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
+
+/** Tên thành viên dài nhất chấp nhận được. */
+const MAX_MEMBER_NAME_LENGTH = 60;
 
 /**
  * Gom số liệu từng thành viên qua mọi tháng.
@@ -59,6 +63,22 @@ export function aggregateMembers() {
       stats.lastMonth = monthKey;
       stats.lastPaid = paid;
       stats.lastSkipped = isSkipped;
+    });
+  });
+
+  // Người vừa được thêm chưa có tên ở tháng nào, nhưng vẫn phải hiện ở tab
+  // Thành viên — nếu không thì thêm xong lại không thấy đâu cả.
+  (store.data.roster ?? []).forEach((entry) => {
+    if (!entry?.name || byName.has(entry.name)) return;
+    byName.set(entry.name, {
+      name: entry.name,
+      total: 0,
+      months: 0,
+      paidMonths: 0,
+      skippedMonths: 0,
+      lastMonth: null,
+      lastPaid: 0,
+      lastSkipped: false,
     });
   });
 
@@ -113,9 +133,11 @@ export function setMemberActive(name, isActive) {
   store.activeMembers[name] = isActive;
 
   if (isFirebaseMode()) {
-    const saved = firebaseApi().saveMemberActive(name, isActive);
-    // Ngưng hoạt động thì rút tên khỏi bảng đóng quỹ của tháng hiện tại trở đi.
-    return isActive ? saved : saved.then(() => removeMemberFromOpenMonths(name));
+    // Bật lại thì đưa tên trở vào bảng đóng quỹ của tháng hiện tại trở đi;
+    // tắt đi thì rút ra. Nhờ vậy bảng đóng quỹ luôn khớp với danh sách có tick.
+    return firebaseApi()
+      .saveMemberActive(name, isActive)
+      .then(() => (isActive ? addMemberToOpenMonths(name) : removeMemberFromOpenMonths(name)));
   }
 
   writeJson(STORAGE_KEYS.ACTIVE_MEMBERS, store.activeMembers);
@@ -131,6 +153,39 @@ export function setMemberOrder(name, order) {
   else store.memberOrder[name] = order;
   if (isFirebaseMode()) return firebaseApi().saveMemberOrder(name, order);
   return Promise.resolve();
+}
+
+/**
+ * Thêm một thành viên mới vào danh sách chung.
+ *
+ * Người mới được coi là đang hoạt động và có mặt ngay ở bảng đóng quỹ của tháng
+ * hiện tại trở đi. Các tháng cũ không đụng tới, vì lúc đó họ chưa tham gia.
+ * @param {string} rawName
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function addMember(rawName) {
+  const name = rawName.trim().replace(/\s+/g, ' ');
+  if (!name) return { ok: false, error: 'Chưa nhập tên.' };
+  if (name.length > MAX_MEMBER_NAME_LENGTH) {
+    return { ok: false, error: `Tên dài quá ${MAX_MEMBER_NAME_LENGTH} ký tự.` };
+  }
+  const existing = store.members.find((member) => member.name.toLowerCase() === name.toLowerCase());
+  if (existing) return { ok: false, error: `Đã có "${existing.name}" trong danh sách.` };
+
+  store.activeMembers[name] = true;
+  if (!isFirebaseMode()) {
+    writeJson(STORAGE_KEYS.ACTIVE_MEMBERS, store.activeMembers);
+    return { ok: false, error: 'Chế độ data.json chưa thêm được thành viên mới.' };
+  }
+
+  try {
+    await firebaseApi().saveMemberActive(name, true);
+    await addMemberToOpenMonths(name);
+    return { ok: true };
+  } catch (error) {
+    delete store.activeMembers[name];
+    return { ok: false, error: `Không lưu được: ${error?.message ?? error}` };
+  }
 }
 
 /** Trả trạng thái hoạt động về đúng như data.json. */
