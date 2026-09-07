@@ -9,7 +9,7 @@
 
 import { DUES_STATUS, FUTURE_MONTH_COUNT, STANDARD_DUES, STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
-import { getCurrentMonthKey, getFollowingMonthKeys } from '../utils/date.js';
+import { getCurrentMonthKey, getFollowingMonthKeys, getNextMonthKey } from '../utils/date.js';
 import { formatMonthLabel } from '../utils/format.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
@@ -331,6 +331,38 @@ export function setNote(monthKey, memberName, note) {
   if (note === (original.note ?? '')) delete store.duesNoteOverrides[key];
   else store.duesNoteOverrides[key] = note;
   persistLocalDuesChanges();
+}
+
+/**
+ * Tháng sắp được tạo tiếp theo: ngay sau tháng cuối cùng đã ghi.
+ * Chưa có tháng nào thì lấy tháng hiện tại theo lịch.
+ * @returns {string} khoá dạng "2026-11"
+ */
+export function getNextMonthToCreate() {
+  const last = store.months[store.months.length - 1]?.month;
+  return last ? getNextMonthKey(last) : getCurrentMonthKey();
+}
+
+/**
+ * Tạo tháng mới với đúng những người đang được tick hoạt động, tất cả để "Chưa đóng".
+ * @returns {Promise<{ok: boolean, month?: string, count?: number, error?: string}>}
+ */
+export async function createNextMonth() {
+  if (!isFirebaseMode()) return { ok: false, error: 'Chế độ data.json chưa tạo được tháng mới.' };
+
+  const monthKey = getNextMonthToCreate();
+  if (!isVirtualMonth(monthKey)) return { ok: false, error: `${formatMonthLabel(monthKey)} đã có rồi.` };
+
+  const names = getActiveMemberNames();
+  if (!names.length) return { ok: false, error: 'Chưa có ai được tick hoạt động.' };
+
+  const rows = names.map((name) => ({ name, paid: 0, note: '', skip: false }));
+  try {
+    await firebaseApi().saveDuesRows(monthKey, formatMonthLabel(monthKey), rows);
+    return { ok: true, month: monthKey, count: rows.length };
+  } catch (error) {
+    return { ok: false, error: `Không lưu được: ${error?.message ?? error}` };
+  }
 }
 
 /**
