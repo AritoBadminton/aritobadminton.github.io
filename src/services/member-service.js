@@ -83,6 +83,14 @@ export function initActiveMembers() {
     }
   });
 
+  store.memberOrder = {};
+  (store.data.roster ?? []).forEach((entry) => {
+    // Number(null) ra 0 chứ không ra NaN, nên phải loại null và chuỗi rỗng trước.
+    if (!entry || entry.order === null || entry.order === undefined || entry.order === '') return;
+    const order = Number(entry.order);
+    if (Number.isFinite(order)) store.memberOrder[entry.name] = order;
+  });
+
   store.activeMembers = { ...store.baseActiveMembers };
   if (isFirebaseMode()) return;
 
@@ -111,6 +119,18 @@ export function setMemberActive(name, isActive) {
   }
 
   writeJson(STORAGE_KEYS.ACTIVE_MEMBERS, store.activeMembers);
+}
+
+/**
+ * Đặt số thứ tự cho một thành viên. Truyền null để bỏ số.
+ * @param {string} name
+ * @param {number|null} order
+ */
+export function setMemberOrder(name, order) {
+  if (order === null) delete store.memberOrder[name];
+  else store.memberOrder[name] = order;
+  if (isFirebaseMode()) return firebaseApi().saveMemberOrder(name, order);
+  return Promise.resolve();
 }
 
 /** Trả trạng thái hoạt động về đúng như data.json. */
