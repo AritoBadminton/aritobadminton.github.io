@@ -8,6 +8,7 @@ import {
 } from '../config/constants.js';
 import {
   createNextMonth,
+  deleteMonth,
   fillMonthWithActiveMembers,
   getActiveMemberNames,
   getChangedMemberNames,
@@ -99,6 +100,30 @@ async function handleCreateMonth() {
   // Snapshot của Firestore sẽ vẽ lại; đặt sẵn ô chọn để mở đúng tháng vừa tạo.
   lastMonthKey = result.month;
   qs('#month-picker').value = result.month;
+  requestRender('months', 'members');
+}
+
+/**
+ * Xoá tháng đang xem, hỏi lại một lần cho chắc.
+ * Tháng đã có số liệu thì dịch vụ từ chối và nói rõ lý do.
+ */
+async function handleDeleteMonth() {
+  const monthKey = getSelectedMonthKey();
+  if (!window.confirm(`Xoá hẳn ${formatMonthLabel(monthKey)} khỏi dữ liệu chung?`)) return;
+
+  const button = qs('#month-delete');
+  button.disabled = true;
+
+  const result = await deleteMonth(monthKey);
+
+  button.disabled = false;
+  if (!result.ok) {
+    window.alert(result.error ?? 'Không xoá được tháng.');
+    return;
+  }
+  // Chuyển sang tháng gần nhất còn lại; snapshot của Firestore sẽ vẽ lại.
+  const rest = store.months.filter((month) => month.month !== monthKey);
+  lastMonthKey = rest[rest.length - 1]?.month ?? '';
   requestRender('months', 'members');
 }
 
@@ -274,6 +299,16 @@ export function renderMonths() {
     `Tạo ${formatMonthLabel(nextMonth)} với ${getActiveMemberNames().length} người đang hoạt động, tất cả để "Chưa đóng"`;
   setVisible(qs('#month-create'), store.isAdmin && isFirebaseMode(), 'inline-block');
 
+  const blank =
+    !isVirtual && rows.every((row) => !row.amount && !row.note.trim() && row.status !== DUES_STATUS.SKIPPED);
+  qs('#month-delete').textContent = `Xoá ${formatMonthLabel(monthKey).toLowerCase()}`;
+  qs('#month-delete').title = blank
+    ? `Xoá hẳn ${formatMonthLabel(monthKey)} — tháng này chưa có số liệu nào`
+    : `${formatMonthLabel(monthKey)} đã có số liệu nên không xoá được`;
+  qs('#month-delete').disabled = !blank;
+  qs('#month-delete').style.opacity = blank ? '1' : '0.45';
+  setVisible(qs('#month-delete'), store.isAdmin && isFirebaseMode() && !isVirtual, 'inline-block');
+
   /* Bảng danh sách đóng quỹ */
   qs('#dues-table').innerHTML = rows
     .map((row, index) => {
@@ -377,6 +412,7 @@ export function initMonthsView() {
   qs('#month-picker').addEventListener('change', handleMonthPickerChange);
   qs('#month-fill').addEventListener('click', handleFillMonth);
   qs('#month-create').addEventListener('click', handleCreateMonth);
+  qs('#month-delete').addEventListener('click', handleDeleteMonth);
   qs('#month-export-toggle').addEventListener('click', handleSaveMonth);
   qs('#month-reset').addEventListener('click', handleResetMonth);
 }
