@@ -24,9 +24,11 @@ import {
   signOut,
 } from 'firebase/auth';
 import {
+  FieldPath,
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getFirestore,
@@ -237,6 +239,18 @@ export function saveRuleItems(items) {
 export function saveMemberActive(name, isActive) {
   const { db } = getConnection();
   return setDoc(doc(db, 'settings', 'roster'), { active: { [name]: isActive } }, { merge: true });
+}
+
+/**
+ * Gỡ hẳn một người khỏi bảng đóng quỹ của một tháng.
+ * Dùng khi người đó chuyển sang ngưng hoạt động mà tháng đó chưa có số liệu gì.
+ * @param {string} monthKey
+ * @param {string} memberName
+ */
+export function removeDuesEntry(monthKey, memberName) {
+  const { db } = getConnection();
+  // FieldPath thay vì chuỗi "dues.<tên>" vì tên có dấu cách và dấu tiếng Việt.
+  return updateDoc(doc(db, 'months', monthKey), new FieldPath('dues', memberName), deleteField());
 }
 
 /**
