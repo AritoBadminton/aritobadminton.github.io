@@ -3,6 +3,7 @@
 import { MEMBER_PAGE_SIZE } from '../config/constants.js';
 import { compareByOrder } from '../services/dues-service.js';
 import {
+  addMember,
   aggregateMembers,
   countUnpaidActive,
   getChangedActiveNames,
@@ -23,10 +24,15 @@ let statusFilter = 'all';
 let currentPage = 1;
 
 /** Các cách sắp xếp danh sách thành viên. */
+/** Tỷ lệ đóng đủ; người chưa có tháng nào tính là 0 để không ra NaN. */
+function getPaidRate(member) {
+  return member.months ? member.paidMonths / member.months : 0;
+}
+
 const SORT_COMPARATORS = {
   stt: (a, b) => compareByOrder(a, b) || b.total - a.total,
   total: (a, b) => b.total - a.total,
-  rate: (a, b) => b.paidMonths / b.months - a.paidMonths / a.months,
+  rate: (a, b) => getPaidRate(b) - getPaidRate(a),
   months: (a, b) => b.months - a.months,
   name: (a, b) => a.name.localeCompare(b.name, 'vi'),
 };
@@ -42,6 +48,38 @@ function getRateColor(rate) {
 function handleToggleActive(name, isActive) {
   setMemberActive(name, isActive);
   requestRender('members');
+}
+
+/** Mở hoặc đóng ô nhập tên thành viên mới. */
+function toggleAddForm(open) {
+  setVisible(qs('#members-add-form'), open, 'flex');
+  qs('#members-add-error').textContent = '';
+  if (open) {
+    qs('#members-add-name').value = '';
+    qs('#members-add-name').focus();
+  }
+}
+
+/** Thêm thành viên mới rồi vẽ lại các bảng liên quan. */
+async function handleAddMember() {
+  const button = qs('#members-add-submit');
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Đang thêm…';
+
+  const result = await addMember(qs('#members-add-name').value);
+
+  button.disabled = false;
+  button.textContent = label;
+
+  if (!result.ok) {
+    qs('#members-add-error').textContent = result.error ?? 'Không thêm được.';
+    qs('#members-add-name').select();
+    return;
+  }
+  toggleAddForm(false);
+  aggregateMembers();
+  requestRender('members', 'months');
 }
 
 /** Đặt số thứ tự cho một thành viên; ô trống nghĩa là bỏ số. */
@@ -160,7 +198,7 @@ export function renderMembers() {
   qs('#members-table').innerHTML = pageRows.length
     ? pageRows
         .map((member, index) => {
-          const rate = member.paidMonths / member.months;
+          const rate = getPaidRate(member);
           const isActive = Boolean(store.activeMembers[member.name]);
           return `<tr class="${isActive ? '' : 'row--inactive'}">
         <td style="text-align:center">
@@ -186,9 +224,12 @@ export function renderMembers() {
             <span style="font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums">${Math.round(rate * 100)}%</span>
           </div>
         </td>
-        <td>${formatMonthLabel(member.lastMonth)}
-          ${member.lastPaid > 0 ? '<span class="pill pill--paid">đã đóng</span>' : '<span class="pill pill--unpaid">chưa</span>'}
-        </td>
+        <td>${
+          member.lastMonth
+            ? `${formatMonthLabel(member.lastMonth)}
+          ${member.lastPaid > 0 ? '<span class="pill pill--paid">đã đóng</span>' : '<span class="pill pill--unpaid">chưa</span>'}`
+            : '<span class="text-muted">Chưa có tháng nào</span>'
+        }</td>
       </tr>`;
         })
         .join('')
@@ -208,6 +249,9 @@ export function renderMembers() {
     });
   });
 
+  setVisible(qs('#members-add-toggle'), store.isAdmin, 'inline-block');
+  if (!store.isAdmin) setVisible(qs('#members-add-form'), false);
+
   renderPager(rows.length, pageCount, pageStart, pageRows.length);
 
   const changed = getChangedActiveNames();
@@ -221,6 +265,16 @@ export function renderMembers() {
 
 /** Gắn sự kiện cho trang Thành viên. */
 export function initMembersView() {
+  qs('#members-add-toggle').addEventListener('click', () => {
+    toggleAddForm(qs('#members-add-form').style.display === 'none');
+  });
+  qs('#members-add-cancel').addEventListener('click', () => toggleAddForm(false));
+  qs('#members-add-submit').addEventListener('click', handleAddMember);
+  qs('#members-add-name').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') handleAddMember();
+    if (event.key === 'Escape') toggleAddForm(false);
+  });
+
   ['#members-keyword', '#members-sort'].forEach((selector) => {
     qs(selector).addEventListener('input', () => {
       currentPage = 1;
