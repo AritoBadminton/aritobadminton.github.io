@@ -39,6 +39,10 @@ function getBaseItems() {
 
 /** Nạp bản sửa đang lưu trên máy. */
 export function loadLocalRuleChanges() {
+  if (isFirebaseMode()) {
+    store.ruleItemsOverride = null;
+    return;
+  }
   const stored = readJson(STORAGE_KEYS.RULES, null);
   store.ruleItemsOverride = Array.isArray(stored) ? stored.map(normalizeItem) : null;
 }

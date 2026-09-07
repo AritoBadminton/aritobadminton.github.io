@@ -65,7 +65,7 @@ export function aggregateMembers() {
  */
 export function initActiveMembers() {
   const lastRecorded = store.months[store.months.length - 1];
-  const namesInLastMonth = new Set(lastRecorded.members.map((member) => member.name));
+  const namesInLastMonth = new Set((lastRecorded?.members ?? []).map((member) => member.name));
 
   store.baseActiveMembers = {};
   store.members.forEach((member) => {
@@ -78,6 +78,8 @@ export function initActiveMembers() {
   });
 
   store.activeMembers = { ...store.baseActiveMembers };
+  if (isFirebaseMode()) return;
+
   const saved = readJson(STORAGE_KEYS.ACTIVE_MEMBERS, null);
   if (saved) {
     Object.keys(saved).forEach((name) => {

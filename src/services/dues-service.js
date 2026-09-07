@@ -16,6 +16,15 @@ import { readJson, writeJson } from './storage-service.js';
 
 /** Nạp mọi ghi đè đóng quỹ đã lưu trên máy. */
 export function loadLocalDuesChanges() {
+  // Chế độ Firebase không có bản nháp: mọi thay đổi ghi thẳng lên máy chủ. Bỏ qua
+  // bản nháp cũ còn sót lại trên máy, nếu không nó sẽ đắp lên số liệu chung.
+  if (isFirebaseMode()) {
+    store.duesPaidOverrides = {};
+    store.duesNoteOverrides = {};
+    store.duesFilledMonths = {};
+    store.duesSkipOverrides = {};
+    return;
+  }
   store.duesPaidOverrides = readJson(STORAGE_KEYS.DUES_PAID, {});
   store.duesNoteOverrides = readJson(STORAGE_KEYS.DUES_NOTES, {});
   store.duesFilledMonths = readJson(STORAGE_KEYS.DUES_FILL, {});

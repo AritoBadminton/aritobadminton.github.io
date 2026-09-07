@@ -50,6 +50,11 @@ export function rebuildTransactions() {
 
 /** Nạp các khoản thêm mới và sửa đổi đã lưu trên máy. */
 export function loadLocalLedgerChanges() {
+  if (isFirebaseMode()) {
+    store.addedTransactions = { incomes: [], expenses: [] };
+    store.editedTransactions = {};
+    return;
+  }
   const added = readJson(STORAGE_KEYS.LEDGER_ADDED, null);
   if (added?.incomes && added?.expenses) store.addedTransactions = added;
   store.editedTransactions = readJson(STORAGE_KEYS.LEDGER_EDITED, {});
