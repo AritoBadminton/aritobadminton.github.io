@@ -3,7 +3,13 @@
 import { STORAGE_KEYS } from '../config/constants.js';
 import { buildDuesKey, store } from '../state/store.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
-import { getEffectivePaid, getEffectiveSkip, getFutureMonthKeys, getMonthMembers } from './dues-service.js';
+import {
+  getEffectivePaid,
+  getEffectiveSkip,
+  getFutureMonthKeys,
+  getMonthMembers,
+  removeMemberFromOpenMonths,
+} from './dues-service.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
 
 /**
@@ -94,8 +100,16 @@ export function initActiveMembers() {
  * @param {boolean} isActive
  */
 export function setMemberActive(name, isActive) {
-  if (isFirebaseMode()) return firebaseApi().saveMemberActive(name, isActive);
+  // Đổi ngay trong bộ nhớ để ô tích không nháy về trạng thái cũ trong lúc chờ
+  // Firestore trả lời; bản trên máy chủ về sau sẽ xác nhận lại.
   store.activeMembers[name] = isActive;
+
+  if (isFirebaseMode()) {
+    const saved = firebaseApi().saveMemberActive(name, isActive);
+    // Ngưng hoạt động thì rút tên khỏi bảng đóng quỹ của tháng hiện tại trở đi.
+    return isActive ? saved : saved.then(() => removeMemberFromOpenMonths(name));
+  }
+
   writeJson(STORAGE_KEYS.ACTIVE_MEMBERS, store.activeMembers);
 }
 
