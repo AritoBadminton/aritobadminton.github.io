@@ -484,6 +484,35 @@ body:not(.is-admin) .admin-only {
   border-color: transparent;
 }
 
+.add-member {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.add-member input {
+  flex: 0 1 280px;
+  padding: 8px 11px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+}
+
+.add-member input:focus {
+  border-color: var(--border-strong);
+  outline: none;
+}
+
+.add-member__error {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--crit);
+}
+
 .stt-input {
   width: 52px;
   padding: 5px 6px;
