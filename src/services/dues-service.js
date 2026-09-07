@@ -366,6 +366,43 @@ export async function createNextMonth() {
 }
 
 /**
+ * Xoá hẳn một tháng.
+ *
+ * Chỉ cho xoá tháng chưa có số liệu nào — chưa ai đóng, không ghi chú, không
+ * đánh dấu "Không chơi". Tháng đã có số liệu là lịch sử, xoá là mất luôn.
+ * @param {string} monthKey
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function deleteMonth(monthKey) {
+  if (!isFirebaseMode()) return { ok: false, error: 'Chế độ data.json chưa xoá được tháng.' };
+  if (isVirtualMonth(monthKey)) {
+    return { ok: false, error: `${formatMonthLabel(monthKey)} chưa có trong dữ liệu.` };
+  }
+
+  const dirty = getMonthMembers(monthKey).filter((member) => !isBlankDuesRow(member));
+  if (dirty.length) {
+    const names = dirty
+      .slice(0, 3)
+      .map((member) => member.name)
+      .join(', ');
+    return {
+      ok: false,
+      error:
+        `${formatMonthLabel(monthKey)} đã có số liệu của ${dirty.length} người ` +
+        `(${names}${dirty.length > 3 ? '…' : ''}) nên không xoá được.\n\n` +
+        'Chỉ xoá được tháng chưa ai đóng, không ghi chú, không đánh dấu "Không chơi".',
+    };
+  }
+
+  try {
+    await firebaseApi().removeMonth(monthKey);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: `Không xoá được: ${error?.message ?? error}` };
+  }
+}
+
+/**
  * Bổ sung thành viên đang hoạt động còn thiếu vào một tháng đã ghi.
  * @param {string} monthKey
  */
