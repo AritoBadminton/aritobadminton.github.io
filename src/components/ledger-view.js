@@ -15,6 +15,7 @@ import {
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
+import { isFirebaseMode } from '../services/data-source.js';
 import { getTodayIso } from '../utils/date.js';
 import {
   buildMoreOption,
@@ -37,6 +38,13 @@ import {
 /* ---------- Trạng thái riêng của trang ---------- */
 
 let filterType = 'all';
+
+/** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
+const DELETE_CONFIRM_MS = 4000;
+
+/** Dòng đang chờ xác nhận xoá, và hẹn giờ tự huỷ xác nhận đó. */
+let pendingDeleteId = '';
+let pendingDeleteTimer = 0;
 
 /** Tháng đang lọc, giữ lại khi mở rộng danh sách tháng. */
 let selectedMonthFilter = '';
@@ -239,6 +247,29 @@ function handleSaveUpdate() {
   requestRender();
 }
 
+/**
+ * Xoá một dòng: bấm lần đầu chỉ hỏi lại, bấm lần hai mới xoá thật.
+ * Ở chế độ Firebase đây là xoá khỏi dữ liệu chung nên không cho lỡ tay.
+ * @param {string} id
+ */
+function handleRowDelete(id) {
+  clearTimeout(pendingDeleteTimer);
+
+  if (pendingDeleteId !== id) {
+    pendingDeleteId = id;
+    pendingDeleteTimer = setTimeout(() => {
+      pendingDeleteId = '';
+      renderLedger();
+    }, DELETE_CONFIRM_MS);
+    renderLedger();
+    return;
+  }
+
+  pendingDeleteId = '';
+  removeAddedTransaction(id);
+  requestRender();
+}
+
 /** Trả các dòng đang chọn về đúng như trong data.json. */
 function handleRevert() {
   revertTransactions(getSelectedRows().map((row) => row.id));
@@ -421,8 +452,10 @@ export function renderLedger() {
           ${row.type === 'thu' ? '+' : '−'}${formatCurrency(row.amount)}
         </td>
         <td>${
-          row.isNew && store.isAdmin
-            ? `<button class="btn--delete js-row-delete" data-id="${row.id}" title="Xoá khoản vừa thêm" aria-label="Xoá khoản ${escapeHtml(row.desc)}">×</button>`
+          store.isAdmin && (row.isNew || isFirebaseMode())
+            ? `<button class="btn--delete js-row-delete${pendingDeleteId === row.id ? ' btn--delete-armed' : ''}"
+                data-id="${row.id}" title="${row.isNew ? 'Xoá khoản vừa thêm' : 'Xoá khoản này khỏi dữ liệu chung'}"
+                aria-label="Xoá khoản ${escapeHtml(row.desc)}">${pendingDeleteId === row.id ? 'Xoá?' : '×'}</button>`
             : ''
         }</td>
       </tr>`,
@@ -431,10 +464,7 @@ export function renderLedger() {
     : '<tr><td colspan="7" class="table-empty text-muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
 
   qsa('#ledger-table .js-row-delete').forEach((button) => {
-    button.addEventListener('click', () => {
-      removeAddedTransaction(button.dataset.id);
-      requestRender();
-    });
+    button.addEventListener('click', () => handleRowDelete(button.dataset.id));
   });
   qsa('#ledger-table .js-row-select').forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
