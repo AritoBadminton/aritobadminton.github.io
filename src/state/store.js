@@ -24,6 +24,9 @@ export const store = {
   /** Trạng thái hoạt động gốc từ data.json, dùng để so sánh thay đổi. */
   baseActiveMembers: {},
 
+  /** Số thứ tự do admin đặt cho từng người: { [tên]: number }. Chưa đặt thì không có khoá. */
+  memberOrder: {},
+
   /** Ghi đè số tiền đóng quỹ: { "2026-08|Văn Khánh": 50000 }. */
   duesPaidOverrides: {},
 
