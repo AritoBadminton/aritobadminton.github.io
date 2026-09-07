@@ -9,8 +9,13 @@ export const DATA_URL = 'data.json';
 /** Mức đóng quỹ chuẩn cho thành viên công ty (đồng / tháng). */
 export const STANDARD_DUES = 50000;
 
-/** Số tháng tương lai được đề xuất sẵn trong ô chọn tháng. */
-export const FUTURE_MONTH_COUNT = 3;
+/**
+ * Số tháng tự sinh sẵn sau tháng cuối cùng đã ghi.
+ *
+ * Để 0 vì tháng mới giờ do admin bấm nút "Tạo tháng mới" tạo ra — rõ ràng hơn là
+ * bày sẵn vài tháng chưa ai đụng tới trong ô chọn tháng.
+ */
+export const FUTURE_MONTH_COUNT = 0;
 
 /** Số giao dịch hiển thị ở khối "Giao dịch gần đây". */
 export const RECENT_TRANSACTION_COUNT = 10;
