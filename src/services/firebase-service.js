@@ -358,6 +358,28 @@ async function touchUpdated(date) {
 }
 
 /**
+ * Xoá hẳn một tháng khỏi bảng đóng quỹ.
+ * @param {string} monthKey
+ */
+export function removeMonth(monthKey) {
+  const { db } = getConnection();
+  return deleteDoc(doc(db, 'months', monthKey));
+}
+
+/**
+ * Xoá nhiều tài liệu theo lô.
+ * @param {string[][]} paths ví dụ [['months','2026-09'], ['transactions','thu-0001']]
+ */
+export async function commitDeletes(paths) {
+  const { db } = getConnection();
+  for (let start = 0; start < paths.length; start += BATCH_LIMIT) {
+    const batch = writeBatch(db);
+    paths.slice(start, start + BATCH_LIMIT).forEach((path) => batch.delete(doc(db, ...path)));
+    await batch.commit();
+  }
+}
+
+/**
  * Ghi nhiều tài liệu theo lô, tự chia nhỏ cho vừa giới hạn của Firestore.
  * @param {{path: string[], data: object, merge?: boolean}[]} writes
  */
