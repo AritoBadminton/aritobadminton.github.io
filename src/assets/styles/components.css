@@ -534,6 +534,27 @@ td.cell-name {
   margin-top: 6px;
 }
 
+.modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.link-button {
+  padding: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text-3);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--text);
+}
+
 /* ---------- Chú giải nổi trên biểu đồ ---------- */
 
 .tooltip {
