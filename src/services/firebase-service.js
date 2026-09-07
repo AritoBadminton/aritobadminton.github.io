@@ -8,7 +8,7 @@
  *   settings/club          { name, updated }
  *   settings/rules         { title, subtitle, items[], footer }
  *   settings/qr            { image, name, account, bank, note }
- *   settings/roster        { active: { "<tên>": true|false } }
+ *   settings/roster        { active: { "<tên>": true|false }, order: { "<tên>": số } }
  *   months/<YYYY-MM>       { label, dues: { "<tên>": { paid, note, skip } } }
  *   transactions/<id>      { type: 'thu'|'chi', date, amount, desc, cat }
  *   admins/<uid>           { email, name }  — chỉ đọc, sửa trong Firebase Console
@@ -16,12 +16,16 @@
 
 import { initializeApp } from 'firebase/app';
 import {
+  EmailAuthProvider,
   browserLocalPersistence,
   getAuth,
   onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
 } from 'firebase/auth';
 import {
   FieldPath,
@@ -82,6 +86,43 @@ export async function firebaseLogout() {
 }
 
 /**
+ * Đổi mật khẩu của chính người đang đăng nhập.
+ *
+ * Firebase bắt xác thực lại bằng mật khẩu hiện tại trước khi cho đổi — nhờ vậy
+ * người mượn máy lúc đang mở sẵn phiên cũng không đổi được mật khẩu của chủ máy.
+ * @param {string} currentPassword
+ * @param {string} newPassword
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function changePassword(currentPassword, newPassword) {
+  const { auth } = getConnection();
+  const user = auth.currentUser;
+  if (!user?.email) return { ok: false, error: 'Chưa đăng nhập.' };
+  try {
+    await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
+    await updatePassword(user, newPassword);
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: describeAuthError(error) };
+  }
+}
+
+/**
+ * Gửi thư đặt lại mật khẩu, dùng khi quên hẳn mật khẩu cũ.
+ * @param {string} email
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function sendResetEmail(email) {
+  const { auth } = getConnection();
+  try {
+    await sendPasswordResetEmail(auth, email.trim());
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: describeAuthError(error) };
+  }
+}
+
+/**
  * Theo dõi trạng thái đăng nhập và cho biết người đó có quyền ghi hay không.
  * @param {(state: {email: string, isAdmin: boolean}|null) => void} onChange
  */
@@ -113,6 +154,9 @@ function describeAuthError(error) {
     'auth/user-disabled': 'Tài khoản này đã bị khoá.',
     'auth/too-many-requests': 'Sai quá nhiều lần, thử lại sau ít phút.',
     'auth/network-request-failed': 'Không kết nối được. Kiểm tra lại mạng.',
+    'auth/weak-password': 'Mật khẩu mới phải từ 6 ký tự trở lên.',
+    'auth/requires-recent-login':
+      'Phiên đăng nhập đã cũ. Đăng xuất rồi đăng nhập lại trước khi đổi mật khẩu.',
   };
   return messages[error?.code] ?? 'Không đăng nhập được, thử lại giúp tôi.';
 }
@@ -183,6 +227,7 @@ export function stopWatching() {
 function buildClubData(parts) {
   const { settings, months, transactions } = parts;
   const activeMap = settings.roster?.active ?? {};
+  const orderMap = settings.roster?.order ?? {};
 
   const monthList = months
     .map((item) => {
@@ -212,7 +257,7 @@ function buildClubData(parts) {
     ...new Set([...Object.keys(activeMap), ...monthList.flatMap((m) => m.members.map((x) => x.name))]),
   ]
     .sort((a, b) => a.localeCompare(b, 'vi'))
-    .map((name) => ({ name, active: Boolean(activeMap[name]) }));
+    .map((name) => ({ name, active: Boolean(activeMap[name]), order: orderMap[name] ?? null }));
 
   return {
     club: settings.club?.name ?? 'CLB Cầu Lông',
@@ -239,6 +284,16 @@ export function saveRuleItems(items) {
 export function saveMemberActive(name, isActive) {
   const { db } = getConnection();
   return setDoc(doc(db, 'settings', 'roster'), { active: { [name]: isActive } }, { merge: true });
+}
+
+/**
+ * Đặt số thứ tự cho một thành viên; null nghĩa là bỏ số, xếp xuống cuối.
+ * @param {string} name
+ * @param {number|null} order
+ */
+export function saveMemberOrder(name, order) {
+  const { db } = getConnection();
+  return setDoc(doc(db, 'settings', 'roster'), { order: { [name]: order } }, { merge: true });
 }
 
 /**
