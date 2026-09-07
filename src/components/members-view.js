@@ -1,12 +1,14 @@
 /** Trang Thành viên: thống kê đóng góp và phân loại đang / ngừng hoạt động. */
 
 import { MEMBER_PAGE_SIZE } from '../config/constants.js';
+import { compareByOrder } from '../services/dues-service.js';
 import {
   aggregateMembers,
   countUnpaidActive,
   getChangedActiveNames,
   resetActiveMembers,
   setMemberActive,
+  setMemberOrder,
 } from '../services/member-service.js';
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
@@ -22,6 +24,7 @@ let currentPage = 1;
 
 /** Các cách sắp xếp danh sách thành viên. */
 const SORT_COMPARATORS = {
+  stt: (a, b) => compareByOrder(a, b) || b.total - a.total,
   total: (a, b) => b.total - a.total,
   rate: (a, b) => b.paidMonths / b.months - a.paidMonths / a.months,
   months: (a, b) => b.months - a.months,
@@ -39,6 +42,18 @@ function getRateColor(rate) {
 function handleToggleActive(name, isActive) {
   setMemberActive(name, isActive);
   requestRender('members');
+}
+
+/** Đặt số thứ tự cho một thành viên; ô trống nghĩa là bỏ số. */
+function handleSetOrder(name, rawValue) {
+  const text = rawValue.trim();
+  const value = text === '' ? null : Number(text);
+  if (value !== null && (!Number.isFinite(value) || value < 0)) {
+    requestRender('members');
+    return;
+  }
+  setMemberOrder(name, value === null ? null : Math.round(value));
+  requestRender('members', 'months');
 }
 
 /** Danh sách thành viên hiện tại, dùng cho cả lưu thẳng lẫn dán tay. */
@@ -153,7 +168,12 @@ export function renderMembers() {
             ${isActive ? 'checked' : ''} ${store.isAdmin ? '' : 'disabled'}
             aria-label="Đánh dấu ${escapeHtml(member.name)} còn hoạt động">
         </td>
-        <td class="cell-num" style="color:var(--text-3)">${pageStart + index + 1}</td>
+        <td class="cell-num">
+          <input type="text" inputmode="numeric" class="stt-input js-member-order"
+            value="${store.memberOrder[member.name] ?? ''}" placeholder="${pageStart + index + 1}"
+            ${store.isAdmin ? '' : 'disabled'} data-name="${escapeHtml(member.name)}"
+            aria-label="Số thứ tự của ${escapeHtml(member.name)}">
+        </td>
         <td class="cell-name">${escapeHtml(member.name)}</td>
         <td class="cell-num" style="color:var(--text);font-weight:550">${formatCurrency(member.total)}</td>
         <td class="cell-num">${member.months}</td>
@@ -176,6 +196,16 @@ export function renderMembers() {
 
   qsa('#members-table .js-member-active').forEach((checkbox) => {
     checkbox.addEventListener('change', () => handleToggleActive(checkbox.dataset.name, checkbox.checked));
+  });
+
+  qsa('#members-table .js-member-order').forEach((input) => {
+    input.addEventListener('blur', () => {
+      const current = String(store.memberOrder[input.dataset.name] ?? '');
+      if (input.value.trim() !== current) handleSetOrder(input.dataset.name, input.value);
+    });
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') input.blur();
+    });
   });
 
   renderPager(rows.length, pageCount, pageStart, pageRows.length);
