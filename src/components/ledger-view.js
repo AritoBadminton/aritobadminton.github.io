@@ -2,6 +2,8 @@
 
 import {
   CATEGORIES,
+  DEFAULT_ENTRY_AMOUNT,
+  DEFAULT_ENTRY_DESC,
   KEEP_UNCHANGED,
   MEMBER_DUES_CATEGORY,
   MONTH_OPTION_LIMIT,
@@ -167,6 +169,27 @@ function renderPendingBar() {
 
 /* ---------- Form thêm mới ---------- */
 
+/** Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới. */
+function resetNewEntryFields() {
+  qs('#new-amount').value = formatNumber(DEFAULT_ENTRY_AMOUNT);
+  qs('#new-desc').value = DEFAULT_ENTRY_DESC;
+}
+
+/**
+ * Danh mục cho một ô chọn: danh mục đang dùng, cộng thêm những danh mục cũ mà
+ * các dòng đang sửa vẫn mang.
+ *
+ * Thiếu bước cộng thêm này thì mở form sửa một dòng thuộc danh mục đã bỏ, ô chọn
+ * tự nhảy về danh mục đầu tiên và bấm Lưu là đổi danh mục dòng đó lúc nào không hay.
+ *
+ * @param {string[]} allowed danh mục còn chọn được
+ * @param {object[]} rows các dòng đang sửa
+ * @returns {string[]}
+ */
+function buildCategoryOptions(allowed, rows) {
+  return [...new Set([...allowed, ...rows.map((row) => row.cat)])];
+}
+
 /** Nạp danh mục hợp lệ theo loại giao dịch đang chọn. */
 function fillNewEntryCategories() {
   qs('#new-category').innerHTML = CATEGORIES[newEntryType]
@@ -189,7 +212,9 @@ function toggleNewEntryForm() {
   qs('#ledger-add-toggle').textContent = isOpen ? '+ Nhập khoản mới' : 'Đóng';
   if (isOpen) return;
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
-  qs('#new-desc').focus();
+  if (!qs('#new-amount').value) resetNewEntryFields();
+  // Bôi đen sẵn để gõ đè lên nội dung mặc định, khỏi phải xoá tay.
+  qs('#new-desc').select();
 }
 
 /** Ghi nhận một khoản thu/chi mới. */
@@ -210,9 +235,8 @@ function handleAddTransaction() {
   requestRender();
   message.textContent = `Đã thêm: ${newEntryType === 'thu' ? 'thu' : 'chi'} ${formatCurrency(amount)} — ${desc}`;
   message.style.color = 'var(--good)';
-  qs('#new-amount').value = '';
-  qs('#new-desc').value = '';
-  qs('#new-desc').focus();
+  resetNewEntryFields();
+  qs('#new-desc').select();
 }
 
 /* ---------- Form cập nhật ---------- */
@@ -232,7 +256,8 @@ function openUpdateForm() {
   qs('#update-message').textContent = '';
 
   const types = [...new Set(rows.map((row) => row.type))];
-  const categories = types.length === 1 ? CATEGORIES[types[0]] : [...CATEGORIES.chi, ...CATEGORIES.thu];
+  const allowed = types.length === 1 ? CATEGORIES[types[0]] : [...CATEGORIES.chi, ...CATEGORIES.thu];
+  const categories = buildCategoryOptions(allowed, rows);
   qs('#update-category').innerHTML =
     (isSingle ? '' : `<option value="${KEEP_UNCHANGED}">— giữ nguyên —</option>`) +
     categories.map((category) => `<option>${escapeHtml(category)}</option>`).join('');
@@ -688,4 +713,5 @@ export function initLedgerView() {
   });
 
   fillNewEntryCategories();
+  resetNewEntryFields();
 }
