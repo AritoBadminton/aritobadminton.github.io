@@ -6,6 +6,7 @@ import {
   addMember,
   aggregateMembers,
   countUnpaidActive,
+  deleteMember,
   getChangedActiveNames,
   getDuplicateOrders,
   getNextFreeOrder,
@@ -14,6 +15,7 @@ import {
   resetActiveMembers,
   setMemberActive,
   setMemberOrder,
+  summariseMemberHistory,
 } from '../services/member-service.js';
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
@@ -26,6 +28,13 @@ let statusFilter = 'all';
 
 /** Trang đang xem của bảng thành viên, đếm từ 1. */
 let currentPage = 1;
+
+/** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
+const DELETE_CONFIRM_MS = 4000;
+
+/** Người đang chờ xác nhận xoá, và hẹn giờ tự huỷ xác nhận đó. */
+let pendingDeleteName = '';
+let pendingDeleteTimer = 0;
 
 /** Các cách sắp xếp danh sách thành viên. */
 /** Tỷ lệ đóng đủ; người chưa có tháng nào tính là 0 để không ra NaN. */
@@ -165,6 +174,46 @@ async function handleRenumber() {
     button.disabled = false;
     button.textContent = label;
   }
+}
+
+/**
+ * Xoá một thành viên: bấm lần đầu chỉ hỏi lại, bấm lần hai mới xoá thật.
+ *
+ * Ai đã có lịch sử đóng quỹ thì hỏi thêm một lần nữa kèm con số cụ thể, vì lúc
+ * đó xoá là mất luôn số tiền đó khỏi thống kê của cả câu lạc bộ.
+ *
+ * @param {string} name
+ */
+async function handleDeleteMember(name) {
+  clearTimeout(pendingDeleteTimer);
+
+  if (pendingDeleteName !== name) {
+    pendingDeleteName = name;
+    pendingDeleteTimer = setTimeout(() => {
+      pendingDeleteName = '';
+      renderMembers();
+    }, DELETE_CONFIRM_MS);
+    renderMembers();
+    return;
+  }
+
+  pendingDeleteName = '';
+  const history = summariseMemberHistory(name);
+  if (history.paid > 0) {
+    const message =
+      `${name} đã đóng ${formatCurrency(history.paid)} trong ${history.months} tháng.\n\n` +
+      'Xoá là mất luôn số tiền này khỏi thống kê của cả câu lạc bộ. ' +
+      'Nếu chỉ muốn họ ngừng sinh hoạt thì bỏ tick "Hoạt động" là đủ.\n\nVẫn xoá?';
+    if (!window.confirm(message)) {
+      renderMembers();
+      return;
+    }
+  }
+
+  const result = await deleteMember(name);
+  if (!result.ok) window.alert(result.error);
+  aggregateMembers();
+  requestRender('members', 'months');
 }
 
 /** Danh sách thành viên hiện tại, dùng cho cả lưu thẳng lẫn dán tay. */
@@ -354,13 +403,24 @@ export function renderMembers() {
           ${member.lastPaid > 0 ? '<span class="pill pill--paid">đã đóng</span>' : '<span class="pill pill--unpaid">chưa</span>'}`
             : '<span class="text-muted">Chưa có tháng nào</span>'
         }</td>
+        <td class="cell-delete">${
+          store.isAdmin
+            ? `<button class="btn--delete js-member-delete${pendingDeleteName === member.name ? ' btn--delete-armed' : ''}"
+                data-name="${escapeHtml(member.name)}" title="Xoá ${escapeHtml(member.name)} khỏi danh sách"
+                aria-label="Xoá ${escapeHtml(member.name)} khỏi danh sách">${pendingDeleteName === member.name ? 'Xoá?' : '×'}</button>`
+            : ''
+        }</td>
       </tr>`;
         })
         .join('')
-    : '<tr><td colspan="8" class="table-empty text-muted">Không có thành viên nào khớp bộ lọc</td></tr>';
+    : '<tr><td colspan="9" class="table-empty text-muted">Không có thành viên nào khớp bộ lọc</td></tr>';
 
   qsa('#members-table .js-member-active').forEach((checkbox) => {
     checkbox.addEventListener('change', () => handleToggleActive(checkbox.dataset.name, checkbox.checked));
+  });
+
+  qsa('#members-table .js-member-delete').forEach((button) => {
+    button.addEventListener('click', () => handleDeleteMember(button.dataset.name));
   });
 
   qsa('#members-table .js-member-order').forEach((input) => {
