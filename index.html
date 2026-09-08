@@ -378,6 +378,7 @@
             <button class="segmented__item" data-status="active" aria-pressed="false" type="button">Đang hoạt động</button>
             <button class="segmented__item" data-status="inactive" aria-pressed="false" type="button">Ngừng hoạt động</button>
           </div>
+          <button class="btn btn--ghost" id="members-renumber" type="button" style="display: none">Đánh số lại</button>
           <button class="btn" id="members-add-toggle" type="button" style="display: none">+ Thêm thành viên</button>
         </div>
 
@@ -411,12 +412,16 @@
           </div>
         </div>
 
+        <div class="callout callout--bar admin-only" id="members-clash" style="display: none; margin-bottom: 14px">
+          <span style="flex: 1; min-width: 220px" id="members-clash-text"></span>
+        </div>
+
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
                 <th style="width: 96px" title="Tick để đánh dấu thành viên còn sinh hoạt">Hoạt động</th>
-                <th style="width: 74px" title="Số thứ tự tự đặt — bảng đóng quỹ sắp theo số này">STT</th>
+                <th style="width: 74px" title="Số thứ tự tự đặt, dùng chung cho cả ba mục lọc">STT</th>
                 <th>Thành viên</th>
                 <th class="cell-num">Tổng đã đóng</th>
                 <th class="cell-num">Số tháng</th>
