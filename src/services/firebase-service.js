@@ -297,6 +297,19 @@ export function saveMemberOrder(name, order) {
 }
 
 /**
+ * Đặt số thứ tự cho nhiều thành viên trong một lần ghi.
+ *
+ * Dùng khi đánh số lại cả danh sách: một lần ghi thay vì mấy chục lần, nên các
+ * máy khác thấy bảng mới nguyên vẹn chứ không thấy số nhảy dần.
+ *
+ * @param {Record<string, number>} orders
+ */
+export function saveMemberOrders(orders) {
+  const { db } = getConnection();
+  return setDoc(doc(db, 'settings', 'roster'), { order: orders }, { merge: true });
+}
+
+/**
  * Gỡ hẳn một người khỏi bảng đóng quỹ của một tháng.
  * Dùng khi người đó chuyển sang ngưng hoạt động mà tháng đó chưa có số liệu gì.
  * @param {string} monthKey
