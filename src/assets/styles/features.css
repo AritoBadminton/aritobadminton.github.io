@@ -508,30 +508,9 @@ body:not(.is-admin) .admin-only {
 }
 
 /* Phải thắng ".add-member input" ở trên nên cần chọn cả thẻ lẫn lớp. */
-/*
- * Cột xoá ở bảng thành viên: dấu × chỉ hiện khi rê chuột vào dòng, để bảng
- * không lởm chởm 44 dấu × trong lúc chỉ ngồi xem số liệu.
- */
+/* Cột xoá ở bảng thành viên, giống hệt cột xoá bên Sổ thu chi. */
 .cell-delete {
   text-align: center;
-}
-
-.cell-delete .btn--delete {
-  opacity: 0;
-  transition: opacity 0.12s ease;
-}
-
-tr:hover .cell-delete .btn--delete,
-.cell-delete .btn--delete:focus-visible,
-.cell-delete .btn--delete-armed {
-  opacity: 1;
-}
-
-/* Màn hình cảm ứng không có chuyện rê chuột nên luôn hiện. */
-@media (hover: none) {
-  .cell-delete .btn--delete {
-    opacity: 1;
-  }
 }
 
 .add-member input.add-member__order {
