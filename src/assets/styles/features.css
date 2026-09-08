@@ -507,6 +507,15 @@ body:not(.is-admin) .admin-only {
   outline: none;
 }
 
+/* Phải thắng ".add-member input" ở trên nên cần chọn cả thẻ lẫn lớp. */
+.add-member input.add-member__order {
+  /* min-width mặc định của input là theo nội dung, không bỏ thì flex-basis vô nghĩa. */
+  flex: 0 0 72px;
+  min-width: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .add-member__error {
   font-size: 13px;
   font-weight: 550;
