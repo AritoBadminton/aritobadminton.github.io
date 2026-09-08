@@ -16,7 +16,7 @@ import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { copyToClipboard, escapeHtml, qs, qsa, setVisible } from '../utils/dom.js';
-import { formatCurrency, formatDateLabel, formatMonthLabel } from '../utils/format.js';
+import { formatCurrency, formatDateLabel } from '../utils/format.js';
 
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>`;
 const TRASH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`;
@@ -215,9 +215,6 @@ export function renderDashboard() {
 
   const lastMonth = store.months[store.months.length - 1];
   qs('#kpi-members').textContent = String(lastMonth?.members.length ?? 0);
-  qs('#kpi-members-note').textContent = lastMonth
-    ? `${formatMonthLabel(lastMonth.month)} · ${store.members.length} người từng tham gia`
-    : 'Chưa có tháng nào';
 
   qs('#app-subtitle').textContent = firstDate
     ? `Từ ${formatDateLabel(firstDate)} đến ${formatDateLabel(lastDate)}`
