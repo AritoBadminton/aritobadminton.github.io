@@ -1,6 +1,13 @@
 /** Trang Sổ thu chi: bộ lọc, bảng giao dịch, form thêm mới và form cập nhật. */
 
-import { CATEGORIES, KEEP_UNCHANGED, MONTH_OPTION_LIMIT, MONTH_OPTION_MORE } from '../config/constants.js';
+import {
+  CATEGORIES,
+  KEEP_UNCHANGED,
+  MEMBER_DUES_CATEGORY,
+  MONTH_OPTION_LIMIT,
+  MONTH_OPTION_MORE,
+} from '../config/constants.js';
+import { getDuesTotal } from '../services/dues-service.js';
 import {
   addTransaction,
   copyTransactions,
@@ -9,6 +16,7 @@ import {
   getAllExpenses,
   getAllIncomes,
   hasEditsIn,
+  isDuesEntry,
   removeAddedTransaction,
   revertTransactions,
   updateTransaction,
@@ -114,6 +122,22 @@ function getScopedRows() {
       (!category || item.cat === category) &&
       (!keyword || `${item.desc} ${item.cat}`.toLowerCase().includes(keyword)),
   );
+}
+
+/**
+ * Tiền đóng quỹ được tính vào ba ô tổng, theo đúng bộ lọc đang đặt.
+ *
+ * Tiền này không có dòng riêng trong bảng nên không lọc theo từ khoá được; gõ
+ * tìm kiếm thì bỏ qua, và ô tổng ghi rõ phần đóng quỹ để không ai thấy lệch mà
+ * tưởng là lỗi.
+ *
+ * @returns {number}
+ */
+function getScopedDues() {
+  if (qs('#filter-keyword').value.trim()) return 0;
+  const category = qs('#filter-category').value;
+  if (category && category !== MEMBER_DUES_CATEGORY) return 0;
+  return getDuesTotal(qs('#filter-month').value);
 }
 
 /** Danh sách hiện trên bảng: thêm nút Thu/Chi và sắp xếp theo cột đang chọn. */
@@ -512,9 +536,14 @@ export function renderLedger() {
   // Cố ý lấy getScopedRows chứ không phải rows: nút Thu/Chi chỉ lọc bảng bên
   // dưới, ba ô tổng luôn hiện đủ cả thu lẫn chi của tháng đang xem.
   const scoped = getScopedRows();
-  const income = scoped.filter((row) => row.type === 'thu').reduce((sum, row) => sum + row.amount, 0);
+  const dues = getScopedDues();
+  const income =
+    scoped
+      .filter((row) => row.type === 'thu' && !isDuesEntry(row))
+      .reduce((sum, row) => sum + row.amount, 0) + dues;
   const expense = scoped.filter((row) => row.type === 'chi').reduce((sum, row) => sum + row.amount, 0);
   const net = income - expense;
+  qs('#ledger-income-note').textContent = dues ? `Gồm ${formatCurrency(dues)} tiền đóng quỹ` : '';
 
   qs('#ledger-income').textContent = formatCurrency(income);
   qs('#ledger-income').style.color = 'var(--good)';
@@ -537,6 +566,11 @@ export function renderLedger() {
         <td class="cell-name">${escapeHtml(row.desc)}
           ${row.isNew ? '<span class="pill pill--new">mới</span>' : ''}
           ${row.edited ? '<span class="pill pill--edited">đã sửa</span>' : ''}
+          ${
+            isDuesEntry(row)
+              ? '<span class="pill pill--merged" title="Tiền đóng quỹ nay lấy từ tab Đóng quỹ theo tháng, nên dòng này không cộng vào tổng nữa">đã gộp</span>'
+              : ''
+          }
         </td>
         <td><span style="display:inline-flex;align-items:center;gap:7px">
           <i class="color-dot" style="background:${getCategoryColor(row.cat)}"></i>${escapeHtml(row.cat)}
