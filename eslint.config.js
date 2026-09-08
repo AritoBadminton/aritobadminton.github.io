@@ -25,6 +25,34 @@ export default [
     },
   },
   {
+    // File kiểm thử chạy bằng Node, nhưng phần trong page.evaluate() lại chạy
+    // trong trình duyệt — nên cần cả hai bộ biến toàn cục.
+    files: ['tests/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-var': 'error',
+      'prefer-const': 'error',
+    },
+  },
+  {
+    files: ['tests/fbstub/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: globals.browser,
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-var': 'error',
+      'prefer-const': 'error',
+    },
+  },
+  {
     // Worker chạy trên Cloudflare, không phải trình duyệt: có fetch, crypto,
     // Response nhưng không có window hay document.
     files: ['worker/**/*.js'],
