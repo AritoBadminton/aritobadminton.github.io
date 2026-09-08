@@ -20,11 +20,25 @@ export const FUTURE_MONTH_COUNT = 0;
 /** Số giao dịch hiển thị ở khối "Giao dịch gần đây". */
 export const RECENT_TRANSACTION_COUNT = 10;
 
-/** Danh mục hợp lệ theo từng loại giao dịch. */
+/**
+ * Danh mục chọn được khi nhập giao dịch mới.
+ *
+ * Nhóm "thu" chỉ còn quỹ công ty: tiền thành viên đóng nay ghi ở bảng Đóng quỹ
+ * theo tháng, gõ thêm một dòng thu nữa là đếm hai lần cùng một số tiền.
+ */
 export const CATEGORIES = {
   chi: ['Tiền thuê sân', 'Tiền cầu lông', 'Tiền nước', 'Tiền khác'],
-  thu: ['Tiền quỹ công ty hàng tháng', 'Tiền quỹ thành viên hàng tháng'],
+  thu: ['Tiền quỹ công ty hàng tháng'],
 };
+
+/** Danh mục của khoản tiền công ty cấp cho quỹ. */
+export const COMPANY_FUND_CATEGORY = 'Tiền quỹ công ty hàng tháng';
+
+/** Số tiền điền sẵn ở ô nhập khoản mới; sửa lại được. */
+export const DEFAULT_ENTRY_AMOUNT = 1000000;
+
+/** Nội dung điền sẵn ở ô nhập khoản mới; sửa lại được. */
+export const DEFAULT_ENTRY_DESC = 'Tiền quỹ thành viên hàng tháng';
 
 /**
  * Danh mục thu do bảng "Đóng quỹ theo tháng" cung cấp.
@@ -32,6 +46,9 @@ export const CATEGORIES = {
  * Tiền đóng quỹ trước đây được gõ tay hai nơi nên hai bản lệch nhau. Nay bảng
  * đóng quỹ là bản chuẩn: các khoản thu thuộc danh mục này không cộng vào tổng
  * nữa, tổng lấy thẳng từ bảng đóng quỹ.
+ *
+ * Không còn chọn được khi nhập mới, nhưng các dòng cũ vẫn mang danh mục này nên
+ * bảng lọc và form sửa vẫn phải hiểu nó.
  */
 export const MEMBER_DUES_CATEGORY = 'Tiền quỹ thành viên hàng tháng';
 
