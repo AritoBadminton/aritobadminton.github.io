@@ -7,9 +7,14 @@ const DEFAULT_PANEL = 'dashboard';
 
 /**
  * Chuyển sang tab được chọn.
+ *
+ * Tab đang bị ẩn thì không mở, kể cả khi có gì đó bấm hộ — nếu không, khách
+ * chưa đăng nhập vẫn mở được trang chỉ dành cho admin.
+ *
  * @param {HTMLElement} selectedTab
  */
 function activateTab(selectedTab) {
+  if (getComputedStyle(selectedTab).display === 'none') return;
   qsa('.tab-nav__item').forEach((tab) => {
     tab.setAttribute('aria-selected', String(tab === selectedTab));
   });
