@@ -14,6 +14,8 @@ import {
   getChangedMemberNames,
   getDuesStatus,
   getEffectiveNote,
+  isCompanyFundVisible,
+  setCompanyFundVisible,
   getEffectivePaid,
   getEffectiveSkip,
   getFutureMonthKeys,
@@ -27,6 +29,7 @@ import {
   setPaidAmount,
 } from '../services/dues-service.js';
 import { isFirebaseMode } from '../services/data-source.js';
+import { getCompanyFundTotal } from '../services/ledger-service.js';
 import { aggregateMembers } from '../services/member-service.js';
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
@@ -53,6 +56,20 @@ const STATUS_CLASS = {
 let lastMonthKey = '';
 
 /* ---------- Xử lý sự kiện ---------- */
+
+/** Bật/tắt việc cho người xem thường thấy ô "Tiền quỹ công ty cấp". */
+async function handleToggleCompanyFund(event) {
+  const checkbox = event.target;
+  checkbox.disabled = true;
+  try {
+    await setCompanyFundVisible(checkbox.checked);
+  } catch {
+    // Ghi hỏng thì trả ô tích về đúng trạng thái đang lưu, đừng để hiện sai.
+    checkbox.checked = isCompanyFundVisible();
+  } finally {
+    checkbox.disabled = false;
+  }
+}
 
 /** Đổi số tiền đóng quỹ rồi vẽ lại các vùng liên quan. */
 function handleSetPaid(monthKey, memberName, amount) {
@@ -242,6 +259,19 @@ export function renderMonthPicker() {
   qs('#month-picker').value = options.includes(kept) ? kept : fallback;
 }
 
+/**
+ * Ô "Tiền quỹ công ty cấp" của tháng đang xem.
+ *
+ * Admin luôn thấy ô này kèm công tắc; người xem thường chỉ thấy khi admin bật.
+ */
+function renderCompanyFund(monthKey) {
+  const visible = isCompanyFundVisible();
+  setVisible(qs('#month-company-tile'), store.isAdmin || visible, '');
+  setVisible(qs('#month-company-switch'), store.isAdmin && isFirebaseMode(), 'flex');
+  qs('#month-company-show').checked = visible;
+  qs('#month-company-fund').textContent = formatCurrency(getCompanyFundTotal(monthKey));
+}
+
 /** Vẽ lại toàn bộ trang Đóng quỹ theo tháng. */
 export function renderMonths() {
   const monthKey = getSelectedMonthKey();
@@ -263,6 +293,7 @@ export function renderMonths() {
   const collected = rows.reduce((sum, row) => sum + row.amount, 0);
   const unpaidCount = expectedCount - paidRows.length;
   qs('#month-collected').textContent = formatCurrency(collected);
+  renderCompanyFund(monthKey);
   qs('#month-paid-count').textContent = `${paidRows.length}/${expectedCount}`;
   qs('#month-paid-note').textContent = skippedRows.length
     ? `${skippedRows.length} người không chơi tháng này`
@@ -415,6 +446,7 @@ export function initMonthsView() {
   qs('#month-delete').addEventListener('click', handleDeleteMonth);
   qs('#month-export-toggle').addEventListener('click', handleSaveMonth);
   qs('#month-reset').addEventListener('click', handleResetMonth);
+  qs('#month-company-show').addEventListener('change', handleToggleCompanyFund);
 }
 
 /* ---------- Hàm phụ trợ ---------- */
