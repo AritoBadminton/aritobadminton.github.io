@@ -7,6 +7,8 @@ import {
   aggregateMembers,
   countUnpaidActive,
   getChangedActiveNames,
+  getDuplicateOrders,
+  renumberMembers,
   resetActiveMembers,
   setMemberActive,
   setMemberOrder,
@@ -94,6 +96,36 @@ function handleSetOrder(name, rawValue) {
   requestRender('members', 'months');
 }
 
+/**
+ * Đánh lại số thứ tự 1→N cho toàn bộ danh sách theo thứ tự đang sắp xếp.
+ *
+ * Cố ý lấy cả store.members chứ không lấy danh sách đang lọc: số thứ tự dùng
+ * chung cho cả ba mục, đánh lại chỉ một phần thì lại sinh ra trùng số.
+ */
+async function handleRenumber() {
+  const names = [...store.members]
+    .sort(SORT_COMPARATORS[qs('#members-sort').value])
+    .map((member) => member.name);
+  const message =
+    `Đánh số lại 1→${names.length} cho toàn bộ thành viên theo thứ tự đang hiện?\n\n` +
+    `Số thứ tự cũ sẽ bị ghi đè. Người đầu danh sách là ${names[0]}, cuối là ${names.at(-1)}.`;
+  if (!names.length || !window.confirm(message)) return;
+
+  const button = qs('#members-renumber');
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Đang đánh số…';
+  try {
+    await renumberMembers(names);
+    requestRender('members', 'months');
+  } catch (error) {
+    window.alert(`Không đánh số lại được: ${error?.message ?? error}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
+}
+
 /** Danh sách thành viên hiện tại, dùng cho cả lưu thẳng lẫn dán tay. */
 function buildRosterPayload() {
   return {
@@ -160,6 +192,48 @@ function renderPager(totalRows, pageCount, pageStart, pageRowCount) {
   qs('#members-next').disabled = currentPage >= pageCount;
 }
 
+/**
+ * Nhắc khi có người trùng số thứ tự, kể cả khi họ nằm ở mục lọc khác.
+ * @param {Record<string, string[]>} clashes
+ */
+function renderClashBar(clashes) {
+  const names = Object.keys(clashes);
+  setVisible(qs('#members-clash'), names.length > 0 && store.isAdmin, 'flex');
+  if (!names.length) return;
+
+  const groups = [
+    ...new Set(
+      names.map((name) => [name, ...clashes[name]].sort((a, b) => a.localeCompare(b, 'vi')).join(' và ')),
+    ),
+  ];
+  qs('#members-clash-text').textContent =
+    `Đang có ${groups.length} số thứ tự bị hai người dùng chung: ${groups.join('; ')}. ` +
+    'Số thứ tự dùng chung cho cả ba mục lọc nên mỗi người cần một số riêng.';
+}
+
+/**
+ * Bật/tắt nút "Đánh số lại".
+ *
+ * Chỉ cho bấm ở mục Tất cả và khi không tìm kiếm, vì nút đánh lại cả danh sách
+ * chứ không riêng phần đang hiện.
+ * @param {string} keyword từ khoá đang tìm
+ */
+function renderRenumberButton(keyword) {
+  const button = qs('#members-renumber');
+  setVisible(button, store.isAdmin, 'inline-block');
+  if (!store.isAdmin) return;
+
+  const blocked = statusFilter !== 'all' ? 'filter' : keyword ? 'keyword' : '';
+  button.disabled = Boolean(blocked) || store.members.length === 0;
+  button.style.opacity = button.disabled ? '0.45' : '1';
+  button.title =
+    blocked === 'filter'
+      ? 'Chuyển về mục "Tất cả" đã — số thứ tự dùng chung nên phải đánh lại cả danh sách.'
+      : blocked === 'keyword'
+        ? 'Xoá ô tìm kiếm đã — nút này đánh lại cho toàn bộ danh sách.'
+        : `Đánh lại 1→${store.members.length} theo thứ tự đang sắp xếp`;
+}
+
 /** Vẽ lại trang Thành viên. */
 export function renderMembers() {
   const lastMonthKey = store.months[store.months.length - 1]?.month ?? '';
@@ -195,11 +269,20 @@ export function renderMembers() {
   qs('#members-unpaid').style.color = unpaidCount ? 'var(--crit)' : 'var(--good)';
   qs('#members-unpaid-note').textContent = `trong nhóm đang hoạt động · ${formatMonthLabel(lastMonthKey)}`;
 
+  // Số thứ tự là của riêng từng người và dùng chung cho cả ba mục lọc, nên ô
+  // trống để trống hẳn — gợi ý theo vị trí trong danh sách đang lọc sẽ khiến
+  // người dùng gõ trúng số của người đang bị lọc ra ngoài.
+  const clashes = getDuplicateOrders();
+
   qs('#members-table').innerHTML = pageRows.length
     ? pageRows
-        .map((member, index) => {
+        .map((member) => {
           const rate = getPaidRate(member);
           const isActive = Boolean(store.activeMembers[member.name]);
+          const clash = clashes[member.name];
+          const orderLabel = clash
+            ? `Số ${store.memberOrder[member.name]} đang trùng với ${clash.join(', ')}`
+            : `Số thứ tự của ${member.name}`;
           return `<tr class="${isActive ? '' : 'row--inactive'}">
         <td style="text-align:center">
           <input type="checkbox" class="checkbox-input js-member-active" data-name="${escapeHtml(member.name)}"
@@ -207,10 +290,10 @@ export function renderMembers() {
             aria-label="Đánh dấu ${escapeHtml(member.name)} còn hoạt động">
         </td>
         <td class="cell-num">
-          <input type="text" inputmode="numeric" class="stt-input js-member-order"
-            value="${store.memberOrder[member.name] ?? ''}" placeholder="${pageStart + index + 1}"
+          <input type="text" inputmode="numeric" class="stt-input js-member-order${clash ? ' stt-input--clash' : ''}"
+            value="${store.memberOrder[member.name] ?? ''}" placeholder="—"
             ${store.isAdmin ? '' : 'disabled'} data-name="${escapeHtml(member.name)}"
-            aria-label="Số thứ tự của ${escapeHtml(member.name)}">
+            title="${escapeHtml(orderLabel)}" aria-label="${escapeHtml(orderLabel)}">
         </td>
         <td class="cell-name">${escapeHtml(member.name)}</td>
         <td class="cell-num" style="color:var(--text);font-weight:550">${formatCurrency(member.total)}</td>
@@ -251,6 +334,9 @@ export function renderMembers() {
 
   setVisible(qs('#members-add-toggle'), store.isAdmin, 'inline-block');
   if (!store.isAdmin) setVisible(qs('#members-add-form'), false);
+
+  renderClashBar(clashes);
+  renderRenumberButton(keyword);
 
   renderPager(rows.length, pageCount, pageStart, pageRows.length);
 
@@ -296,6 +382,7 @@ export function initMembersView() {
     });
   });
 
+  qs('#members-renumber').addEventListener('click', handleRenumber);
   qs('#members-export-toggle').addEventListener('click', handleSave);
   qs('#members-reset').addEventListener('click', handleReset);
 }
