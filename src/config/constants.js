@@ -117,4 +117,4 @@ export const MONTH_OPTION_LIMIT = 5;
 export const MONTH_OPTION_MORE = '__more__';
 
 /** Số thành viên hiển thị trên mỗi trang của bảng Thành viên. */
-export const MEMBER_PAGE_SIZE = 15;
+export const MEMBER_PAGE_SIZE = 25;
