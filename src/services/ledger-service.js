@@ -7,7 +7,7 @@
  *   - "n<timestamp><random>": dòng mới nhập trên máy, chưa lưu vào data.json.
  */
 
-import { MEMBER_DUES_CATEGORY, STORAGE_KEYS } from '../config/constants.js';
+import { COMPANY_FUND_CATEGORY, MEMBER_DUES_CATEGORY, STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
@@ -38,6 +38,22 @@ function withOverrides(source, prefix) {
  */
 export function isDuesEntry(row) {
   return row.type === INCOME_PREFIX && row.cat === MEMBER_DUES_CATEGORY;
+}
+
+/**
+ * Tổng tiền công ty cấp cho quỹ, lấy thẳng từ sổ thu chi.
+ *
+ * Bảng Đóng quỹ theo tháng chỉ ghi phần thành viên đóng, nên khoản công ty cấp
+ * phải đọc ngược từ sổ thu chi mới ra đủ nguồn tiền của tháng.
+ *
+ * @param {string} [monthKey] dạng "2026-09"; bỏ trống thì tính tất cả các tháng
+ * @returns {number}
+ */
+export function getCompanyFundTotal(monthKey = '') {
+  return getAllIncomes()
+    .filter((item) => item.cat === COMPANY_FUND_CATEGORY)
+    .filter((item) => !monthKey || String(item.date).slice(0, 7) === monthKey)
+    .reduce((sum, item) => sum + item.amount, 0);
 }
 
 /** Toàn bộ khoản thu đang hiệu lực. */
