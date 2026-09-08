@@ -8,6 +8,8 @@ import {
   countUnpaidActive,
   getChangedActiveNames,
   getDuplicateOrders,
+  getNextFreeOrder,
+  getOrderOwner,
   renumberMembers,
   resetActiveMembers,
   setMemberActive,
@@ -52,30 +54,69 @@ function handleToggleActive(name, isActive) {
   requestRender('members');
 }
 
-/** Mở hoặc đóng ô nhập tên thành viên mới. */
+/** Mở hoặc đóng ô nhập thành viên mới. */
 function toggleAddForm(open) {
   setVisible(qs('#members-add-form'), open, 'flex');
   qs('#members-add-error').textContent = '';
-  if (open) {
-    qs('#members-add-name').value = '';
-    qs('#members-add-name').focus();
+  if (!open) return;
+
+  qs('#members-add-name').value = '';
+  qs('#members-add-order').value = '';
+  // Gợi ý số kế tiếp còn trống, và cũng là số dùng luôn nếu để trống ô này.
+  qs('#members-add-order').placeholder = String(getNextFreeOrder());
+  qs('#members-add-name').focus();
+}
+
+/**
+ * Đọc ô STT của form thêm mới.
+ * @returns {{order: number|null, error?: string}} order null nghĩa là để hệ thống tự chọn
+ */
+function readNewMemberOrder() {
+  const text = qs('#members-add-order').value.trim();
+  if (text === '') return { order: null };
+  const value = Number(text);
+  if (!Number.isFinite(value) || value < 1) return { order: null, error: 'STT phải là số từ 1 trở lên.' };
+  return { order: Math.round(value) };
+}
+
+/** Nhắc ngay khi số thứ tự vừa gõ đã có người giữ; nhắc thôi chứ không chặn. */
+function checkNewMemberOrder() {
+  const { order, error } = readNewMemberOrder();
+  const message = qs('#members-add-error');
+
+  if (error) {
+    message.textContent = error;
+    message.style.color = 'var(--crit)';
+    return;
   }
+  const owner = order === null ? '' : getOrderOwner(order);
+  message.textContent = owner ? `Số ${order} đang là của ${owner} — thêm xong sẽ báo trùng.` : '';
+  message.style.color = 'var(--warn)';
 }
 
 /** Thêm thành viên mới rồi vẽ lại các bảng liên quan. */
 async function handleAddMember() {
+  const { order, error } = readNewMemberOrder();
+  if (error) {
+    qs('#members-add-error').textContent = error;
+    qs('#members-add-error').style.color = 'var(--crit)';
+    qs('#members-add-order').select();
+    return;
+  }
+
   const button = qs('#members-add-submit');
   const label = button.textContent;
   button.disabled = true;
   button.textContent = 'Đang thêm…';
 
-  const result = await addMember(qs('#members-add-name').value);
+  const result = await addMember(qs('#members-add-name').value, order);
 
   button.disabled = false;
   button.textContent = label;
 
   if (!result.ok) {
     qs('#members-add-error').textContent = result.error ?? 'Không thêm được.';
+    qs('#members-add-error').style.color = 'var(--crit)';
     qs('#members-add-name').select();
     return;
   }
@@ -356,10 +397,13 @@ export function initMembersView() {
   });
   qs('#members-add-cancel').addEventListener('click', () => toggleAddForm(false));
   qs('#members-add-submit').addEventListener('click', handleAddMember);
-  qs('#members-add-name').addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') handleAddMember();
-    if (event.key === 'Escape') toggleAddForm(false);
+  ['#members-add-name', '#members-add-order'].forEach((selector) => {
+    qs(selector).addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') handleAddMember();
+      if (event.key === 'Escape') toggleAddForm(false);
+    });
   });
+  qs('#members-add-order').addEventListener('input', checkNewMemberOrder);
 
   ['#members-keyword', '#members-sort'].forEach((selector) => {
     qs(selector).addEventListener('input', () => {
