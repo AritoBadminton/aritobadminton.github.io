@@ -1,7 +1,8 @@
 /** Trang Tổng quan: ô số liệu, khối quy định, mã QR và giao dịch gần đây. */
 
 import { RECENT_TRANSACTION_COUNT } from '../config/constants.js';
-import { getAllExpenses, getAllIncomes } from '../services/ledger-service.js';
+import { getDuesTotal } from '../services/dues-service.js';
+import { getAllExpenses, getAllIncomes, isDuesEntry } from '../services/ledger-service.js';
 import {
   addRuleItem,
   buildRulesJson,
@@ -186,9 +187,12 @@ export function renderQrPanel() {
 
 /** Vẽ lại toàn bộ trang Tổng quan. */
 export function renderDashboard() {
-  const incomes = getAllIncomes();
+  // Tiền đóng quỹ lấy thẳng từ bảng Đóng quỹ theo tháng; các khoản thu cùng loại
+  // gõ tay ngày xưa bị loại ra để không đếm hai lần cùng một số tiền.
+  const otherIncomes = getAllIncomes().filter((item) => !isDuesEntry({ ...item, type: 'thu' }));
   const expenses = getAllExpenses();
-  const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
+  const duesTotal = getDuesTotal();
+  const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + duesTotal;
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const balance = totalIncome - totalExpense;
   const monthCount = store.months.length;
@@ -204,7 +208,7 @@ export function renderDashboard() {
 
   qs('#kpi-income').textContent = formatCurrency(totalIncome);
   qs('#kpi-income-note').textContent =
-    `${incomes.length} khoản thu · TB ${formatCurrency(totalIncome / monthCount)}/tháng`;
+    `Gồm ${formatCurrency(duesTotal)} tiền đóng quỹ · TB ${formatCurrency(totalIncome / monthCount)}/tháng`;
   qs('#kpi-expense').textContent = formatCurrency(totalExpense);
   qs('#kpi-expense-note').textContent =
     `${expenses.length} khoản chi · TB ${formatCurrency(totalExpense / monthCount)}/tháng`;
