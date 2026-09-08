@@ -1286,7 +1286,7 @@
    "date": "2025-05-09",
    "amount": 100000,
    "desc": "Anh Quốc Nghĩa tài trợ",
-   "cat": "Tiền quỹ thành viên hàng tháng"
+   "cat": "Tiền quỹ công ty hàng tháng"
   },
   {
    "date": "2025-06-03",
@@ -1304,7 +1304,7 @@
    "date": "2025-06-20",
    "amount": 72000,
    "desc": "Tiền Đoàn Hoàng chung kèo",
-   "cat": "Tiền quỹ thành viên hàng tháng"
+   "cat": "Tiền quỹ công ty hàng tháng"
   },
   {
    "date": "2025-07-03",
@@ -1491,6 +1491,7 @@
   {
    "month": "2024-12",
    "label": "Tháng 12/2024",
+   "total": 240000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1532,12 +1533,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 240000
+   ]
   },
   {
    "month": "2025-01",
    "label": "Tháng 01/2025",
+   "total": 240000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1584,12 +1585,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 240000
+   ]
   },
   {
    "month": "2025-02",
    "label": "Tháng 02/2025",
+   "total": 240000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1636,12 +1637,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 240000
+   ]
   },
   {
    "month": "2025-03",
    "label": "Tháng 03/2025",
+   "total": 240000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1688,12 +1689,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 240000
+   ]
   },
   {
    "month": "2025-04",
    "label": "Tháng 04/2025",
+   "total": 270000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1740,12 +1741,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 270000
+   ]
   },
   {
    "month": "2025-05",
    "label": "Tháng 05/2025",
+   "total": 540000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1837,12 +1838,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 540000
+   ]
   },
   {
    "month": "2025-06",
    "label": "Tháng 06/2025",
+   "total": 710000,
    "members": [
     {
      "name": "Văn Khánh",
@@ -1959,12 +1960,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 710000
+   ]
   },
   {
    "month": "2025-07",
    "label": "Tháng 07/2025",
+   "total": 1090000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2081,12 +2082,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 1090000
+   ]
   },
   {
    "month": "2025-08",
    "label": "Tháng 08/2025",
+   "total": 1250000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2196,7 +2197,7 @@
     {
      "name": "Đức Khoa",
      "paid": 80000,
-     "note": "+ 1 buổi"
+     "note": ""
     },
     {
      "name": "Như Nguyệt",
@@ -2218,12 +2219,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 1250000
+   ]
   },
   {
    "month": "2025-09",
    "label": "Tháng 09/2025",
+   "total": 1310000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2293,7 +2294,7 @@
     {
      "name": "Đức Khoa",
      "paid": 150000,
-     "note": "+ vợ"
+     "note": ""
     },
     {
      "name": "Đình Phúc",
@@ -2340,12 +2341,12 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 1310000
+   ]
   },
   {
    "month": "2025-10",
    "label": "Tháng 10/2025",
+   "total": 1380000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2405,7 +2406,7 @@
     {
      "name": "Đức Khoa",
      "paid": 150000,
-     "note": "+ Vợ"
+     "note": ""
     },
     {
      "name": "Tiến Đạt",
@@ -2492,12 +2493,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 1380000
+   ]
   },
   {
    "month": "2025-11",
    "label": "Tháng 11/2025",
+   "total": 1430000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2582,7 +2583,7 @@
     {
      "name": "Anh Thư",
      "paid": 80000,
-     "note": "1 lượt phạt"
+     "note": ""
     },
     {
      "name": "Minh Ngọc",
@@ -2597,7 +2598,7 @@
     {
      "name": "Đức Tín",
      "paid": 80000,
-     "note": "1 lượt phạt"
+     "note": ""
     },
     {
      "name": "Thành Nguyên",
@@ -2644,12 +2645,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 1430000
+   ]
   },
   {
    "month": "2025-12",
    "label": "Tháng 12/2025",
+   "total": 1140000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2729,7 +2730,7 @@
     {
      "name": "Võ Lâm",
      "paid": 50000,
-     "note": "Phạt 1 lần"
+     "note": ""
     },
     {
      "name": "Anh Thư",
@@ -2759,7 +2760,7 @@
     {
      "name": "Hoàng Phúc",
      "paid": 110000,
-     "note": "Phạt 1 lần 60"
+     "note": ""
     },
     {
      "name": "Ngọc Anh",
@@ -2801,12 +2802,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 1140000
+   ]
   },
   {
    "month": "2026-01",
    "label": "Tháng 01/2026",
+   "total": 930000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -2938,12 +2939,18 @@
      "paid": 30000,
      "note": ""
     }
-   ],
-   "total": 930000
+   ]
+  },
+  {
+   "month": "2026-02",
+   "label": "Tháng 02/2026",
+   "total": 0,
+   "members": []
   },
   {
    "month": "2026-03",
    "label": "Tháng 03/2026",
+   "total": 800000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3015,12 +3022,12 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 800000
+   ]
   },
   {
    "month": "2026-04",
    "label": "Tháng 04/2026",
+   "total": 650000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3087,12 +3094,12 @@
      "paid": 0,
      "note": ""
     }
-   ],
-   "total": 650000
+   ]
   },
   {
    "month": "2026-05",
    "label": "Tháng 05/2026",
+   "total": 600000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3149,12 +3156,12 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 600000
+   ]
   },
   {
    "month": "2026-06",
    "label": "Tháng 06/2026",
+   "total": 600000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3206,12 +3213,12 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 600000
+   ]
   },
   {
    "month": "2026-07",
    "label": "Tháng 07/2026",
+   "total": 1030000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3256,7 +3263,7 @@
     {
      "name": "Võ Lâm",
      "paid": 80000,
-     "note": "+1 buổi vãng lai"
+     "note": ""
     },
     {
      "name": "Ngọc Anh",
@@ -3298,12 +3305,12 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 1030000
+   ]
   },
   {
    "month": "2026-08",
    "label": "Tháng 08/2026",
+   "total": 990000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3343,7 +3350,7 @@
     {
      "name": "Ngọc Em",
      "paid": 80000,
-     "note": "+1 buổi vãng lai"
+     "note": ""
     },
     {
      "name": "Ngọc Anh",
@@ -3363,7 +3370,7 @@
     {
      "name": "Minh Nhật",
      "paid": 150000,
-     "note": "Bù tháng trước 50k"
+     "note": ""
     },
     {
      "name": "Chị Lu",
@@ -3380,12 +3387,12 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 990000
+   ]
   },
   {
    "month": "2026-09",
    "label": "Tháng 09/2026",
+   "total": 600000,
    "members": [
     {
      "name": "Minh Nghĩa",
@@ -3467,8 +3474,7 @@
      "paid": 100000,
      "note": ""
     }
-   ],
-   "total": 600000
+   ]
   }
  ]
 }
