@@ -194,15 +194,28 @@ export async function renumberMembers(names) {
   return names.length;
 }
 
+/** Số thứ tự nhỏ nhất chưa ai dùng, dùng làm gợi ý cho người mới. */
+export function getNextFreeOrder() {
+  const used = Object.values(store.memberOrder).filter(Number.isFinite);
+  return used.length ? Math.max(...used) + 1 : 1;
+}
+
+/** Tên người đang giữ một số thứ tự, hoặc chuỗi rỗng nếu số còn trống. */
+export function getOrderOwner(order) {
+  return Object.keys(store.memberOrder).find((name) => store.memberOrder[name] === order) ?? '';
+}
+
 /**
  * Thêm một thành viên mới vào danh sách chung.
  *
  * Người mới được coi là đang hoạt động và có mặt ngay ở bảng đóng quỹ của tháng
  * hiện tại trở đi. Các tháng cũ không đụng tới, vì lúc đó họ chưa tham gia.
+ *
  * @param {string} rawName
- * @returns {Promise<{ok: boolean, error?: string}>}
+ * @param {number|null} order số thứ tự; null thì lấy số kế tiếp còn trống
+ * @returns {Promise<{ok: boolean, error?: string, order?: number}>}
  */
-export async function addMember(rawName) {
+export async function addMember(rawName, order = null) {
   const name = rawName.trim().replace(/\s+/g, ' ');
   if (!name) return { ok: false, error: 'Chưa nhập tên.' };
   if (name.length > MAX_MEMBER_NAME_LENGTH) {
@@ -210,6 +223,8 @@ export async function addMember(rawName) {
   }
   const existing = store.members.find((member) => member.name.toLowerCase() === name.toLowerCase());
   if (existing) return { ok: false, error: `Đã có "${existing.name}" trong danh sách.` };
+
+  const finalOrder = order === null ? getNextFreeOrder() : order;
 
   store.activeMembers[name] = true;
   if (!isFirebaseMode()) {
@@ -219,10 +234,13 @@ export async function addMember(rawName) {
 
   try {
     await firebaseApi().saveMemberActive(name, true);
+    // Ghi số thứ tự trước khi đưa vào bảng đóng quỹ, để bảng đó xếp đúng chỗ ngay.
+    await setMemberOrder(name, finalOrder);
     await addMemberToOpenMonths(name);
-    return { ok: true };
+    return { ok: true, order: finalOrder };
   } catch (error) {
     delete store.activeMembers[name];
+    delete store.memberOrder[name];
     return { ok: false, error: `Không lưu được: ${error?.message ?? error}` };
   }
 }
