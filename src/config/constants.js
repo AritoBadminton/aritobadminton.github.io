@@ -26,6 +26,15 @@ export const CATEGORIES = {
   thu: ['Tiền quỹ công ty hàng tháng', 'Tiền quỹ thành viên hàng tháng'],
 };
 
+/**
+ * Danh mục thu do bảng "Đóng quỹ theo tháng" cung cấp.
+ *
+ * Tiền đóng quỹ trước đây được gõ tay hai nơi nên hai bản lệch nhau. Nay bảng
+ * đóng quỹ là bản chuẩn: các khoản thu thuộc danh mục này không cộng vào tổng
+ * nữa, tổng lấy thẳng từ bảng đóng quỹ.
+ */
+export const MEMBER_DUES_CATEGORY = 'Tiền quỹ thành viên hàng tháng';
+
 /** Màu biểu diễn cho từng danh mục, tham chiếu biến CSS trong base.css. */
 export const CATEGORY_COLORS = {
   'Tiền thuê sân': 'var(--series-1)',
