@@ -531,3 +531,20 @@ export function getMonthsWithChanges() {
   ];
   return [...new Set(keys)].sort();
 }
+
+/**
+ * Người xem thường có được thấy ô "Tiền quỹ công ty cấp" hay không.
+ *
+ * Mặc định là ẩn: đây là con số nội bộ, chỉ hiện khi admin chủ động bật.
+ */
+export function isCompanyFundVisible() {
+  return Boolean(store.data?.showCompanyFund);
+}
+
+/**
+ * Bật/tắt việc hiển thị ô "Tiền quỹ công ty cấp" cho người xem thường.
+ * @param {boolean} visible
+ */
+export function setCompanyFundVisible(visible) {
+  return firebaseApi().saveCompanyFundVisible(visible);
+}
