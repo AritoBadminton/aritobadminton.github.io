@@ -7,7 +7,7 @@
  *   - "n<timestamp><random>": dòng mới nhập trên máy, chưa lưu vào data.json.
  */
 
-import { STORAGE_KEYS } from '../config/constants.js';
+import { MEMBER_DUES_CATEGORY, STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
 import { readJson, writeJson } from './storage-service.js';
@@ -26,6 +26,18 @@ function withOverrides(source, prefix) {
     const id = `${prefix}#${index}`;
     return { ...item, ...(store.editedTransactions[id] ?? {}), id, edited: id in store.editedTransactions };
   });
+}
+
+/**
+ * Khoản thu tiền quỹ thành viên gõ tay từ thời còn ghi hai nơi.
+ *
+ * Không cộng vào tổng nữa: cùng số tiền đó đã nằm ở bảng Đóng quỹ theo tháng.
+ * Dòng vẫn hiện trong bảng để giữ lịch sử, chỉ là có nhãn "đã gộp".
+ *
+ * @param {{type: string, cat?: string}} row
+ */
+export function isDuesEntry(row) {
+  return row.type === INCOME_PREFIX && row.cat === MEMBER_DUES_CATEGORY;
 }
 
 /** Toàn bộ khoản thu đang hiệu lực. */
