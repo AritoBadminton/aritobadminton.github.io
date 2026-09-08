@@ -156,6 +156,45 @@ export function setMemberOrder(name, order) {
 }
 
 /**
+ * Những người đang dùng chung một số thứ tự với người khác.
+ *
+ * Số thứ tự là của riêng từng người và dùng chung cho cả ba mục lọc, nên hai
+ * người trùng số là sai sót cần chỉ ra chứ không phải chuyện bình thường.
+ *
+ * @returns {Record<string, string[]>} tên → những người khác cũng giữ số đó
+ */
+export function getDuplicateOrders() {
+  const byOrder = {};
+  Object.entries(store.memberOrder).forEach(([name, order]) => {
+    byOrder[order] = [...(byOrder[order] ?? []), name];
+  });
+
+  const clashes = {};
+  Object.values(byOrder).forEach((names) => {
+    if (names.length < 2) return;
+    names.forEach((name) => {
+      clashes[name] = names.filter((other) => other !== name).sort((a, b) => a.localeCompare(b, 'vi'));
+    });
+  });
+  return clashes;
+}
+
+/**
+ * Đánh lại số thứ tự 1→N theo đúng thứ tự tên được truyền vào.
+ * @param {string[]} names
+ * @returns {Promise<number>} số người đã được đánh số
+ */
+export async function renumberMembers(names) {
+  const orders = {};
+  names.forEach((name, index) => {
+    orders[name] = index + 1;
+  });
+  Object.assign(store.memberOrder, orders);
+  if (isFirebaseMode()) await firebaseApi().saveMemberOrders(orders);
+  return names.length;
+}
+
+/**
  * Thêm một thành viên mới vào danh sách chung.
  *
  * Người mới được coi là đang hoạt động và có mặt ngay ở bảng đóng quỹ của tháng
