@@ -5,7 +5,7 @@ import { firebaseApi, isFirebaseMode } from '../services/data-source.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { enforceVisibleTab } from './tab-nav.js';
-import { escapeHtml, qs } from '../utils/dom.js';
+import { escapeHtml, qs, setVisible } from '../utils/dom.js';
 
 /** Firebase bắt mật khẩu tối thiểu 6 ký tự. */
 const MIN_PASSWORD_LENGTH = 6;
@@ -22,11 +22,14 @@ export function applyAuthState() {
   qs('#auth-icon').textContent = store.isAdmin ? '✓' : signedIn ? '!' : '🔒';
   qs('#auth-label').textContent = signedIn ? shortName || 'Admin' : 'Đăng nhập';
   qs('#auth-toggle').title = signedIn ? 'Bấm để đăng xuất' : 'Đăng nhập để chỉnh sửa';
-  qs('#readonly-text').innerHTML =
-    signedIn && !store.isAdmin
-      ? `Tài khoản <b>${escapeHtml(store.authEmail)}</b> chưa được cấp quyền chỉnh sửa — ` +
-        'nhờ thủ quỹ thêm bạn vào danh sách quản trị.'
-      : 'Đang ở <b>chế độ chỉ xem</b> — đăng nhập để nhập liệu và chỉnh sửa.';
+  // Khách chưa đăng nhập không cần thanh nhắc nào; chỉ người đăng nhập được mà
+  // chưa có quyền ghi mới cần biết vì sao mình không sửa được gì.
+  const needsGrant = signedIn && !store.isAdmin;
+  setVisible(qs('#readonly-bar'), needsGrant, 'flex');
+  qs('#readonly-text').innerHTML = needsGrant
+    ? `Tài khoản <b>${escapeHtml(store.authEmail)}</b> chưa được cấp quyền chỉnh sửa — ` +
+      'nhờ thủ quỹ thêm bạn vào danh sách quản trị.'
+    : '';
   const passwordButton = qs('#password-toggle');
   if (passwordButton) passwordButton.style.display = isFirebaseMode() && signedIn ? '' : 'none';
   enforceVisibleTab();
@@ -166,7 +169,6 @@ export function initLoginModal() {
     if (store.isAdmin || store.authEmail) handleLogout();
     else openLoginModal();
   });
-  qs('#readonly-login').addEventListener('click', openLoginModal);
   qs('#password-toggle').addEventListener('click', openPasswordModal);
   qs('#password-cancel').addEventListener('click', closePasswordModal);
   qs('#password-submit').addEventListener('click', handleChangePassword);
