@@ -73,8 +73,8 @@ liệu chung thật sự là quyền ghi vào repo GitHub.
 
 - **Ô chọn tháng** (cả hai tab) chỉ hiện **5 tháng gần nhất**; các tháng cũ hơn nằm sau dòng
   `▾ Xem thêm N tháng cũ hơn…`. Chọn dòng đó thì danh sách mở đầy đủ và vẫn giữ nguyên tháng đang xem.
-- **Bảng Thành viên** phân trang **15 người mỗi trang**, có nút Trước / Sau và dòng trạng thái
-  `1–15 trên 43 người · trang 1/3`. Đổi bộ lọc hay ô tìm kiếm thì tự về trang 1.
+- **Bảng Thành viên** phân trang **25 người mỗi trang**, có nút Trước / Sau và dòng trạng thái
+  `1–25 trên 43 người · trang 1/2`. Đổi bộ lọc hay ô tìm kiếm thì tự về trang 1.
 
 ## Cấu trúc dự án
 
