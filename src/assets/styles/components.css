@@ -385,6 +385,13 @@ td.cell-name {
   border-color: color-mix(in srgb, var(--series-4) 36%, transparent);
 }
 
+/* Khoản thu tiền quỹ gõ tay cũ: đã được bảng Đóng quỹ thay thế. */
+.pill--merged {
+  color: var(--text-3);
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
 /* ---------- Thanh tiến độ nhỏ ---------- */
 
 .progress-bar {
