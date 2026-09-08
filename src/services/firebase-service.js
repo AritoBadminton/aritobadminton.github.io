@@ -297,6 +297,19 @@ export function saveMemberOrder(name, order) {
 }
 
 /**
+ * Gỡ hẳn một người khỏi danh sách chung: cả ô tích hoạt động lẫn số thứ tự.
+ *
+ * FieldPath thay vì chuỗi "active.<tên>" vì tên có dấu cách và dấu tiếng Việt.
+ * @param {string} name
+ */
+export async function removeMemberFromRoster(name) {
+  const { db } = getConnection();
+  const ref = doc(db, 'settings', 'roster');
+  await updateDoc(ref, new FieldPath('active', name), deleteField());
+  await updateDoc(ref, new FieldPath('order', name), deleteField());
+}
+
+/**
  * Đặt số thứ tự cho nhiều thành viên trong một lần ghi.
  *
  * Dùng khi đánh số lại cả danh sách: một lần ghi thay vì mấy chục lần, nên các
