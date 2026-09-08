@@ -9,7 +9,9 @@ import {
   getEffectiveSkip,
   getFutureMonthKeys,
   getMonthMembers,
+  removeMemberFromAllMonths,
   removeMemberFromOpenMonths,
+  summariseMemberHistory,
 } from './dues-service.js';
 import { readJson, removeKey, writeJson } from './storage-service.js';
 
@@ -244,6 +246,31 @@ export async function addMember(rawName, order = null) {
     return { ok: false, error: `Không lưu được: ${error?.message ?? error}` };
   }
 }
+
+/**
+ * Xoá hẳn một thành viên khỏi dữ liệu chung.
+ *
+ * Phải gỡ cả các dòng đóng quỹ ở mọi tháng, vì danh sách thành viên được dựng
+ * lại từ chính những dòng đó — bỏ mỗi tên khỏi roster thì họ hiện lại ngay.
+ *
+ * @param {string} name
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function deleteMember(name) {
+  if (!isFirebaseMode()) return { ok: false, error: 'Chế độ data.json chưa xoá được thành viên.' };
+
+  try {
+    await removeMemberFromAllMonths(name);
+    await firebaseApi().removeMemberFromRoster(name);
+    delete store.activeMembers[name];
+    delete store.memberOrder[name];
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: `Không xoá được: ${error?.message ?? error}` };
+  }
+}
+
+export { summariseMemberHistory };
 
 /** Trả trạng thái hoạt động về đúng như data.json. */
 export function resetActiveMembers() {
