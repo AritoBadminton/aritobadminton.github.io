@@ -112,6 +112,25 @@ export function sortByMemberOrder(rows) {
     .map((item) => item.row);
 }
 
+/**
+ * Tổng tiền đã đóng quỹ, dùng làm nguồn chuẩn cho Sổ thu chi.
+ *
+ * Chỉ tính tháng đã ghi trong dữ liệu chung — tháng tự sinh chỉ là xem trước,
+ * cộng vào thì số dư của cả câu lạc bộ sẽ vống lên vì tiền chưa ai đóng.
+ *
+ * @param {string} [monthKey] bỏ trống nghĩa là tính hết mọi tháng
+ * @returns {number}
+ */
+export function getDuesTotal(monthKey = '') {
+  return store.months
+    .filter((month) => !monthKey || month.month === monthKey)
+    .reduce(
+      (sum, month) =>
+        sum + month.members.reduce((inner, member) => inner + getEffectivePaid(month.month, member), 0),
+      0,
+    );
+}
+
 /** Tên các thành viên đang ở trạng thái hoạt động. */
 export function getActiveMemberNames() {
   return store.members.filter((member) => store.activeMembers[member.name]).map((member) => member.name);
