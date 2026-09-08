@@ -526,6 +526,14 @@ body:not(.is-admin) .admin-only {
   font-variant-numeric: tabular-nums;
 }
 
+/* Số thứ tự đang bị hai người dùng chung. */
+.stt-input--clash {
+  font-weight: 600;
+  color: var(--crit);
+  background: color-mix(in srgb, var(--crit) 12%, transparent);
+  border-color: var(--crit);
+}
+
 .stt-input::placeholder {
   color: var(--text-3);
   opacity: 0.5;
