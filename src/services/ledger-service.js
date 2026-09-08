@@ -84,8 +84,9 @@ function commitLedgerChange() {
  * Thêm một giao dịch mới.
  * @param {'thu'|'chi'} type
  * @param {{date: string, amount: number, desc: string, cat: string}} fields
+ * @returns {Promise<string>} id của dòng vừa tạo
  */
-export function addTransaction(type, fields) {
+export async function addTransaction(type, fields) {
   if (isFirebaseMode()) {
     return firebaseApi().addTransaction({ type, ...fields });
   }
@@ -97,6 +98,25 @@ export function addTransaction(type, fields) {
   const bucket = type === INCOME_PREFIX ? 'incomes' : 'expenses';
   store.addedTransactions[bucket].push(record);
   commitLedgerChange();
+  return record.id;
+}
+
+/**
+ * Nhân bản các giao dịch đang chọn thành khoản mới, giữ nguyên mọi thông tin.
+ *
+ * Ghi tuần tự chứ không song song: ở chế độ Firebase mỗi lần ghi còn cập nhật
+ * ngày mới nhất của quỹ, chạy chồng lên nhau dễ ghi đè lẫn nhau.
+ *
+ * @param {object[]} rows các dòng cần nhân bản
+ * @returns {Promise<string[]>} id của các bản sao, theo đúng thứ tự đã truyền vào
+ */
+export async function copyTransactions(rows) {
+  const ids = [];
+  for (const row of rows) {
+    const fields = { date: row.date, amount: row.amount, desc: row.desc, cat: row.cat };
+    ids.push(await addTransaction(row.type, fields));
+  }
+  return ids;
 }
 
 /**
