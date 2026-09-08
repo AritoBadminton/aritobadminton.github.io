@@ -25,10 +25,10 @@
       }
     </script>
 
-    <link rel="stylesheet" href="src/assets/styles/base.css?v=2" />
-    <link rel="stylesheet" href="src/assets/styles/layout.css?v=2" />
-    <link rel="stylesheet" href="src/assets/styles/components.css?v=2" />
-    <link rel="stylesheet" href="src/assets/styles/features.css?v=2" />
+    <link rel="stylesheet" href="src/assets/styles/base.css?v=3" />
+    <link rel="stylesheet" href="src/assets/styles/layout.css?v=3" />
+    <link rel="stylesheet" href="src/assets/styles/components.css?v=3" />
+    <link rel="stylesheet" href="src/assets/styles/features.css?v=3" />
   </head>
 
   <body>
@@ -84,18 +84,20 @@
         <button class="tab-nav__item" role="tab" aria-selected="true" data-panel="dashboard" type="button">Tổng quan</button>
         <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="members" type="button">Thành viên</button>
         <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="months" type="button">Đóng quỹ theo tháng</button>
-        <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="ledger" type="button">Sổ thu chi</button>
+        <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="ledger" type="button">Sổ thu chi</button>
       </nav>
     </header>
 
-    <!-- ==================== Thanh chế độ chỉ xem ==================== -->
-    <div class="readonly-bar" id="readonly-bar">
+    <!--
+      Chỉ hiện khi đăng nhập được nhưng chưa được cấp quyền ghi. Khách chưa đăng
+      nhập không thấy gì cả — họ không cần được nhắc là mình đang chỉ xem.
+    -->
+    <div class="readonly-bar" id="readonly-bar" style="display: none">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      <span class="readonly-bar__text" id="readonly-text">Đang ở <b>chế độ chỉ xem</b> — đăng nhập để nhập liệu và chỉnh sửa.</span>
-      <button class="btn" id="readonly-login" type="button">Đăng nhập</button>
+      <span class="readonly-bar__text" id="readonly-text"></span>
     </div>
 
     <!-- ==================== Hộp thoại đăng nhập ==================== -->
