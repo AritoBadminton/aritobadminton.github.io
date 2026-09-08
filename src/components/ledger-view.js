@@ -3,6 +3,7 @@
 import { CATEGORIES, KEEP_UNCHANGED, MONTH_OPTION_LIMIT, MONTH_OPTION_MORE } from '../config/constants.js';
 import {
   addTransaction,
+  copyTransactions,
   countPendingLedgerChanges,
   discardAllLedgerChanges,
   getAllExpenses,
@@ -42,6 +43,10 @@ let filterType = 'all';
 /** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
 const DELETE_CONFIRM_MS = 4000;
 
+/** Chờ bản sao hiện ra trong dữ liệu chung: tối đa 20 lần, mỗi lần 150ms. */
+const COPY_WAIT_TRIES = 20;
+const COPY_WAIT_MS = 150;
+
 /** Dòng đang chờ xác nhận xoá, và hẹn giờ tự huỷ xác nhận đó. */
 let pendingDeleteId = '';
 let pendingDeleteTimer = 0;
@@ -53,6 +58,9 @@ let sortDirection = -1;
 let newEntryType = 'chi';
 let visibleRowIds = [];
 
+/** Đang chạy một lượt sao chép, chặn bấm chồng lên nhau. */
+let isCopying = false;
+
 /* ---------- Hàm bổ trợ ---------- */
 
 /** Các dòng đang được tick chọn. */
@@ -60,33 +68,57 @@ function getSelectedRows() {
   return store.transactions.filter((item) => store.selectedTransactionIds.has(item.id));
 }
 
-/** Cập nhật nhãn và trạng thái nút "Cập nhật". */
-function syncUpdateButton() {
+/** Cập nhật nhãn và trạng thái hai nút làm việc theo dòng đang tick chọn. */
+function syncSelectionButtons() {
   const count = store.selectedTransactionIds.size;
-  const button = qs('#ledger-update');
-  button.disabled = !store.isAdmin || count === 0;
-  button.style.opacity = button.disabled ? '0.45' : '1';
-  button.textContent = count ? `Cập nhật (${count})` : 'Cập nhật';
-  button.title = !store.isAdmin
+
+  const updateButton = qs('#ledger-update');
+  updateButton.disabled = !store.isAdmin || count === 0;
+  updateButton.style.opacity = updateButton.disabled ? '0.45' : '1';
+  updateButton.textContent = count ? `Cập nhật (${count})` : 'Cập nhật';
+  updateButton.title = !store.isAdmin
     ? 'Đăng nhập để chỉnh sửa'
     : count === 0
       ? 'Tick chọn dòng cần sửa ở bảng bên dưới'
       : `Sửa ${count} dòng đang chọn`;
+
+  // Nút sao chép chỉ có biểu tượng nên mọi lời giải thích nằm ở title/aria-label.
+  const copyButton = qs('#ledger-copy');
+  copyButton.disabled = updateButton.disabled || isCopying;
+  copyButton.style.opacity = copyButton.disabled ? '0.45' : '1';
+  const copyLabel = !store.isAdmin
+    ? 'Đăng nhập để sao chép'
+    : isCopying
+      ? 'Đang sao chép…'
+      : count === 0
+        ? 'Sao chép: tick chọn dòng cần nhân bản ở bảng bên dưới'
+        : `Sao chép ${count} dòng đang chọn thành khoản mới`;
+  copyButton.title = copyLabel;
+  copyButton.setAttribute('aria-label', copyLabel);
 }
 
-/** Đọc bộ lọc hiện tại và trả về danh sách dòng đã lọc, đã sắp xếp. */
-function getFilteredRows() {
+/**
+ * Các dòng khớp bộ lọc tháng, danh mục và từ khoá — chưa áp nút Thu/Chi.
+ *
+ * Ba ô tổng dùng danh sách này để dù đang xem riêng Thu hay riêng Chi thì tổng
+ * của tháng vẫn hiện đủ cả hai chiều.
+ */
+function getScopedRows() {
   const month = qs('#filter-month').value;
   const category = qs('#filter-category').value;
   const keyword = qs('#filter-keyword').value.trim().toLowerCase();
 
-  const rows = store.transactions.filter(
+  return store.transactions.filter(
     (item) =>
-      (filterType === 'all' || item.type === filterType) &&
       (!month || item.date.startsWith(month)) &&
       (!category || item.cat === category) &&
       (!keyword || `${item.desc} ${item.cat}`.toLowerCase().includes(keyword)),
   );
+}
+
+/** Danh sách hiện trên bảng: thêm nút Thu/Chi và sắp xếp theo cột đang chọn. */
+function getFilteredRows() {
+  const rows = getScopedRows().filter((item) => filterType === 'all' || item.type === filterType);
 
   return rows.sort((a, b) => {
     const left = sortField === 'date' ? a.date : a.amount;
@@ -270,6 +302,63 @@ function handleRowDelete(id) {
   requestRender();
 }
 
+/* ---------- Sao chép ---------- */
+
+/**
+ * Chờ các bản sao xuất hiện trong danh sách chung.
+ *
+ * Ở chế độ Firebase, dòng mới chỉ về qua onSnapshot chứ không có ngay sau khi
+ * ghi, nên phải đợi rồi mới mở được form sửa cho chúng.
+ *
+ * @param {string[]} ids
+ * @returns {Promise<boolean>} đã thấy đủ hay hết lượt chờ
+ */
+async function waitForRows(ids) {
+  for (let attempt = 0; attempt < COPY_WAIT_TRIES; attempt += 1) {
+    const available = new Set(store.transactions.map((item) => item.id));
+    if (ids.every((id) => available.has(id))) return true;
+    await new Promise((resolve) => setTimeout(resolve, COPY_WAIT_MS));
+  }
+  return false;
+}
+
+/** Nhân bản các dòng đang chọn rồi mở sẵn form để đổi ngày cho bản sao. */
+async function handleCopySelected() {
+  const rows = getSelectedRows();
+  if (!rows.length || isCopying) return;
+
+  isCopying = true;
+  syncSelectionButtons();
+
+  try {
+    const ids = await copyTransactions(rows);
+    const ready = await waitForRows(ids);
+
+    // Chuyển lựa chọn sang bản sao để mọi thao tác tiếp theo không đụng bản gốc.
+    store.selectedTransactionIds.clear();
+    ids.forEach((id) => store.selectedTransactionIds.add(id));
+    requestRender();
+
+    if (!ready) {
+      window.alert(`Đã tạo ${ids.length} bản sao. Chúng sẽ hiện trong bảng ngay khi dữ liệu chung về.`);
+      return;
+    }
+
+    openUpdateForm();
+    const message = qs('#update-message');
+    message.textContent =
+      ids.length === 1
+        ? 'Đã tạo bản sao — đổi ngày rồi bấm "Lưu thay đổi".'
+        : `Đã tạo ${ids.length} bản sao — đổi ngày rồi bấm "Lưu thay đổi".`;
+    message.style.color = 'var(--good)';
+  } catch (error) {
+    window.alert(`Không sao chép được: ${error?.message ?? error}`);
+  } finally {
+    isCopying = false;
+    syncSelectionButtons();
+  }
+}
+
 /** Trả các dòng đang chọn về đúng như trong data.json. */
 function handleRevert() {
   revertTransactions(getSelectedRows().map((row) => row.id));
@@ -419,8 +508,12 @@ export function renderLedgerFilters() {
 /** Vẽ lại bảng sổ thu chi và các số liệu kèm theo. */
 export function renderLedger() {
   const rows = getFilteredRows();
-  const income = rows.filter((row) => row.type === 'thu').reduce((sum, row) => sum + row.amount, 0);
-  const expense = rows.filter((row) => row.type === 'chi').reduce((sum, row) => sum + row.amount, 0);
+
+  // Cố ý lấy getScopedRows chứ không phải rows: nút Thu/Chi chỉ lọc bảng bên
+  // dưới, ba ô tổng luôn hiện đủ cả thu lẫn chi của tháng đang xem.
+  const scoped = getScopedRows();
+  const income = scoped.filter((row) => row.type === 'thu').reduce((sum, row) => sum + row.amount, 0);
+  const expense = scoped.filter((row) => row.type === 'chi').reduce((sum, row) => sum + row.amount, 0);
   const net = income - expense;
 
   qs('#ledger-income').textContent = formatCurrency(income);
@@ -471,7 +564,7 @@ export function renderLedger() {
       if (checkbox.checked) store.selectedTransactionIds.add(checkbox.dataset.id);
       else store.selectedTransactionIds.delete(checkbox.dataset.id);
       checkbox.closest('tr').classList.toggle('row--selected', checkbox.checked);
-      syncUpdateButton();
+      syncSelectionButtons();
     });
   });
 
@@ -480,7 +573,7 @@ export function renderLedger() {
   selectAll.checked = rows.length > 0 && rows.every((row) => store.selectedTransactionIds.has(row.id));
   selectAll.disabled = !store.isAdmin || rows.length === 0;
 
-  syncUpdateButton();
+  syncSelectionButtons();
   qs('#ledger-count').textContent = `${rows.length} giao dịch`;
   renderPendingBar();
 }
@@ -548,6 +641,7 @@ export function initLedgerView() {
   qs('#ledger-add-toggle').addEventListener('click', toggleNewEntryForm);
   qs('#new-submit').addEventListener('click', handleAddTransaction);
   qs('#ledger-update').addEventListener('click', openUpdateForm);
+  qs('#ledger-copy').addEventListener('click', handleCopySelected);
   qs('#update-save').addEventListener('click', handleSaveUpdate);
   qs('#update-cancel').addEventListener('click', closeUpdateForm);
   qs('#update-revert').addEventListener('click', handleRevert);
