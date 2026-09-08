@@ -273,6 +273,37 @@ export function removeMemberFromOpenMonths(memberName) {
 }
 
 /**
+ * Gỡ một người khỏi bảng đóng quỹ của MỌI tháng, kể cả tháng đã qua.
+ *
+ * Chỉ dùng khi xoá hẳn thành viên. Bình thường không đụng tháng cũ, vì đó là
+ * lịch sử; nhưng xoá người mà để lại dòng cũ thì họ hiện lại ngay ở tab Thành
+ * viên, do danh sách được dựng từ chính các dòng đó.
+ *
+ * @param {string} memberName
+ */
+export function removeMemberFromAllMonths(memberName) {
+  if (!isFirebaseMode()) return Promise.resolve();
+  const targets = store.months.filter((month) => month.members.some((member) => member.name === memberName));
+  return Promise.all(targets.map((month) => firebaseApi().removeDuesEntry(month.month, memberName)));
+}
+
+/**
+ * Tổng đã đóng và số tháng có tên của một người, để cảnh báo trước khi xoá.
+ * @param {string} memberName
+ */
+export function summariseMemberHistory(memberName) {
+  let paid = 0;
+  let months = 0;
+  store.months.forEach((month) => {
+    const row = month.members.find((member) => member.name === memberName);
+    if (!row) return;
+    months += 1;
+    paid += Number(row.paid ?? 0);
+  });
+  return { paid, months };
+}
+
+/**
  * Đặt số tiền đóng quỹ, tự bỏ ghi đè nếu trùng với bản gốc.
  * @param {string} monthKey
  * @param {string} memberName
