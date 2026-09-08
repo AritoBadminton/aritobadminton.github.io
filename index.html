@@ -384,6 +384,15 @@
 
         <div class="add-member" id="members-add-form" style="display: none">
           <input type="text" id="members-add-name" placeholder="Tên thành viên mới…" aria-label="Tên thành viên mới" maxlength="60" />
+          <input
+            type="text"
+            inputmode="numeric"
+            id="members-add-order"
+            class="add-member__order"
+            placeholder="STT"
+            aria-label="Số thứ tự của thành viên mới"
+            maxlength="4"
+          />
           <button class="btn" id="members-add-submit" type="button">Thêm</button>
           <button class="btn btn--ghost" id="members-add-cancel" type="button">Huỷ</button>
           <span class="add-member__error" id="members-add-error"></span>
