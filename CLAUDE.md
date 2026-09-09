@@ -52,7 +52,7 @@ cố ý chỉ hỗ trợ chế độ Firebase thì ghi rõ trong chú thích.
 ### Hình dạng dữ liệu trên Firestore
 
 ```
-settings/club     { name, updated, notes[], showCompanyFund }
+settings/club     { name, updated, notes[] }
 settings/rules    { title, subtitle, items[], footer }
 settings/qr       { image, name, account, bank, note }
 settings/roster   { active: { "<tên>": bool }, order: { "<tên>": số } }
@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=6`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=8`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -140,8 +140,9 @@ mục đầu tiên và bấm Lưu là đổi danh mục dòng đó lúc nào kh�
 
 **Ô "Tiền quỹ công ty cấp"** ở tab Đóng quỹ đọc ngược từ sổ thu chi
 (`getCompanyFundTotal(monthKey)`), vì bảng đóng quỹ chỉ ghi phần thành viên đóng.
-Công tắc `settings/club.showCompanyFund` quyết định người xem thường có thấy
-không; **mặc định là ẩn**, admin luôn thấy.
+**Chỉ admin thấy ô này**; người xem thường không bao giờ thấy. Trước đây có công
+tắc `settings/club.showCompanyFund` cho phép admin bật hiển thị cho người xem
+thường, nhưng đã bỏ theo yêu cầu chủ trang (09/2026) — đừng thêm lại.
 
 **Số thứ tự thành viên (STT)** đặt ở mục "Tất cả" là số dùng chung cho mọi bộ
 lọc. Người bị lọc ra vẫn giữ số của mình và **số đó không được nhảy sang người
