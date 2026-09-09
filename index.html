@@ -232,7 +232,8 @@
         <div class="card" style="margin-bottom: 16px">
           <div class="card__header" style="display: flex; align-items: center; gap: 12px; padding-bottom: 0">
             <div style="flex: 1">
-              <h3>Thêm giao dịch</h3> 
+              <h3>Thêm giao dịch</h3>
+              <p>Nhập một khoản thu hoặc chi — hiện ngay trên biểu đồ và số dư</p>
             </div>
             <button class="btn admin-only" id="ledger-add-toggle" aria-expanded="false" type="button">+ Nhập khoản mới</button>
             <button class="btn btn--ghost admin-only" id="ledger-update" type="button" disabled>Cập nhật</button>
@@ -500,6 +501,8 @@
             <div class="stat-tile__label">Tiền quỹ công ty cấp</div>
             <div class="stat-tile__value stat-tile__value--compact stat-tile__value--positive" id="month-company-fund">—</div>
             <label class="stat-tile__switch admin-only" id="month-company-switch" style="display: none">
+              <input type="checkbox" id="month-company-show" />
+              Cho người xem thường thấy ô này
             </label>
           </div>
           <div class="card stat-tile">
