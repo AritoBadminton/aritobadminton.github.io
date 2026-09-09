@@ -20,20 +20,20 @@ const browser = await chromium.launch({
 const errors = [];
 // Mỗi newPage là một context riêng nên localStorage không dùng chung: trang khách
 // phải được gieo lại dữ liệu, kèm đúng trạng thái công tắc cần kiểm tra.
-const moTrang = async (hienQuyCongTy = false) => {
+const moTrang = async () => {
   const page = await browser.newPage({ viewport: { width: 1500, height: 1000 } });
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push('console: ' + m.text());
   });
   await page.addInitScript(
-    ([thisM, prevM, hien]) => {
+    ([thisM, prevM]) => {
       if (localStorage.getItem('__fakestore__')) return;
       localStorage.setItem(
         '__fakestore__',
         JSON.stringify({
           settings: {
-            club: { name: 'CLB Test', updated: thisM + '-01', notes: [], showCompanyFund: hien },
+            club: { name: 'CLB Test', updated: thisM + '-01', notes: [] },
             rules: { footer: '', items: [] },
             qr: {},
             roster: { active: { An: true, Bình: true, Cường: true }, order: { An: 1, Bình: 2, Cường: 3 } },
@@ -90,7 +90,7 @@ const moTrang = async (hienQuyCongTy = false) => {
         }),
       );
     },
-    [THIS, PREV, hienQuyCongTy],
+    [THIS, PREV],
   );
   await page.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1500);
@@ -156,46 +156,19 @@ check(
   '1 người không chơi tháng này',
 );
 
-/* ---------- 4. Công tắc hiển thị ---------- */
+/* ---------- 4. Chỉ admin thấy ô, không còn công tắc bật/tắt ---------- */
 
-check('admin thấy công tắc', await page.isVisible('#month-company-switch'), true);
-check('mặc định chưa bật', await page.isChecked('#month-company-show'), false);
+check('không còn công tắc hiển thị', await page.isVisible('#month-company-switch'), false);
+check('admin luôn thấy ô', await page.isVisible('#month-company-tile'), true);
 
-await page.check('#month-company-show');
-await page.waitForTimeout(1500);
-check(
-  'bật thì ghi lên settings/club',
-  await page.evaluate(() => JSON.parse(localStorage.getItem('__fakestore__')).settings.club.showCompanyFund),
-  true,
-);
-check('ô tích vẫn bật sau khi vẽ lại', await page.isChecked('#month-company-show'), true);
+const khach = await moTrang();
+await khach.click('[data-panel="months"]');
+await khach.waitForTimeout(900);
+check('khách không thấy ô', await khach.isVisible('#month-company-tile'), false);
+check('khách không thấy công tắc', await khach.isVisible('#month-company-switch'), false);
+await khach.close();
 
-/* ---------- 5. Người xem thường ---------- */
-
-const khachBat = await moTrang(true);
-await khachBat.click('[data-panel="months"]');
-await khachBat.waitForTimeout(900);
-check('đã bật: khách thấy ô', await khachBat.isVisible('#month-company-tile'), true);
-check('khách không thấy công tắc', await khachBat.isVisible('#month-company-switch'), false);
-check('khách thấy đúng số', (await khachBat.textContent('#month-company-fund')).trim(), '1.200.000 đ');
-await khachBat.close();
-
-const khachTat = await moTrang(false);
-await khachTat.click('[data-panel="months"]');
-await khachTat.waitForTimeout(900);
-check('tắt: khách không thấy ô', await khachTat.isVisible('#month-company-tile'), false);
-await khachTat.close();
-
-await page.uncheck('#month-company-show');
-await page.waitForTimeout(1500);
-check(
-  'tắt xong ghi lại lên settings/club',
-  await page.evaluate(() => JSON.parse(localStorage.getItem('__fakestore__')).settings.club.showCompanyFund),
-  false,
-);
-check('admin vẫn thấy ô khi đang tắt', await page.isVisible('#month-company-tile'), true);
-
-/* ---------- 6. Sổ thu chi: số tiền mặc định 1 triệu ---------- */
+/* ---------- 5. Sổ thu chi: số tiền mặc định 1 triệu ---------- */
 
 await page.click('[data-panel="ledger"]');
 await page.waitForTimeout(900);
@@ -229,7 +202,7 @@ check(
   true,
 );
 
-/* ---------- 7. Danh mục thu chỉ còn quỹ công ty ---------- */
+/* ---------- 6. Danh mục thu chỉ còn quỹ công ty ---------- */
 
 await page.click('#new-type-toggle [data-type="thu"]');
 await page.waitForTimeout(400);
@@ -248,7 +221,7 @@ check(
 await page.click('#ledger-add-toggle');
 await page.waitForTimeout(300);
 
-/* ---------- 8. Dòng mang danh mục cũ không bị đổi khi sửa ---------- */
+/* ---------- 7. Dòng mang danh mục cũ không bị đổi khi sửa ---------- */
 
 await page.selectOption('#filter-month', '');
 await page.fill('#filter-keyword', 'gõ tay');
