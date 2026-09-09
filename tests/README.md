@@ -47,15 +47,16 @@ Tài khoản admin trong bản giả lập: `nghia@arito.vn` / `MatKhauRatDai#20
 
 ## Các file
 
-| File                                                     | Kiểm cái gì                                                                |
-| -------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `verify-guest.mjs`                                       | Khách chưa đăng nhập thấy gì; tab và bảng chỉ dành cho admin               |
-| `verify-gopquy.mjs`                                      | Gộp tiền đóng quỹ vào tổng thu, không đếm hai lần                          |
-| `verify-quycongty.mjs`                                   | Ô "Tiền quỹ công ty cấp", công tắc hiển thị, mặc định ô nhập, danh mục thu |
-| `verify-stt.mjs`, `verify-stt2.mjs`, `verify-addstt.mjs` | Số thứ tự thành viên: đặt, trùng, đánh số lại, giữ nguyên khi lọc          |
-| `verify-addmember.mjs`, `verify-delmember.mjs`           | Thêm và xoá thành viên                                                     |
-| `verify-createmonth.mjs`, `verify-delmonth.mjs`          | Tạo và xoá tháng đóng quỹ                                                  |
-| `verify-copy.mjs`                                        | Nhân bản giao dịch ở Sổ thu chi                                            |
+| File                                                     | Kiểm cái gì                                                            |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `verify-guest.mjs`                                       | Khách chưa đăng nhập thấy gì; tab và bảng chỉ dành cho admin           |
+| `verify-gopquy.mjs`                                      | Gộp tiền đóng quỹ vào tổng thu, không đếm hai lần                      |
+| `verify-quycongty.mjs`                                   | Ô "Tiền quỹ công ty cấp" chỉ admin thấy, mặc định ô nhập, danh mục thu |
+| `verify-month-order.mjs`                                 | Droplist tháng ở tab Đóng quỹ và Sổ thu chi cùng thứ tự mới→cũ         |
+| `verify-stt.mjs`, `verify-stt2.mjs`, `verify-addstt.mjs` | Số thứ tự thành viên: đặt, trùng, đánh số lại, giữ nguyên khi lọc      |
+| `verify-addmember.mjs`, `verify-delmember.mjs`           | Thêm và xoá thành viên                                                 |
+| `verify-createmonth.mjs`, `verify-delmonth.mjs`          | Tạo và xoá tháng đóng quỹ                                              |
+| `verify-copy.mjs`                                        | Nhân bản giao dịch ở Sổ thu chi                                        |
 
 Chạy hết bộ mất khoảng 12 phút. Sửa mã nguồn xong vẫn nên chạy lại **cả bộ**
 trước khi đẩy lên, vì các màn hình dùng
