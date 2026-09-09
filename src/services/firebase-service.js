@@ -5,7 +5,7 @@
  * mọi máy đang mở trang, nên cả nhóm thấy cùng lúc mà không cần tải lại.
  *
  * Đường dẫn dữ liệu:
- *   settings/club          { name, updated, showCompanyFund }
+ *   settings/club          { name, updated }
  *   settings/rules         { title, subtitle, items[], footer }
  *   settings/qr            { image, name, account, bank, note }
  *   settings/roster        { active: { "<tên>": true|false }, order: { "<tên>": số } }
@@ -262,7 +262,6 @@ function buildClubData(parts) {
   return {
     club: settings.club?.name ?? 'CLB Cầu Lông',
     updated: settings.club?.updated ?? '',
-    showCompanyFund: Boolean(settings.club?.showCompanyFund),
     rules: settings.rules ?? {},
     qr: settings.qr ?? {},
     notes: settings.club?.notes ?? [],
@@ -279,15 +278,6 @@ function buildClubData(parts) {
 export function saveRuleItems(items) {
   const { db } = getConnection();
   return setDoc(doc(db, 'settings', 'rules'), { items }, { merge: true });
-}
-
-/**
- * Ghi lại việc có cho người xem thường thấy ô "Tiền quỹ công ty cấp" hay không.
- * @param {boolean} visible
- */
-export function saveCompanyFundVisible(visible) {
-  const { db } = getConnection();
-  return setDoc(doc(db, 'settings', 'club'), { showCompanyFund: visible }, { merge: true });
 }
 
 /** Đánh dấu một thành viên còn hoạt động hay không. */
