@@ -111,7 +111,9 @@
   font-weight: 600;
   color: #fff;
   background: var(--series-1);
-  border: none;
+  /* Trong suốt chứ không phải "none": .btn--ghost và .btn--icon đều có viền 1px,
+     thiếu viền ở đây làm nút chính thấp hơn 2px, lệch hàng với hai nút kia. */
+  border: 1px solid transparent;
   border-radius: 9px;
   cursor: pointer;
 }
