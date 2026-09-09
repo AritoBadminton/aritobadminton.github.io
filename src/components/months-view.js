@@ -14,8 +14,6 @@ import {
   getChangedMemberNames,
   getDuesStatus,
   getEffectiveNote,
-  isCompanyFundVisible,
-  setCompanyFundVisible,
   getEffectivePaid,
   getEffectiveSkip,
   getFutureMonthKeys,
@@ -56,20 +54,6 @@ const STATUS_CLASS = {
 let lastMonthKey = '';
 
 /* ---------- Xử lý sự kiện ---------- */
-
-/** Bật/tắt việc cho người xem thường thấy ô "Tiền quỹ công ty cấp". */
-async function handleToggleCompanyFund(event) {
-  const checkbox = event.target;
-  checkbox.disabled = true;
-  try {
-    await setCompanyFundVisible(checkbox.checked);
-  } catch {
-    // Ghi hỏng thì trả ô tích về đúng trạng thái đang lưu, đừng để hiện sai.
-    checkbox.checked = isCompanyFundVisible();
-  } finally {
-    checkbox.disabled = false;
-  }
-}
 
 /** Đổi số tiền đóng quỹ rồi vẽ lại các vùng liên quan. */
 function handleSetPaid(monthKey, memberName, amount) {
@@ -237,22 +221,24 @@ export function renderMonthPicker() {
 
   // Mặc định chỉ hiện 5 tháng gần nhất cho gọn; tháng tự tạo luôn giữ lại.
   const hiddenCount = store.showAllDuesMonths ? 0 : Math.max(0, store.months.length - MONTH_OPTION_LIMIT);
-  const shownMonths = store.months.slice(hiddenCount);
+  // Tháng mới nhất lên đầu, khớp thứ tự droplist tháng ở tab Sổ thu chi.
+  const shownMonths = store.months.slice(hiddenCount).reverse();
 
   qs('#month-picker').innerHTML =
-    buildMoreOption(hiddenCount, MONTH_OPTION_MORE) +
+    getFutureMonthKeys()
+      .reverse()
+      .map(
+        (key) =>
+          `<option value="${key}">${formatMonthLabel(key)} — tự tạo, ${activeCount} người đang hoạt động</option>`,
+      )
+      .join('') +
     shownMonths
       .map(
         (month) =>
           `<option value="${month.month}">${formatMonthLabel(month.month)} — ${month.members.length} thành viên</option>`,
       )
       .join('') +
-    getFutureMonthKeys()
-      .map(
-        (key) =>
-          `<option value="${key}">${formatMonthLabel(key)} — tự tạo, ${activeCount} người đang hoạt động</option>`,
-      )
-      .join('');
+    buildMoreOption(hiddenCount, MONTH_OPTION_MORE);
 
   const options = [...qs('#month-picker').options].map((option) => option.value);
   const fallback = store.months[store.months.length - 1]?.month ?? getFutureMonthKeys()[0] ?? '';
@@ -262,13 +248,10 @@ export function renderMonthPicker() {
 /**
  * Ô "Tiền quỹ công ty cấp" của tháng đang xem.
  *
- * Admin luôn thấy ô này kèm công tắc; người xem thường chỉ thấy khi admin bật.
+ * Đây là con số nội bộ, chỉ admin xem được; người xem thường không thấy.
  */
 function renderCompanyFund(monthKey) {
-  const visible = isCompanyFundVisible();
-  setVisible(qs('#month-company-tile'), store.isAdmin || visible, '');
-  setVisible(qs('#month-company-switch'), store.isAdmin && isFirebaseMode(), 'flex');
-  qs('#month-company-show').checked = visible;
+  setVisible(qs('#month-company-tile'), store.isAdmin, '');
   qs('#month-company-fund').textContent = formatCurrency(getCompanyFundTotal(monthKey));
 }
 
@@ -446,7 +429,6 @@ export function initMonthsView() {
   qs('#month-delete').addEventListener('click', handleDeleteMonth);
   qs('#month-export-toggle').addEventListener('click', handleSaveMonth);
   qs('#month-reset').addEventListener('click', handleResetMonth);
-  qs('#month-company-show').addEventListener('change', handleToggleCompanyFund);
 }
 
 /* ---------- Hàm phụ trợ ---------- */
