@@ -154,16 +154,3 @@
 .mt-sm {
   margin-top: 14px;
 }
-
-/* ---------- Footer ---------- */
-
-.app-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 40px;
-  padding-top: 18px;
-  font-size: 12.5px;
-  color: var(--text-3);
-  border-top: 1px solid var(--border);
-}
