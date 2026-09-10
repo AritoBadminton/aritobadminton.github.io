@@ -168,15 +168,35 @@ check('khách không thấy ô', await khach.isVisible('#month-company-tile'), f
 check('khách không thấy công tắc', await khach.isVisible('#month-company-switch'), false);
 await khach.close();
 
-/* ---------- 5. Sổ thu chi: số tiền mặc định 1 triệu ---------- */
+/* ---------- 5. Sổ thu chi: mặc định chỉ áp cho Thu, Chi để trống ---------- */
 
 await page.click('[data-panel="ledger"]');
 await page.waitForTimeout(900);
-check('ô số tiền điền sẵn 1 triệu', await page.inputValue('#new-amount'), '1.000.000');
-check('ô nội dung điền sẵn', await page.inputValue('#new-desc'), 'Tiền quỹ thành viên hàng tháng');
-
 await page.click('#ledger-add-toggle');
 await page.waitForTimeout(400);
+
+check(
+  'mở lên đang chọn Chi',
+  await page.getAttribute('#new-type-toggle [data-type="chi"]', 'aria-pressed'),
+  'true',
+);
+check('Chi không có số tiền mặc định', await page.inputValue('#new-amount'), '');
+check('Chi không có nội dung mặc định', await page.inputValue('#new-desc'), '');
+
+await page.click('#new-type-toggle [data-type="thu"]');
+await page.waitForTimeout(300);
+check('đổi sang Thu thì hiện mặc định 1 triệu', await page.inputValue('#new-amount'), '1.000.000');
+check(
+  'đổi sang Thu thì hiện nội dung mặc định',
+  await page.inputValue('#new-desc'),
+  'Tiền quỹ thành viên hàng tháng',
+);
+
+await page.click('#new-type-toggle [data-type="chi"]');
+await page.waitForTimeout(300);
+check('đổi lại Chi thì xoá mặc định của Thu', await page.inputValue('#new-amount'), '');
+check('đổi lại Chi thì xoá nội dung mặc định của Thu', await page.inputValue('#new-desc'), '');
+
 await page.fill('#new-amount', '250000');
 await page.fill('#new-desc', 'Khoản thử');
 await page.waitForTimeout(200);
@@ -186,12 +206,8 @@ check('nội dung sửa lại được', await page.inputValue('#new-desc'), 'Kh
 await page.fill('#new-date', THIS + '-09');
 await page.click('#new-submit');
 await page.waitForTimeout(1600);
-check('thêm xong thì điền lại 1 triệu', await page.inputValue('#new-amount'), '1.000.000');
-check(
-  'thêm xong thì điền lại nội dung mặc định',
-  await page.inputValue('#new-desc'),
-  'Tiền quỹ thành viên hàng tháng',
-);
+check('thêm xong Chi vẫn để trống, không tự điền mặc định của Thu', await page.inputValue('#new-amount'), '');
+check('thêm xong Chi vẫn để trống nội dung', await page.inputValue('#new-desc'), '');
 check(
   'vẫn ghi đúng nội dung đã gõ',
   await page.evaluate(() =>
@@ -202,14 +218,14 @@ check(
   true,
 );
 
-/* ---------- 6. Danh mục thu chỉ còn quỹ công ty ---------- */
+/* ---------- 6. Danh mục thu có quỹ công ty và tiền tài trợ ---------- */
 
 await page.click('#new-type-toggle [data-type="thu"]');
 await page.waitForTimeout(400);
 check(
-  'danh mục thu chỉ còn một lựa chọn',
+  'danh mục thu có quỹ công ty và tiền tài trợ',
   await page.$$eval('#new-category option', (els) => els.map((e) => e.textContent)),
-  ['Tiền quỹ công ty hàng tháng'],
+  ['Tiền quỹ công ty hàng tháng', 'Tiền được tài trợ cho CLB'],
 );
 await page.click('#new-type-toggle [data-type="chi"]');
 await page.waitForTimeout(300);
