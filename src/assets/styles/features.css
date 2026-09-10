@@ -269,7 +269,10 @@ body:not(.is-admin) .admin-only {
   color: var(--series-1);
 }
 
-.rules-panel__footer b {
+/* formatNoteHtml() xuất chữ đậm bằng <strong>, không phải <b> — phải bắt cả
+   hai thì phần đậm do chủ trang gõ trong ghi chú mới cùng màu với "Lưu ý:". */
+.rules-panel__footer b,
+.rules-panel__footer strong {
   color: var(--text);
 }
 
