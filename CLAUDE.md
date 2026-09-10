@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=9`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=10`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -155,10 +155,16 @@ Bảng "Giao dịch gần đây" ở Tổng quan cũng mang class `admin-only`.
 **Ghi chú ở Tổng quan** (`settings/club.notes[]`) chỉ hiện khi `settings/rules.items`
 rỗng và người xem không phải admin (`renderRules` trong `dashboard-view.js`) —
 đây là bản dự phòng khi chưa ai nhập mức đóng vào `settings/rules`, và đúng là
-cảnh trang thật đang gặp. `formatNoteHtml` (`utils/format.js`) hỗ trợ `\n` để
-xuống dòng, `**...**` để in đậm, và **tự động tô đỏ mọi số tiền** dạng "N.NNNđ"
-— không cần đánh dấu riêng cho phần tiền. Chưa có màn hình admin nào để sửa
-`notes`; đổi nội dung ghi chú phải sửa thẳng trong Firebase Console.
+cảnh trang thật đang gặp. `settings/rules.footer` ("Lưu ý") dùng chung hàm này.
+`formatNoteHtml` (`utils/format.js`) hỗ trợ `\n` để xuống dòng, `**...**` để in
+đậm, `*...*` để in nghiêng (đậm phải thay trước nghiêng), và **tự động tô đỏ
+số tiền** — nhận cả có hậu tố ("30.000đ", "30k") lẫn số viết theo nhóm ba chữ
+số kiểu Việt Nam mà không có hậu tố ("30.000"), nhưng bỏ qua số trần không
+chấm nhóm (như năm "2026") để không tô nhầm. Không cần đánh dấu riêng cho phần
+tiền. Chữ đậm trong "Lưu ý" ra `<strong>`, không phải `<b>`, nên CSS
+(`.rules-panel__footer b, .rules-panel__footer strong`) phải bắt cả hai thì mới
+cùng màu với nhãn "Lưu ý:". Chưa có màn hình admin nào để sửa `notes` hay
+`footer`; đổi nội dung phải sửa thẳng trong Firebase Console.
 
 **Ô nhập khoản mới ở Sổ thu chi chỉ Thu mới có mặc định** (`DEFAULT_ENTRY_AMOUNT`,
 `DEFAULT_ENTRY_DESC`) — đó là khoản quỹ công ty lặp lại gần như y hệt mỗi tháng.
