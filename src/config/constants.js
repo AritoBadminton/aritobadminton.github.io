@@ -60,7 +60,7 @@ export const CATEGORY_COLORS = {
   'Tiền khác': 'var(--series-4)',
   'Tiền quỹ công ty hàng tháng': 'var(--series-1)',
   'Tiền quỹ thành viên hàng tháng': 'var(--series-2)',
-  'Tiền được tài trợ cho CLB': 'var(--series-3)',
+  'Tiền được tài trợ': 'var(--series-3)',
 };
 
 export const CATEGORY_COLOR_FALLBACK = 'var(--series-5)';
