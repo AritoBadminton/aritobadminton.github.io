@@ -107,6 +107,28 @@ check(
   'Sân <script>alert(1)</script> & "trích dẫn"',
 );
 
+/* ---------- 4. "Lưu ý" (rules.footer) dùng chung định dạng, nhận cả "30k" ---------- */
+
+await page.evaluate(() => {
+  const data = JSON.parse(localStorage.getItem('__fakestore__'));
+  data.settings.club.notes = [];
+  data.settings.rules.footer =
+    'Chuyển khoản xong nhắn Zalo cho thủ quỹ để được ghi nhận.\n' +
+    'Để hạn chế lãng phí tiền sân, **vote mà không đi, phạt 30k** (trừ trường hợp có lý do hợp lý)';
+  localStorage.setItem('__fakestore__', JSON.stringify(data));
+});
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(1500);
+
+const footerHtml = await page.$eval('.rules-panel__footer div', (e) => e.innerHTML);
+check('Lưu ý cũng xuống dòng được', footerHtml.includes('<br>'), true);
+check('Lưu ý cũng in đậm được', footerHtml.includes('<strong>vote mà không đi, phạt'), true);
+check(
+  'Lưu ý nhận cách viết tắt "30k", không cần "30.000đ"',
+  footerHtml.includes('<span class="note-amount">30k</span>'),
+  true,
+);
+
 check('không có lỗi javascript', errors, []);
 
 await browser.close();
