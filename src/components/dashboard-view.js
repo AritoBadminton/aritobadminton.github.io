@@ -197,14 +197,9 @@ export function renderDashboard() {
   const balance = totalIncome - totalExpense;
   const monthCount = store.months.length;
 
-  const dates = store.transactions.map((item) => item.date).sort();
-  const firstDate = dates[0] ?? '';
-  const lastDate = dates[dates.length - 1] ?? '';
-
   const balanceValue = qs('#kpi-balance');
   balanceValue.textContent = formatCurrency(balance);
   balanceValue.classList.toggle('stat-tile__value--negative', balance < 0);
-  qs('#kpi-balance-note').textContent = lastDate ? `Cập nhật ${formatDateLabel(lastDate)}` : '';
 
   qs('#kpi-income').textContent = formatCurrency(totalIncome);
   qs('#kpi-income-note').textContent =
@@ -215,8 +210,6 @@ export function renderDashboard() {
 
   const lastMonth = store.months[store.months.length - 1];
   qs('#kpi-members').textContent = String(lastMonth?.members.length ?? 0);
-
-  
 
   const recent = [...store.transactions]
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
