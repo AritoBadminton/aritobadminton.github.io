@@ -169,10 +169,17 @@ function renderPendingBar() {
 
 /* ---------- Form thêm mới ---------- */
 
-/** Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới. */
+/**
+ * Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới.
+ *
+ * Chỉ Thu mới có giá trị mặc định — đó là khoản quỹ công ty lặp lại gần như y
+ * hệt nhau mỗi tháng. Chi thì mỗi khoản một số tiền, một nội dung khác nhau nên
+ * điền sẵn số của Thu vào chỉ gây nhầm; để trống cho admin gõ tay.
+ */
 function resetNewEntryFields() {
-  qs('#new-amount').value = formatNumber(DEFAULT_ENTRY_AMOUNT);
-  qs('#new-desc').value = DEFAULT_ENTRY_DESC;
+  const isThu = newEntryType === 'thu';
+  qs('#new-amount').value = isThu ? formatNumber(DEFAULT_ENTRY_AMOUNT) : '';
+  qs('#new-desc').value = isThu ? DEFAULT_ENTRY_DESC : '';
 }
 
 /**
@@ -684,6 +691,8 @@ export function initLedgerView() {
       });
       newEntryType = button.dataset.type;
       fillNewEntryCategories();
+      // Đổi loại thì giá trị mặc định của loại cũ (nếu có) không còn hợp nữa.
+      resetNewEntryFields();
     });
   });
 
