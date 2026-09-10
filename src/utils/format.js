@@ -72,9 +72,11 @@ export function getCategoryColor(category) {
 
 /**
  * Định dạng một dòng ghi chú thành HTML: xuống dòng, chữ đậm `**...**`, chữ
- * nghiêng `*...*`, và tô đỏ số tiền (nhận cả "30.000đ" lẫn cách viết tắt
- * "30k") — để chủ trang gõ ghi chú trong Firestore mà vẫn trình bày đẹp ngay,
- * khỏi cần thêm màn hình soạn thảo riêng cho ghi chú.
+ * nghiêng `*...*`, và tô đỏ số tiền — để chủ trang gõ ghi chú trong Firestore
+ * mà vẫn trình bày đẹp ngay, khỏi cần thêm màn hình soạn thảo riêng cho ghi
+ * chú. Số tiền nhận cả có hậu tố ("30.000đ", "30k") lẫn số viết theo nhóm ba
+ * chữ số kiểu Việt Nam mà không có hậu tố ("30.000") — nhưng số trần không
+ * chấm nhóm (như "2026") thì bỏ qua, để không tô nhầm năm tháng.
  *
  * Đậm phải thay trước nghiêng: thay nghiêng trước thì mỗi cặp `**` bị đọc
  * nhầm thành hai cặp `*` lồng nhau, hỏng cả chữ đậm lẫn chữ nghiêng.
@@ -83,7 +85,10 @@ export function getCategoryColor(category) {
  */
 export function formatNoteHtml(text) {
   return escapeHtml(text)
-    .replace(/\d[\d.,]*\s?(?:đ|k)(?![\p{L}])/gu, (amount) => `<span class="note-amount">${amount}</span>`)
+    .replace(
+      /\d[\d.,]*\s?(?:đ|k)(?![\p{L}])|\d{1,3}(?:\.\d{3})+(?![\p{L}\d])/gu,
+      (amount) => `<span class="note-amount">${amount}</span>`,
+    )
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/\n/g, '<br>');
