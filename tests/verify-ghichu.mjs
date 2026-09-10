@@ -50,7 +50,7 @@ await page.waitForTimeout(1500);
 await page.evaluate(() => {
   const data = JSON.parse(localStorage.getItem('__fakestore__'));
   data.settings.club.notes = [
-    'Để hạn chế lãng phí tiền sân:\n**Vote mà không đi, phạt 30.000đ** (trừ trường hợp có lý do hợp lý)',
+    'Để hạn chế lãng phí tiền sân:\n**Vote mà không đi, phạt 30.000đ** *(trừ trường hợp có lý do hợp lý)*',
   ];
   localStorage.setItem('__fakestore__', JSON.stringify(data));
 });
@@ -62,8 +62,13 @@ check('có xuống dòng', noteHtml.includes('<br>'), true);
 check('có chữ đậm', noteHtml.includes('<strong>Vote mà không đi, phạt'), true);
 check('số tiền được bọc span tô đỏ', noteHtml.includes('<span class="note-amount">30.000đ</span>'), true);
 check(
-  'không còn cú pháp ** thô trên trang',
-  await page.$eval('#rules-panel', (e) => e.textContent.includes('**')),
+  'có chữ nghiêng, không lẫn với chữ đậm bên cạnh',
+  noteHtml.includes('<em>(trừ trường hợp có lý do hợp lý)</em>'),
+  true,
+);
+check(
+  'không còn cú pháp * hay ** thô trên trang',
+  await page.$eval('#rules-panel', (e) => e.textContent.includes('*')),
   false,
 );
 check(
