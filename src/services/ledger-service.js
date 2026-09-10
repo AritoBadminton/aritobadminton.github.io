@@ -10,6 +10,7 @@
 import { COMPANY_FUND_CATEGORY, MEMBER_DUES_CATEGORY, STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
+import { getDuesTotal } from './dues-service.js';
 import { readJson, writeJson } from './storage-service.js';
 
 const INCOME_PREFIX = 'thu';
@@ -54,6 +55,22 @@ export function getCompanyFundTotal(monthKey = '') {
     .filter((item) => item.cat === COMPANY_FUND_CATEGORY)
     .filter((item) => !monthKey || String(item.date).slice(0, 7) === monthKey)
     .reduce((sum, item) => sum + item.amount, 0);
+}
+
+/**
+ * Số dư quỹ hiện tại: tổng thu (đã gộp tiền đóng quỹ từ bảng Đóng quỹ theo
+ * tháng, loại trừ dòng gõ tay ngày xưa để khỏi đếm hai lần) trừ tổng chi.
+ *
+ * Một nguồn tính duy nhất để ô "Số dư quỹ hiện tại" ở Tổng quan và ô "Số dư
+ * quỹ" ở Sổ thu chi luôn khớp nhau, không lệch mỗi khi có ai sửa công thức.
+ *
+ * @returns {number}
+ */
+export function getFundBalance() {
+  const otherIncomes = getAllIncomes().filter((item) => !isDuesEntry({ ...item, type: INCOME_PREFIX }));
+  const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + getDuesTotal();
+  const totalExpense = getAllExpenses().reduce((sum, item) => sum + item.amount, 0);
+  return totalIncome - totalExpense;
 }
 
 /** Toàn bộ khoản thu đang hiệu lực. */
