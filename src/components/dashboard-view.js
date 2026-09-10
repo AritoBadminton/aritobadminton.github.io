@@ -2,7 +2,7 @@
 
 import { RECENT_TRANSACTION_COUNT } from '../config/constants.js';
 import { getDuesTotal } from '../services/dues-service.js';
-import { getAllExpenses, getAllIncomes, isDuesEntry } from '../services/ledger-service.js';
+import { getAllExpenses, getAllIncomes, getFundBalance, isDuesEntry } from '../services/ledger-service.js';
 import {
   addRuleItem,
   buildRulesJson,
@@ -194,7 +194,9 @@ export function renderDashboard() {
   const duesTotal = getDuesTotal();
   const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + duesTotal;
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
-  const balance = totalIncome - totalExpense;
+  // Dùng chung getFundBalance() với ô "Số dư quỹ" ở Sổ thu chi — một công thức
+  // duy nhất, hai ô không bao giờ lệch số nhau.
+  const balance = getFundBalance();
   const monthCount = store.months.length;
 
   const balanceValue = qs('#kpi-balance');
