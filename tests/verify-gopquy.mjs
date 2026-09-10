@@ -114,15 +114,26 @@ await page.selectOption('#filter-month', '');
 await page.waitForTimeout(500);
 check('tất cả các tháng: thu gộp đủ', (await tiles()).thu, '670.000 đ');
 check('tất cả các tháng: ghi rõ phần đóng quỹ', (await tiles()).ghiChu, 'Gồm 170.000 đ tiền đóng quỹ');
+check('ô Số dư quỹ khớp với Tổng quan', (await page.textContent('#ledger-balance')).trim(), '470.000 đ');
 
 await page.selectOption('#filter-month', THIS);
 await page.waitForTimeout(500);
 check('lọc tháng này: chỉ cộng đóng quỹ tháng này', (await tiles()).thu, '570.000 đ');
 check('lọc tháng này: ghi chú theo tháng', (await tiles()).ghiChu, 'Gồm 70.000 đ tiền đóng quỹ');
+check(
+  'lọc tháng này: Số dư quỹ không đổi theo bộ lọc',
+  (await page.textContent('#ledger-balance')).trim(),
+  '470.000 đ',
+);
 
 await page.selectOption('#filter-month', PREV);
 await page.waitForTimeout(500);
 check('lọc tháng trước: bỏ khoản gõ tay 90.000', (await tiles()).thu, '100.000 đ');
+check(
+  'lọc tháng trước: Số dư quỹ vẫn không đổi',
+  (await page.textContent('#ledger-balance')).trim(),
+  '470.000 đ',
+);
 
 /* ---------- 3. Lọc danh mục ---------- */
 
@@ -186,6 +197,11 @@ await page.selectOption('#filter-month', '');
 await page.waitForTimeout(600);
 check('đóng thêm 50.000 thì tổng thu tăng đúng', (await tiles()).thu, '720.000 đ');
 check('ghi chú cập nhật theo', (await tiles()).ghiChu, 'Gồm 220.000 đ tiền đóng quỹ');
+check(
+  'ô Số dư quỹ ở Sổ thu chi cũng cập nhật theo',
+  (await page.textContent('#ledger-balance')).trim(),
+  '520.000 đ',
+);
 
 await page.click('[data-panel="dashboard"]');
 await page.waitForTimeout(700);
