@@ -134,6 +134,39 @@ check(
   true,
 );
 
+/* ---------- 5. Lưu ý: số tiền không hậu tố (kiểu "30.000") vẫn tô đỏ, chữ
+   đậm trong Lưu ý cùng màu với nhãn "Lưu ý:", năm tháng không bị tô nhầm ---------- */
+
+await page.evaluate(() => {
+  const data = JSON.parse(localStorage.getItem('__fakestore__'));
+  data.settings.rules.footer =
+    'Để hạn chế lãng phí tiền sân: **Vote mà không đi, phạt 30.000** ' +
+    '(trừ trường hợp có lý do hợp lý). Cập nhật năm 2026.';
+  localStorage.setItem('__fakestore__', JSON.stringify(data));
+});
+await page.reload({ waitUntil: 'networkidle' });
+await page.waitForTimeout(1500);
+
+const footerHtml2 = await page.$eval('.rules-panel__footer div', (e) => e.innerHTML);
+check(
+  'số tiền "30.000" không hậu tố vẫn tô đỏ',
+  footerHtml2.includes('<span class="note-amount">30.000</span>'),
+  true,
+);
+check(
+  'năm "2026" (không chấm nhóm ba số) không bị tô đỏ nhầm',
+  footerHtml2.includes('<span class="note-amount">2026</span>'),
+  false,
+);
+
+const colors = await page.evaluate(() => {
+  const footer = document.querySelector('.rules-panel__footer div');
+  const label = getComputedStyle(footer.querySelector('b'));
+  const bold = getComputedStyle(footer.querySelector('strong'));
+  return { label: label.color, bold: bold.color };
+});
+check('chữ đậm trong Lưu ý cùng màu với nhãn "Lưu ý:"', colors.bold, colors.label);
+
 check('không có lỗi javascript', errors, []);
 
 await browser.close();
