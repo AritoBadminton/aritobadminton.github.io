@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=10`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=11`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -175,6 +175,14 @@ Chi thì mỗi khoản khác nhau, điền sẵn số của Thu vào chỉ gây 
 tài trợ cho CLB" — khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng
 thu bình thường, chỉ khác là **không** được `getCompanyFundTotal` xem là tiền
 công ty cấp hàng tháng (chỉ lọc đúng danh mục quỹ công ty).
+
+**Phụ đề dưới tiêu đề và các dòng "Cập nhật ..." đã bỏ (09/2026).** Trước đây
+`renderDashboard` tự tính `firstDate`/`lastDate` từ ngày giao dịch mới nhất để
+hiển thị "Cập nhật lần cuối" ở footer, "Cập nhật ..." dưới số dư quỹ, và phụ đề
+"Từ ... đến ..." dưới tiêu đề — theo yêu cầu chủ trang, cả ba đã bỏ. Phụ đề
+`#app-subtitle` giờ là **chữ tĩnh** "Từ tháng 11/2024 đến nay" viết thẳng trong
+`index.html`, không còn do JS tính. **Đừng thêm lại** các dòng ngày-cập-nhật tự
+động này nếu không được yêu cầu lại.
 
 ## Cạm bẫy đã gặp
 
