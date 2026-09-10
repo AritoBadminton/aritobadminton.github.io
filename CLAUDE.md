@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=8`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=9`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -151,6 +151,24 @@ khác**. Trùng số thì báo đỏ nhưng vẫn cho lưu, kèm nút "Đánh s�
 **Tab chỉ dành cho admin:** Thành viên và Sổ thu chi. `tab-nav.js` từ chối kích
 hoạt tab đang `display: none`, nên bấm thẳng vào tab ẩn cũng không mở được.
 Bảng "Giao dịch gần đây" ở Tổng quan cũng mang class `admin-only`.
+
+**Ghi chú ở Tổng quan** (`settings/club.notes[]`) chỉ hiện khi `settings/rules.items`
+rỗng và người xem không phải admin (`renderRules` trong `dashboard-view.js`) —
+đây là bản dự phòng khi chưa ai nhập mức đóng vào `settings/rules`, và đúng là
+cảnh trang thật đang gặp. `formatNoteHtml` (`utils/format.js`) hỗ trợ `\n` để
+xuống dòng, `**...**` để in đậm, và **tự động tô đỏ mọi số tiền** dạng "N.NNNđ"
+— không cần đánh dấu riêng cho phần tiền. Chưa có màn hình admin nào để sửa
+`notes`; đổi nội dung ghi chú phải sửa thẳng trong Firebase Console.
+
+**Ô nhập khoản mới ở Sổ thu chi chỉ Thu mới có mặc định** (`DEFAULT_ENTRY_AMOUNT`,
+`DEFAULT_ENTRY_DESC`) — đó là khoản quỹ công ty lặp lại gần như y hệt mỗi tháng.
+Chi thì mỗi khoản khác nhau, điền sẵn số của Thu vào chỉ gây nhầm nên để trống;
+đổi qua lại giữa Thu/Chi ở `#new-type-toggle` sẽ tự căn lại theo đúng quy tắc này.
+
+**Danh mục Thu có hai lựa chọn:** "Tiền quỹ công ty hàng tháng" và "Tiền được
+tài trợ cho CLB" — khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng
+thu bình thường, chỉ khác là **không** được `getCompanyFundTotal` xem là tiền
+công ty cấp hàng tháng (chỉ lọc đúng danh mục quỹ công ty).
 
 ## Cạm bẫy đã gặp
 
