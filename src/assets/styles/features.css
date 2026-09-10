@@ -158,6 +158,12 @@ body:not(.is-admin) .admin-only {
   color: var(--text-3);
 }
 
+/* Số tiền nhắc tới trong ghi chú (vd. mức phạt) — nổi bật để không bị đọc lướt qua. */
+.note-amount {
+  font-weight: 700;
+  color: var(--crit);
+}
+
 /* Chế độ admin: xếp dọc để mỗi ô nhập đủ bề ngang, không cắt chữ. */
 .rule-item--editable {
   position: relative;
