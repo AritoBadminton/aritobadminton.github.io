@@ -135,7 +135,7 @@ function renderRules() {
   }
 
   const footer = rules?.footer
-    ? `<div class="rules-panel__footer">${CHAT_ICON}<div><b>Lưu ý:</b> ${escapeHtml(rules.footer)}</div></div>`
+    ? `<div class="rules-panel__footer">${CHAT_ICON}<div><b>Lưu ý:</b> ${formatNoteHtml(rules.footer)}</div></div>`
     : '';
 
   qs('#rules-panel').innerHTML = `
