@@ -17,6 +17,7 @@ import {
   discardAllLedgerChanges,
   getAllExpenses,
   getAllIncomes,
+  getFundBalance,
   hasEditsIn,
   isDuesEntry,
   removeAddedTransaction,
@@ -576,6 +577,12 @@ export function renderLedger() {
   const expense = scoped.filter((row) => row.type === 'chi').reduce((sum, row) => sum + row.amount, 0);
   const net = income - expense;
   qs('#ledger-income-note').textContent = dues ? `Gồm ${formatCurrency(dues)} tiền đóng quỹ` : '';
+
+  // Số dư quỹ thật của cả câu lạc bộ — cố ý KHÔNG theo bộ lọc, để admin lọc
+  // xem từng tháng mà vẫn có một mốc số dư chung, khớp với ô ở Tổng quan.
+  const balance = getFundBalance();
+  qs('#ledger-balance').textContent = formatCurrency(balance);
+  qs('#ledger-balance').classList.toggle('stat-tile__value--negative', balance < 0);
 
   qs('#ledger-income').textContent = formatCurrency(income);
   qs('#ledger-income').style.color = 'var(--good)';
