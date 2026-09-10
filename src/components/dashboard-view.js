@@ -216,10 +216,7 @@ export function renderDashboard() {
   const lastMonth = store.months[store.months.length - 1];
   qs('#kpi-members').textContent = String(lastMonth?.members.length ?? 0);
 
-  qs('#app-subtitle').textContent = firstDate
-    ? `Từ ${formatDateLabel(firstDate)} đến ${formatDateLabel(lastDate)}`
-    : 'Chưa có giao dịch nào';
-  qs('#footer-updated').textContent = lastDate ? `Cập nhật lần cuối: ${formatDateLabel(lastDate)}` : '';
+  
 
   const recent = [...store.transactions]
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
