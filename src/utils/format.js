@@ -72,14 +72,15 @@ export function getCategoryColor(category) {
 
 /**
  * Định dạng một dòng ghi chú thành HTML: xuống dòng, chữ đậm `**...**`, và tô
- * đỏ số tiền — để chủ trang gõ ghi chú trong Firestore mà vẫn trình bày đẹp
- * ngay, khỏi cần thêm màn hình soạn thảo riêng cho ghi chú.
+ * đỏ số tiền (nhận cả "30.000đ" lẫn cách viết tắt "30k") — để chủ trang gõ ghi
+ * chú trong Firestore mà vẫn trình bày đẹp ngay, khỏi cần thêm màn hình soạn
+ * thảo riêng cho ghi chú.
  * @param {string} text
  * @returns {string} HTML đã thoát ký tự đặc biệt, an toàn để chèn thẳng
  */
 export function formatNoteHtml(text) {
   return escapeHtml(text)
-    .replace(/\d[\d.,]*\s?đ/g, (amount) => `<span class="note-amount">${amount}</span>`)
+    .replace(/\d[\d.,]*\s?(?:đ|k)(?![\p{L}])/gu, (amount) => `<span class="note-amount">${amount}</span>`)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>');
 }
