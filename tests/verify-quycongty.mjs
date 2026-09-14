@@ -156,7 +156,7 @@ check(
   '1 người không chơi tháng này',
 );
 
-/* ---------- 4. Chỉ admin thấy ô, không còn công tắc bật/tắt ---------- */
+/* ---------- 4. Cả admin lẫn khách đều thấy ô, không còn công tắc bật/tắt ---------- */
 
 check('không còn công tắc hiển thị', await page.isVisible('#month-company-switch'), false);
 check('admin luôn thấy ô', await page.isVisible('#month-company-tile'), true);
@@ -164,7 +164,7 @@ check('admin luôn thấy ô', await page.isVisible('#month-company-tile'), true
 const khach = await moTrang();
 await khach.click('[data-panel="months"]');
 await khach.waitForTimeout(900);
-check('khách không thấy ô', await khach.isVisible('#month-company-tile'), false);
+check('khách cũng thấy ô như admin', await khach.isVisible('#month-company-tile'), true);
 check('khách không thấy công tắc', await khach.isVisible('#month-company-switch'), false);
 await khach.close();
 
