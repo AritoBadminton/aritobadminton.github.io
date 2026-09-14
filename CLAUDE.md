@@ -140,9 +140,11 @@ mục đầu tiên và bấm Lưu là đổi danh mục dòng đó lúc nào kh�
 
 **Ô "Tiền quỹ công ty cấp"** ở tab Đóng quỹ đọc ngược từ sổ thu chi
 (`getCompanyFundTotal(monthKey)`), vì bảng đóng quỹ chỉ ghi phần thành viên đóng.
-**Chỉ admin thấy ô này**; người xem thường không bao giờ thấy. Trước đây có công
-tắc `settings/club.showCompanyFund` cho phép admin bật hiển thị cho người xem
-thường, nhưng đã bỏ theo yêu cầu chủ trang (09/2026) — đừng thêm lại.
+Từng chỉ admin thấy ô này, có công tắc `settings/club.showCompanyFund` cho admin
+bật hiển thị cho người xem thường rồi bị bỏ (09/2026). Sau đó chủ trang lại yêu
+cầu cho người xem thường thấy hẳn (09/2026), nên **giờ ai cũng thấy ô này, không
+còn phân biệt admin hay không** — không dùng công tắc, `renderCompanyFund`
+(`months-view.js`) hiện luôn hiện ô này.
 
 **Số thứ tự thành viên (STT)** đặt ở mục "Tất cả" là số dùng chung cho mọi bộ
 lọc. Người bị lọc ra vẫn giữ số của mình và **số đó không được nhảy sang người

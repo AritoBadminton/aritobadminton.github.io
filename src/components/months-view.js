@@ -248,10 +248,11 @@ export function renderMonthPicker() {
 /**
  * Ô "Tiền quỹ công ty cấp" của tháng đang xem.
  *
- * Đây là con số nội bộ, chỉ admin xem được; người xem thường không thấy.
+ * Trước đây chỉ admin xem được; theo yêu cầu chủ trang (09/2026) người xem
+ * thường giờ cũng thấy như admin.
  */
 function renderCompanyFund(monthKey) {
-  setVisible(qs('#month-company-tile'), store.isAdmin, '');
+  setVisible(qs('#month-company-tile'), true, '');
   qs('#month-company-fund').textContent = formatCurrency(getCompanyFundTotal(monthKey));
 }
 
