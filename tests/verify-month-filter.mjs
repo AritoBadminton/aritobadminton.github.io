@@ -108,7 +108,11 @@ check(
 
 await page.fill('#month-keyword', '');
 await page.waitForTimeout(200);
-check('xoá bộ lọc: đủ ba người trở lại', await rowNames(), ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Văn Cường']);
+check('xoá bộ lọc: đủ ba người trở lại', await rowNames(), [
+  'Nguyễn Văn An',
+  'Trần Thị Bình',
+  'Lê Văn Cường',
+]);
 
 check('không có lỗi javascript', errors, []);
 
