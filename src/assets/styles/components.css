@@ -520,6 +520,7 @@ td.cell-name {
 }
 
 .modal__box input[type='text'],
+.modal__box input[type='email'],
 .modal__box input[type='password'] {
   width: 100%;
   margin-top: 5px;
