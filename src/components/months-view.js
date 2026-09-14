@@ -289,6 +289,11 @@ export function renderMonths() {
     (store.isAdmin ? ' · chọn ở cột Trạng thái để đánh dấu' : '');
   qs('#month-note-hint').textContent = store.isAdmin ? '(sửa được)' : '';
 
+  // Từ khoá chỉ lọc danh sách hiển thị, các ô tổng hợp phía trên vẫn tính trên
+  // toàn bộ thành viên của tháng — lọc tên không phải lọc số liệu.
+  const keyword = qs('#month-keyword').value.trim().toLowerCase();
+  const shownRows = keyword ? rows.filter((row) => row.name.toLowerCase().includes(keyword)) : rows;
+
   /* Thanh báo tháng tự sinh / đã bổ sung */
   const addedCount = rows.filter((row) => row.isNewRow).length;
   setVisible(qs('#month-auto-bar'), isVirtual || Boolean(store.duesFilledMonths[monthKey]), 'flex');
@@ -324,17 +329,18 @@ export function renderMonths() {
   setVisible(qs('#month-delete'), store.isAdmin && isFirebaseMode() && !isVirtual, 'inline-block');
 
   /* Bảng danh sách đóng quỹ */
-  qs('#dues-table').innerHTML = rows
-    .map((row, index) => {
-      const isPaid = row.status === DUES_STATUS.PAID;
-      const isSkipped = row.status === DUES_STATUS.SKIPPED;
-      const statusOptions = Object.values(DUES_STATUS)
-        .map(
-          (value) =>
-            `<option value="${value}" ${value === row.status ? 'selected' : ''}>${DUES_STATUS_LABELS[value]}</option>`,
-        )
-        .join('');
-      return `<tr class="${row.isEdited ? 'row--edited' : ''} ${row.isNewRow ? 'row--added' : ''}">
+  qs('#dues-table').innerHTML = shownRows.length
+    ? shownRows
+        .map((row, index) => {
+          const isPaid = row.status === DUES_STATUS.PAID;
+          const isSkipped = row.status === DUES_STATUS.SKIPPED;
+          const statusOptions = Object.values(DUES_STATUS)
+            .map(
+              (value) =>
+                `<option value="${value}" ${value === row.status ? 'selected' : ''}>${DUES_STATUS_LABELS[value]}</option>`,
+            )
+            .join('');
+          return `<tr class="${row.isEdited ? 'row--edited' : ''} ${row.isNewRow ? 'row--added' : ''}">
         <td class="cell-num" style="color:var(--text-3)">${index + 1}</td>
         <td class="cell-name">${escapeHtml(row.name)}</td>
         <td class="cell-num">
@@ -357,8 +363,9 @@ export function renderMonths() {
             data-name="${escapeHtml(row.name)}" aria-label="Ghi chú cho ${escapeHtml(row.name)}">
         </td>
       </tr>`;
-    })
-    .join('');
+        })
+        .join('')
+    : '<tr><td colspan="5" class="table-empty text-muted">Không có ai khớp từ khoá tìm kiếm</td></tr>';
 
   qsa('#dues-table .status-select').forEach((select) => {
     select.addEventListener('change', () => handleSetStatus(monthKey, select.dataset.name, select.value));
@@ -423,6 +430,7 @@ export function renderMonths() {
 
 /** Gắn sự kiện cho trang Đóng quỹ theo tháng. */
 export function initMonthsView() {
+  qs('#month-keyword').addEventListener('input', renderMonths);
   qs('#month-picker').addEventListener('change', handleMonthPickerChange);
   qs('#month-fill').addEventListener('click', handleFillMonth);
   qs('#month-create').addEventListener('click', handleCreateMonth);
