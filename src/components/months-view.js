@@ -288,7 +288,6 @@ export function renderMonths() {
   qs('#month-subtitle').textContent =
     `${formatMonthLabel(monthKey)} · ${rows.length} thành viên` +
     (store.isAdmin ? ' · chọn ở cột Trạng thái để đánh dấu' : '');
-  qs('#month-note-hint').textContent = store.isAdmin ? '(sửa được)' : '';
 
   // Từ khoá chỉ lọc danh sách hiển thị, các ô tổng hợp phía trên vẫn tính trên
   // toàn bộ thành viên của tháng — lọc tên không phải lọc số liệu.
