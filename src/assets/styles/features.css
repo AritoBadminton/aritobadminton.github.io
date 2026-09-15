@@ -462,7 +462,7 @@ body:not(.is-admin) .admin-only {
   padding: 5px 6px;
   font-family: inherit;
   font-size: 13.5px;
-  text-align: right;
+  text-align: center;
   color: var(--text-3);
   background: transparent;
   border: 1px solid transparent;
