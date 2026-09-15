@@ -1,6 +1,6 @@
 /** Trang Thành viên: thống kê đóng góp và phân loại đang / ngừng hoạt động. */
 
-import { MEMBER_PAGE_SIZE } from '../config/constants.js';
+import { DUES_STATUS, DUES_STATUS_LABELS, MEMBER_PAGE_SIZE } from '../config/constants.js';
 import { compareByOrder } from '../services/dues-service.js';
 import {
   addMember,
@@ -55,6 +55,19 @@ function getRateColor(rate) {
   if (rate >= 0.8) return 'var(--good)';
   if (rate >= 0.5) return 'var(--warn)';
   return 'var(--crit)';
+}
+
+/**
+ * Trạng thái đóng quỹ tháng gần nhất, dùng chung nhãn với tab Đóng quỹ theo
+ * tháng (Đã đóng / Chưa đóng / Không chơi) cho nhất quán chữ hoa/thường.
+ */
+function getLastMonthStatus(member) {
+  const status = member.lastSkipped
+    ? DUES_STATUS.SKIPPED
+    : member.lastPaid > 0
+      ? DUES_STATUS.PAID
+      : DUES_STATUS.UNPAID;
+  return { className: `pill--${status}`, label: DUES_STATUS_LABELS[status] };
 }
 
 /** Đổi trạng thái hoạt động của một thành viên. */
@@ -370,6 +383,7 @@ export function renderMembers() {
           const rate = getPaidRate(member);
           const isActive = Boolean(store.activeMembers[member.name]);
           const clash = clashes[member.name];
+          const lastStatus = getLastMonthStatus(member);
           const orderLabel = clash
             ? `Số ${store.memberOrder[member.name]} đang trùng với ${clash.join(', ')}`
             : `Số thứ tự của ${member.name}`;
@@ -400,7 +414,7 @@ export function renderMembers() {
         <td>${
           member.lastMonth
             ? `${formatMonthLabel(member.lastMonth)}
-          ${member.lastPaid > 0 ? '<span class="pill pill--paid">đã đóng</span>' : '<span class="pill pill--unpaid">chưa</span>'}`
+          <span class="pill ${lastStatus.className}">${lastStatus.label}</span>`
             : '<span class="text-muted">Chưa có tháng nào</span>'
         }</td>
         <td class="cell-delete">${

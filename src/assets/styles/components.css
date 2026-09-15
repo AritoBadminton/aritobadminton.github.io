@@ -394,6 +394,13 @@ td.cell-name {
   background: color-mix(in srgb, var(--crit) 12%, transparent);
 }
 
+/* Màu vàng cố định #a06b00 vì var(--warn) một mình quá nhạt trên nền sáng;
+   chế độ tối đổi lại màu sáng hơn ở features.css (cùng cách với .status-select--skipped). */
+.pill--skipped {
+  color: #a06b00;
+  background: color-mix(in srgb, var(--warn) 26%, transparent);
+}
+
 .pill--new {
   color: var(--series-1);
   background: color-mix(in srgb, var(--series-1) 14%, transparent);

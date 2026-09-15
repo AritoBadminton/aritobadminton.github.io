@@ -440,13 +440,15 @@ body:not(.is-admin) .admin-only {
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .status-select--skipped {
+  :root:not([data-theme='light']) .status-select--skipped,
+  :root:not([data-theme='light']) .pill--skipped {
     color: var(--warn);
     background: color-mix(in srgb, var(--warn) 18%, transparent);
   }
 }
 
-:root[data-theme='dark'] .status-select--skipped {
+:root[data-theme='dark'] .status-select--skipped,
+:root[data-theme='dark'] .pill--skipped {
   color: var(--warn);
   background: color-mix(in srgb, var(--warn) 18%, transparent);
 }
