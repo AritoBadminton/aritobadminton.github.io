@@ -45,9 +45,6 @@ export const store = {
   /** Sửa đổi lên giao dịch vốn có: { "chi#12": { amount: 250000 } }. */
   editedTransactions: {},
 
-  /** Id các dòng đang được tick chọn ở sổ thu chi. */
-  selectedTransactionIds: new Set(),
-
   /** Quy định đóng quỹ do admin sửa tại chỗ; null nghĩa là dùng nguyên data.json. */
   ruleItemsOverride: null,
 

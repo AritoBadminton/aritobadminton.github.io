@@ -4,7 +4,6 @@ import {
   CATEGORIES,
   DEFAULT_ENTRY_AMOUNT,
   DEFAULT_ENTRY_DESC,
-  KEEP_UNCHANGED,
   MEMBER_DUES_CATEGORY,
   MONTH_OPTION_LIMIT,
   MONTH_OPTION_MORE,
@@ -12,12 +11,11 @@ import {
 import { getDuesTotal } from '../services/dues-service.js';
 import {
   addTransaction,
-  copyTransactions,
   countPendingLedgerChanges,
   discardAllLedgerChanges,
   getAllExpenses,
   getAllIncomes,
-  getFundBalance,
+  getFundBalanceUpTo,
   hasEditsIn,
   isDuesEntry,
   removeAddedTransaction,
@@ -54,9 +52,13 @@ let filterType = 'all';
 /** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
 const DELETE_CONFIRM_MS = 4000;
 
-/** Chờ bản sao hiện ra trong dữ liệu chung: tối đa 20 lần, mỗi lần 150ms. */
-const COPY_WAIT_TRIES = 20;
-const COPY_WAIT_MS = 150;
+/** Nhãn mặc định của nút mở form thêm mới — khớp với chữ tĩnh trong index.html. */
+const ADD_TOGGLE_LABEL = '+ Thêm giao dịch';
+
+/** Biểu tượng cây bút cho nút "Cập nhật" ở mỗi dòng. */
+const EDIT_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>`;
+/** Biểu tượng hai ô chồng nhau cho nút "Sao chép" ở mỗi dòng. */
+const COPY_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h8" /></svg>`;
 
 /** Dòng đang chờ xác nhận xoá, và hẹn giờ tự huỷ xác nhận đó. */
 let pendingDeleteId = '';
@@ -67,46 +69,17 @@ let selectedMonthFilter = '';
 let sortField = 'date';
 let sortDirection = -1;
 let newEntryType = 'chi';
-let visibleRowIds = [];
 
-/** Đang chạy một lượt sao chép, chặn bấm chồng lên nhau. */
-let isCopying = false;
+/** Id dòng đang mở trong form cập nhật, rỗng khi form đang đóng hoặc đang ở chế độ sao chép. */
+let editingId = '';
 
-/* ---------- Hàm bổ trợ ---------- */
-
-/** Các dòng đang được tick chọn. */
-function getSelectedRows() {
-  return store.transactions.filter((item) => store.selectedTransactionIds.has(item.id));
-}
-
-/** Cập nhật nhãn và trạng thái hai nút làm việc theo dòng đang tick chọn. */
-function syncSelectionButtons() {
-  const count = store.selectedTransactionIds.size;
-
-  const updateButton = qs('#ledger-update');
-  updateButton.disabled = !store.isAdmin || count === 0;
-  updateButton.style.opacity = updateButton.disabled ? '0.45' : '1';
-  updateButton.textContent = count ? `Cập nhật (${count})` : 'Cập nhật';
-  updateButton.title = !store.isAdmin
-    ? 'Đăng nhập để chỉnh sửa'
-    : count === 0
-      ? 'Tick chọn dòng cần sửa ở bảng bên dưới'
-      : `Sửa ${count} dòng đang chọn`;
-
-  // Nút sao chép chỉ có biểu tượng nên mọi lời giải thích nằm ở title/aria-label.
-  const copyButton = qs('#ledger-copy');
-  copyButton.disabled = updateButton.disabled || isCopying;
-  copyButton.style.opacity = copyButton.disabled ? '0.45' : '1';
-  const copyLabel = !store.isAdmin
-    ? 'Đăng nhập để sao chép'
-    : isCopying
-      ? 'Đang sao chép…'
-      : count === 0
-        ? 'Sao chép: tick chọn dòng cần nhân bản ở bảng bên dưới'
-        : `Sao chép ${count} dòng đang chọn thành khoản mới`;
-  copyButton.title = copyLabel;
-  copyButton.setAttribute('aria-label', copyLabel);
-}
+/**
+ * Loại ('thu'/'chi') của dòng nguồn khi form đang mở ở chế độ sao chép, rỗng
+ * khi không sao chép. Khác `editingId`: bấm Lưu lúc này tạo dòng MỚI chứ không
+ * sửa dòng đã có — form chỉ mượn dữ liệu để điền sẵn, chưa đụng gì tới dữ liệu
+ * chung cho tới khi admin bấm Lưu.
+ */
+let copyType = '';
 
 /**
  * Các dòng khớp bộ lọc tháng, danh mục và từ khoá — chưa áp nút Thu/Chi.
@@ -205,8 +178,20 @@ function fillNewEntryCategories() {
     .join('');
 }
 
+/**
+ * Chọn danh mục thì gán luôn tên danh mục vào ô nội dung.
+ *
+ * Đa số khoản chi/thu trùng ngay tên danh mục ("Tiền nước", "Tiền quỹ công ty
+ * hàng tháng"…), gán sẵn đỡ phải gõ lại; ai cần nội dung khác cứ sửa đè lên.
+ */
+function handleNewCategoryChange() {
+  qs('#new-desc').value = qs('#new-category').value;
+}
+
 /** Đóng form cập nhật. */
 function closeUpdateForm() {
+  editingId = '';
+  copyType = '';
   setVisible(qs('#update-form'), false);
 }
 
@@ -217,7 +202,7 @@ function toggleNewEntryForm() {
   const isOpen = form.style.display !== 'none';
   setVisible(form, !isOpen);
   qs('#ledger-add-toggle').setAttribute('aria-expanded', String(!isOpen));
-  qs('#ledger-add-toggle').textContent = isOpen ? '+ Nhập khoản mới' : 'Đóng';
+  qs('#ledger-add-toggle').textContent = isOpen ? ADD_TOGGLE_LABEL : 'Đóng';
   if (isOpen) return;
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
   if (!qs('#new-amount').value) resetNewEntryFields();
@@ -249,90 +234,89 @@ function handleAddTransaction() {
 
 /* ---------- Form cập nhật ---------- */
 
-/** Mở form cập nhật, điền sẵn dữ liệu của các dòng đang chọn. */
-function openUpdateForm() {
-  const rows = getSelectedRows();
-  if (!rows.length) return;
+/**
+ * Mở form cập nhật cho đúng một dòng, điền sẵn dữ liệu của dòng đó.
+ * @param {string} id
+ */
+function openUpdateForm(id) {
+  const row = store.transactions.find((item) => item.id === id);
+  if (!row) return;
 
-  const isSingle = rows.length === 1;
-  const [firstRow] = rows;
+  editingId = id;
+  copyType = '';
 
+  fillUpdateForm(row, {
+    head: `Đang sửa: <b>${escapeHtml(row.desc)}</b> · ${formatDateLabel(row.date)} · ${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)}`,
+    showRevert: Boolean(row.edited),
+  });
+}
+
+/**
+ * Mở form với dữ liệu mượn từ một dòng có sẵn, nhưng bấm Lưu sẽ TẠO DÒNG MỚI
+ * chứ không sửa dòng nguồn — sao chép chỉ điền sẵn để đổi rồi lưu, không đụng
+ * gì tới dữ liệu chung cho tới lúc đó.
+ * @param {string} id
+ */
+function openCopyForm(id) {
+  const row = store.transactions.find((item) => item.id === id);
+  if (!row) return;
+
+  editingId = '';
+  copyType = row.type;
+
+  fillUpdateForm(row, {
+    head: `Đang sao chép: <b>${escapeHtml(row.desc)}</b> · ${formatDateLabel(row.date)} · ${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)}. Sửa rồi bấm "Lưu thay đổi" để tạo khoản mới.`,
+    showRevert: false,
+  });
+}
+
+/**
+ * Phần dựng giao diện dùng chung giữa mở form sửa và mở form sao chép: điền
+ * sẵn 4 ô từ dòng nguồn, chỉ khác nhau ở dòng đầu và có hiện nút Khôi phục hay
+ * không.
+ * @param {object} row
+ * @param {{head: string, showRevert: boolean}} options
+ */
+function fillUpdateForm(row, { head, showRevert }) {
   setVisible(qs('#new-entry-form'), false);
-  qs('#ledger-add-toggle').textContent = '+ Nhập khoản mới';
+  qs('#ledger-add-toggle').textContent = ADD_TOGGLE_LABEL;
   qs('#ledger-add-toggle').setAttribute('aria-expanded', 'false');
   setVisible(qs('#update-form'), true);
   qs('#update-message').textContent = '';
 
-  const types = [...new Set(rows.map((row) => row.type))];
-  const allowed = types.length === 1 ? CATEGORIES[types[0]] : [...CATEGORIES.chi, ...CATEGORIES.thu];
-  const categories = buildCategoryOptions(allowed, rows);
-  qs('#update-category').innerHTML =
-    (isSingle ? '' : `<option value="${KEEP_UNCHANGED}">— giữ nguyên —</option>`) +
-    categories.map((category) => `<option>${escapeHtml(category)}</option>`).join('');
+  const categories = buildCategoryOptions(CATEGORIES[row.type], [row]);
+  qs('#update-category').innerHTML = categories
+    .map((category) => `<option>${escapeHtml(category)}</option>`)
+    .join('');
 
-  if (isSingle) {
-    qs('#update-head').innerHTML =
-      `Đang sửa: <b>${escapeHtml(firstRow.desc)}</b> · ${formatDateLabel(firstRow.date)} · ` +
-      `${firstRow.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(firstRow.amount)}`;
-    qs('#update-date').value = firstRow.date;
-    qs('#update-amount').value = formatNumber(firstRow.amount);
-    qs('#update-amount').disabled = false;
-    qs('#update-desc').value = firstRow.desc;
-    qs('#update-desc').disabled = false;
-    qs('#update-category').value = firstRow.cat;
-    setVisible(qs('#update-revert'), Boolean(firstRow.edited), 'inline-block');
-    return;
-  }
-
-  qs('#update-head').innerHTML =
-    `Đang sửa <b>${rows.length} dòng</b> cùng lúc. Chỉ <b>Ngày</b> và <b>Danh mục</b> áp dụng cho tất cả — ` +
-    `để trống Ngày và chọn "giữ nguyên" ở Danh mục thì ô đó không đổi. ` +
-    `Số tiền và nội dung phải sửa từng dòng một.`;
-  qs('#update-date').value = '';
-  qs('#update-amount').value = '';
-  qs('#update-amount').disabled = true;
-  qs('#update-desc').value = '';
-  qs('#update-desc').disabled = true;
-  qs('#update-category').value = KEEP_UNCHANGED;
-  setVisible(
-    qs('#update-revert'),
-    rows.some((row) => row.edited),
-    'inline-block',
-  );
+  qs('#update-head').innerHTML = head;
+  qs('#update-date').value = row.date;
+  qs('#update-amount').value = formatNumber(row.amount);
+  qs('#update-desc').value = row.desc;
+  qs('#update-category').value = row.cat;
+  setVisible(qs('#update-revert'), showRevert, 'inline-block');
 }
 
-/** Lưu nội dung form cập nhật vào các dòng đang chọn. */
+/** Lưu nội dung form cập nhật: sửa dòng đang sửa, hoặc tạo dòng mới nếu đang sao chép. */
 function handleSaveUpdate() {
-  const rows = getSelectedRows();
-  if (!rows.length) return;
+  if (!editingId && !copyType) return;
 
   const date = qs('#update-date').value;
   const category = qs('#update-category').value;
+  const amount = parseAmount(qs('#update-amount').value);
+  const desc = qs('#update-desc').value.trim();
   const message = qs('#update-message');
 
-  if (rows.length === 1) {
-    const amount = parseAmount(qs('#update-amount').value);
-    const desc = qs('#update-desc').value.trim();
-    if (!date || !amount || !desc) {
-      message.textContent = 'Cần đủ ngày, số tiền và nội dung.';
-      message.style.color = 'var(--crit)';
-      return;
-    }
-    updateTransaction(rows[0].id, { date, amount, desc, cat: category });
-  } else {
-    const patch = {};
-    if (date) patch.date = date;
-    if (category !== KEEP_UNCHANGED) patch.cat = category;
-    if (!Object.keys(patch).length) {
-      message.textContent = 'Chưa chọn gì để đổi.';
-      message.style.color = 'var(--crit)';
-      return;
-    }
-    rows.forEach((row) => updateTransaction(row.id, patch));
+  if (!date || !amount || !desc) {
+    message.textContent = 'Cần đủ ngày, số tiền và nội dung.';
+    message.style.color = 'var(--crit)';
+    return;
   }
 
+  if (copyType) addTransaction(copyType, { date, amount, desc, cat: category });
+  else updateTransaction(editingId, { date, amount, desc, cat: category });
+
   closeUpdateForm();
-  store.selectedTransactionIds.clear();
   requestRender();
 }
 
@@ -359,68 +343,11 @@ function handleRowDelete(id) {
   requestRender();
 }
 
-/* ---------- Sao chép ---------- */
-
-/**
- * Chờ các bản sao xuất hiện trong danh sách chung.
- *
- * Ở chế độ Firebase, dòng mới chỉ về qua onSnapshot chứ không có ngay sau khi
- * ghi, nên phải đợi rồi mới mở được form sửa cho chúng.
- *
- * @param {string[]} ids
- * @returns {Promise<boolean>} đã thấy đủ hay hết lượt chờ
- */
-async function waitForRows(ids) {
-  for (let attempt = 0; attempt < COPY_WAIT_TRIES; attempt += 1) {
-    const available = new Set(store.transactions.map((item) => item.id));
-    if (ids.every((id) => available.has(id))) return true;
-    await new Promise((resolve) => setTimeout(resolve, COPY_WAIT_MS));
-  }
-  return false;
-}
-
-/** Nhân bản các dòng đang chọn rồi mở sẵn form để đổi ngày cho bản sao. */
-async function handleCopySelected() {
-  const rows = getSelectedRows();
-  if (!rows.length || isCopying) return;
-
-  isCopying = true;
-  syncSelectionButtons();
-
-  try {
-    const ids = await copyTransactions(rows);
-    const ready = await waitForRows(ids);
-
-    // Chuyển lựa chọn sang bản sao để mọi thao tác tiếp theo không đụng bản gốc.
-    store.selectedTransactionIds.clear();
-    ids.forEach((id) => store.selectedTransactionIds.add(id));
-    requestRender();
-
-    if (!ready) {
-      window.alert(`Đã tạo ${ids.length} bản sao. Chúng sẽ hiện trong bảng ngay khi dữ liệu chung về.`);
-      return;
-    }
-
-    openUpdateForm();
-    const message = qs('#update-message');
-    message.textContent =
-      ids.length === 1
-        ? 'Đã tạo bản sao — đổi ngày rồi bấm "Lưu thay đổi".'
-        : `Đã tạo ${ids.length} bản sao — đổi ngày rồi bấm "Lưu thay đổi".`;
-    message.style.color = 'var(--good)';
-  } catch (error) {
-    window.alert(`Không sao chép được: ${error?.message ?? error}`);
-  } finally {
-    isCopying = false;
-    syncSelectionButtons();
-  }
-}
-
-/** Trả các dòng đang chọn về đúng như trong data.json. */
+/** Trả dòng đang sửa về đúng như trong data.json. */
 function handleRevert() {
-  revertTransactions(getSelectedRows().map((row) => row.id));
+  if (!editingId) return;
+  revertTransactions([editingId]);
   closeUpdateForm();
-  store.selectedTransactionIds.clear();
   requestRender();
 }
 
@@ -578,9 +505,9 @@ export function renderLedger() {
   const net = income - expense;
   qs('#ledger-income-note').textContent = dues ? `Gồm ${formatCurrency(dues)} tiền đóng quỹ` : '';
 
-  // Số dư quỹ thật của cả câu lạc bộ — cố ý KHÔNG theo bộ lọc, để admin lọc
-  // xem từng tháng mà vẫn có một mốc số dư chung, khớp với ô ở Tổng quan.
-  const balance = getFundBalance();
+  // Số dư luỹ kế tính đến hết tháng đang lọc — khác ô "Số dư quỹ hiện tại" ở
+  // Tổng quan, vốn luôn là số dư mới nhất bất kể đang lọc gì ở đây.
+  const balance = getFundBalanceUpTo(qs('#filter-month').value);
   qs('#ledger-balance').textContent = formatCurrency(balance);
   qs('#ledger-balance').classList.toggle('stat-tile__value--negative', balance < 0);
 
@@ -594,12 +521,7 @@ export function renderLedger() {
   qs('#ledger-table').innerHTML = rows.length
     ? rows
         .map(
-          (row) => `<tr class="${store.selectedTransactionIds.has(row.id) ? 'row--selected' : ''}">
-        <td class="cell-select" style="text-align:center">
-          <input type="checkbox" class="checkbox-input js-row-select" data-id="${row.id}"
-            ${store.selectedTransactionIds.has(row.id) ? 'checked' : ''} ${store.isAdmin ? '' : 'disabled'}
-            aria-label="Chọn ${escapeHtml(row.desc)}">
-        </td>
+          (row) => `<tr>
         <td>${formatDateLabel(row.date)}</td>
         <td><span class="pill ${row.type === 'thu' ? 'pill--income' : 'pill--expense'}">${row.type === 'thu' ? 'Thu' : 'Chi'}</span></td>
         <td class="cell-name">${escapeHtml(row.desc)}
@@ -617,36 +539,34 @@ export function renderLedger() {
         <td class="cell-num" style="color:${row.type === 'thu' ? 'var(--good)' : 'var(--crit)'}">
           ${row.type === 'thu' ? '+' : '−'}${formatCurrency(row.amount)}
         </td>
-        <td>${
-          store.isAdmin && (row.isNew || isFirebaseMode())
-            ? `<button class="btn--delete js-row-delete${pendingDeleteId === row.id ? ' btn--delete-armed' : ''}"
+        <td class="admin-only" style="white-space:nowrap">
+          <button class="btn--row-action js-row-update" data-id="${row.id}" type="button"
+            title="Sửa khoản này" aria-label="Sửa khoản ${escapeHtml(row.desc)}">${EDIT_ICON}</button>
+          <button class="btn--row-action js-row-copy" data-id="${row.id}" type="button"
+            title="Sao chép thành khoản mới" aria-label="Sao chép khoản ${escapeHtml(row.desc)}">${COPY_ICON}</button>
+          ${
+            row.isNew || isFirebaseMode()
+              ? `<button class="btn--delete js-row-delete${pendingDeleteId === row.id ? ' btn--delete-armed' : ''}"
                 data-id="${row.id}" title="${row.isNew ? 'Xoá khoản vừa thêm' : 'Xoá khoản này khỏi dữ liệu chung'}"
                 aria-label="Xoá khoản ${escapeHtml(row.desc)}">${pendingDeleteId === row.id ? 'Xoá?' : '×'}</button>`
-            : ''
-        }</td>
+              : ''
+          }
+        </td>
       </tr>`,
         )
         .join('')
-    : '<tr><td colspan="7" class="table-empty text-muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
+    : '<tr><td colspan="6" class="table-empty text-muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
 
   qsa('#ledger-table .js-row-delete').forEach((button) => {
     button.addEventListener('click', () => handleRowDelete(button.dataset.id));
   });
-  qsa('#ledger-table .js-row-select').forEach((checkbox) => {
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) store.selectedTransactionIds.add(checkbox.dataset.id);
-      else store.selectedTransactionIds.delete(checkbox.dataset.id);
-      checkbox.closest('tr').classList.toggle('row--selected', checkbox.checked);
-      syncSelectionButtons();
-    });
+  qsa('#ledger-table .js-row-update').forEach((button) => {
+    button.addEventListener('click', () => openUpdateForm(button.dataset.id));
+  });
+  qsa('#ledger-table .js-row-copy').forEach((button) => {
+    button.addEventListener('click', () => openCopyForm(button.dataset.id));
   });
 
-  visibleRowIds = rows.map((row) => row.id);
-  const selectAll = qs('#ledger-select-all');
-  selectAll.checked = rows.length > 0 && rows.every((row) => store.selectedTransactionIds.has(row.id));
-  selectAll.disabled = !store.isAdmin || rows.length === 0;
-
-  syncSelectionButtons();
   qs('#ledger-count').textContent = `${rows.length} giao dịch`;
   renderPendingBar();
 }
@@ -682,15 +602,6 @@ export function initLedgerView() {
     });
   });
 
-  qs('#ledger-select-all').addEventListener('change', () => {
-    const shouldSelect = qs('#ledger-select-all').checked;
-    visibleRowIds.forEach((id) => {
-      if (shouldSelect) store.selectedTransactionIds.add(id);
-      else store.selectedTransactionIds.delete(id);
-    });
-    renderLedger();
-  });
-
   qsa('#new-type-toggle .segmented__item').forEach((button) => {
     button.addEventListener('click', () => {
       qsa('#new-type-toggle .segmented__item').forEach((item) => {
@@ -714,9 +625,8 @@ export function initLedgerView() {
   });
 
   qs('#ledger-add-toggle').addEventListener('click', toggleNewEntryForm);
+  qs('#new-category').addEventListener('change', handleNewCategoryChange);
   qs('#new-submit').addEventListener('click', handleAddTransaction);
-  qs('#ledger-update').addEventListener('click', openUpdateForm);
-  qs('#ledger-copy').addEventListener('click', handleCopySelected);
   qs('#update-save').addEventListener('click', handleSaveUpdate);
   qs('#update-cancel').addEventListener('click', closeUpdateForm);
   qs('#update-revert').addEventListener('click', handleRevert);

@@ -72,11 +72,9 @@ export async function login(username, password, remember) {
 /** Đóng phiên đăng nhập và xoá dấu vết đã lưu. */
 export function logout() {
   if (isFirebaseMode()) {
-    store.selectedTransactionIds.clear();
     return firebaseApi().firebaseLogout();
   }
   store.isAdmin = false;
-  store.selectedTransactionIds.clear();
   removeKey(STORAGE_KEYS.AUTH);
   clearApiSession();
 }

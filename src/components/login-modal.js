@@ -12,7 +12,6 @@ const MIN_PASSWORD_LENGTH = 6;
 
 /** Cập nhật giao diện theo trạng thái đăng nhập hiện tại. */
 export function applyAuthState() {
-  if (!store.isAdmin) store.selectedTransactionIds.clear();
   // Đăng nhập được nhưng chưa được cấp quyền là một trạng thái riêng: phải nói rõ
   // lý do và vẫn cho đăng xuất, nếu không người đó sẽ bị kẹt ở màn hình chỉ xem.
   const signedIn = store.isAdmin || Boolean(store.authEmail);

@@ -106,36 +106,42 @@ await page.selectOption('#filter-category', '');
 await page.click('#ledger-type-toggle [data-type="all"]');
 await page.waitForTimeout(400);
 
-/* ---------- 2. Nút Sao chép ---------- */
+/* ---------- 2. Nút Sao chép trên từng dòng ---------- */
 
-check('có nút sao chép', await page.isVisible('#ledger-copy'), true);
-check('nút chỉ có biểu tượng, không có chữ', (await page.textContent('#ledger-copy')).trim(), '');
-check('có svg bên trong', await page.$eval('#ledger-copy', (e) => Boolean(e.querySelector('svg'))), true);
-check('chưa chọn dòng nào → nút mờ', await page.isDisabled('#ledger-copy'), true);
-check(
-  'nhãn trợ năng nhắc tick chọn',
-  (await page.getAttribute('#ledger-copy', 'aria-label')).includes('tick chọn'),
-  true,
-);
-
-// Tick dòng "Thuê sân 2 tiếng" rồi sao chép.
+// Dòng "Thuê sân 2 tiếng" có nút sao chép riêng, đặt trước nút xoá.
 const rowIndex = await page.$$eval('#ledger-table tr', (els) =>
   els.findIndex((e) => e.textContent.includes('Thuê sân 2 tiếng')),
 );
-await page.click(`#ledger-table tr:nth-child(${rowIndex + 1}) .js-row-select`);
-await page.waitForTimeout(300);
-check('chọn 1 dòng → nút bật', await page.isDisabled('#ledger-copy'), false);
-check(
-  'nhãn nêu rõ số dòng',
-  (await page.getAttribute('#ledger-copy', 'aria-label')).includes('Sao chép 1 dòng'),
-  true,
-);
+const rowSelector = `#ledger-table tr:nth-child(${rowIndex + 1})`;
+const copyButtonSelector = `${rowSelector} .js-row-copy`;
+
+check('có nút sao chép trên dòng', await page.isVisible(copyButtonSelector), true);
+check('nút chỉ có biểu tượng, không có chữ', (await page.textContent(copyButtonSelector)).trim(), '');
+check('có svg bên trong', await page.$eval(copyButtonSelector, (e) => Boolean(e.querySelector('svg'))), true);
 
 const before = await rowCount();
-await page.click('#ledger-copy');
-await page.waitForTimeout(1800);
+await page.click(copyButtonSelector);
+await page.waitForTimeout(500);
 
-check('bảng thêm đúng 1 dòng', await rowCount(), before + 1);
+// Bấm sao chép chỉ mở form điền sẵn — chưa ghi gì, bảng chưa đổi.
+check('bấm sao chép chưa tạo dòng nào', await rowCount(), before);
+check('form sửa mở sẵn', await page.isVisible('#update-form'), true);
+check(
+  'form nhắc sẽ tạo khoản mới khi lưu',
+  (await page.textContent('#update-head')).includes('Lưu thay đổi'),
+  true,
+);
+check('điền sẵn ngày theo dòng gốc', await page.inputValue('#update-date'), '2026-08-14');
+check('điền sẵn số tiền theo dòng gốc', await page.inputValue('#update-amount'), '200.000');
+check('điền sẵn nội dung theo dòng gốc', await page.inputValue('#update-desc'), 'Thuê sân 2 tiếng');
+check('không hiện nút Khôi phục bản gốc khi đang sao chép', await page.isVisible('#update-revert'), false);
+
+// Đổi ngày rồi bấm Lưu mới thật sự tạo dòng mới — dòng gốc không đụng tới.
+await page.fill('#update-date', '2026-08-27');
+await page.click('#update-save');
+await page.waitForTimeout(1500);
+
+check('lưu xong bảng mới thêm đúng 1 dòng', await rowCount(), before + 1);
 const copies = await page.$$eval('#ledger-table tr', (els) =>
   els
     .filter((e) => e.textContent.includes('Thuê sân 2 tiếng'))
@@ -143,40 +149,19 @@ const copies = await page.$$eval('#ledger-table tr', (els) =>
 );
 check('có 2 dòng Thuê sân 2 tiếng', copies.length, 2);
 check(
-  'bản sao giữ nguyên số tiền',
+  'cả hai dòng đều giữ nguyên số tiền',
   copies.every((t) => t.includes('200.000')),
-  true,
-);
-check(
-  'bản sao giữ nguyên ngày',
-  copies.every((t) => t.includes('14/08/2026')),
   true,
 );
 check('tổng chi tăng đúng 200.000', (await tiles()).chi, '460.000 đ');
 
-check('form sửa mở sẵn', await page.isVisible('#update-form'), true);
-check('form nhắc đổi ngày', (await page.textContent('#update-message')).includes('đổi ngày'), true);
-check('nút Cập nhật trỏ vào 1 dòng', (await page.textContent('#ledger-update')).trim(), 'Cập nhật (1)');
-
-// Bản sao phải là dòng đang chọn, không phải bản gốc: sửa ngày chỉ đổi bản sao.
-await page.fill('#update-date', '2026-08-27');
-await page.click('#update-save');
-await page.waitForTimeout(1500);
 const dates = await page.$$eval('#ledger-table tr', (els) =>
   els
     .filter((e) => e.textContent.includes('Thuê sân 2 tiếng'))
     .map((e) => e.textContent.match(/\d{2}\/\d{2}\/\d{4}/)[0])
     .sort(),
 );
-check('bản gốc giữ ngày, bản sao đổi ngày', dates, ['14/08/2026', '27/08/2026']);
-
-// Sao chép nhiều dòng cùng lúc.
-await page.click('#ledger-select-all');
-await page.waitForTimeout(400);
-const totalBefore = await rowCount();
-await page.click('#ledger-copy');
-await page.waitForTimeout(2500);
-check('sao chép hàng loạt nhân đôi bảng', await rowCount(), totalBefore * 2);
+check('bản gốc giữ ngày, dòng mới lấy đúng ngày đã đổi', dates, ['14/08/2026', '27/08/2026']);
 
 check('không có lỗi javascript', errors, []);
 

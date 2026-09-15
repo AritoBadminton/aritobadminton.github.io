@@ -194,8 +194,8 @@ export function renderDashboard() {
   const duesTotal = getDuesTotal();
   const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + duesTotal;
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
-  // Dùng chung getFundBalance() với ô "Số dư quỹ" ở Sổ thu chi — một công thức
-  // duy nhất, hai ô không bao giờ lệch số nhau.
+  // Không giới hạn ngày — khác ô "Số dư quỹ của tháng" ở Sổ thu chi, vốn tính
+  // luỹ kế đến hết tháng đang lọc (xem getFundBalanceUpTo).
   const balance = getFundBalance();
   const monthCount = store.months.length;
 

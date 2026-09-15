@@ -25,10 +25,10 @@
       }
     </script>
 
-    <link rel="stylesheet" href="src/assets/styles/base.css?v=16" />
-    <link rel="stylesheet" href="src/assets/styles/layout.css?v=16" />
-    <link rel="stylesheet" href="src/assets/styles/components.css?v=16" />
-    <link rel="stylesheet" href="src/assets/styles/features.css?v=16" />
+    <link rel="stylesheet" href="src/assets/styles/base.css?v=18" />
+    <link rel="stylesheet" href="src/assets/styles/layout.css?v=18" />
+    <link rel="stylesheet" href="src/assets/styles/components.css?v=18" />
+    <link rel="stylesheet" href="src/assets/styles/features.css?v=18" />
   </head>
 
   <body>
@@ -228,31 +228,9 @@
 
       <!-- ==================== Sổ thu chi ==================== -->
       <section class="tab-panel" id="panel-ledger" role="tabpanel" aria-label="Sổ thu chi">
-        <div class="admin-only" style="margin-bottom: 16px">
-          <div class="card__header" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-bottom: 11px">
-            <div style="padding: 9px 14px; color: #000; background: #fff; border: 1px solid var(--border); border-radius: 9px">
-              <h3>Thêm giao dịch</h3>
-            </div>
-            <div id="ledger-quick-actions" style="display: flex; align-items: center; gap: 12px">
-              <button class="btn admin-only" id="ledger-add-toggle" aria-expanded="false" type="button">+ Nhập khoản mới</button>
-              <button class="btn btn--ghost admin-only" id="ledger-update" type="button" disabled>Cập nhật</button>
-              <button class="btn--icon admin-only" id="ledger-copy" type="button" disabled aria-label="Sao chép" title="Sao chép">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="17"
-                  height="17"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.9"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <rect x="9" y="9" width="11" height="11" rx="2" />
-                  <path d="M5 15V5a2 2 0 0 1 2-2h8" />
-                </svg>
-              </button>
-            </div>
+        <div class="card admin-only" style="margin-bottom: 16px">
+          <div class="card__header" style="padding-bottom: 11px">
+            <button class="btn admin-only" id="ledger-add-toggle" aria-expanded="false" type="button">+ Thêm giao dịch</button>
           </div>
 
           <div class="card__body" id="new-entry-form" style="display: none">
@@ -324,7 +302,7 @@
 
         <div class="grid grid--4" style="margin-bottom: 14px">
           <div class="card stat-tile">
-            <div class="stat-tile__label">Số dư quỹ hiện tại</div>
+            <div class="stat-tile__label">Số dư quỹ của tháng</div>
             <div class="stat-tile__value stat-tile__value--compact stat-tile__value--positive" id="ledger-balance">—</div>
           </div>
           <div class="card stat-tile">
@@ -346,21 +324,12 @@
           <table>
             <thead>
               <tr>
-                <th class="admin-only" style="width: 40px; text-align: center">
-                  <input
-                    type="checkbox"
-                    class="checkbox-input"
-                    id="ledger-select-all"
-                    title="Chọn tất cả đang hiện"
-                    aria-label="Chọn tất cả"
-                  />
-                </th>
                 <th data-sort="date" style="cursor: pointer">Ngày ⇅</th>
                 <th>Loại</th>
                 <th>Nội dung</th>
                 <th>Danh mục</th>
                 <th class="cell-num" data-sort="amount" style="cursor: pointer">Số tiền ⇅</th>
-                <th style="width: 44px"></th>
+                <th class="admin-only" style="width: 100px"></th>
               </tr>
             </thead>
             <tbody id="ledger-table"></tbody>

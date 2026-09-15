@@ -179,15 +179,16 @@ Bấm **Lưu chung lên GitHub** để lấy khối `"roster"` dán đè vào `d
 
 ## Sửa một khoản thu / chi đã có
 
-Tab **Sổ thu chi**, cần đăng nhập Admin:
+Tab **Sổ thu chi**, cần đăng nhập Admin. Mỗi dòng trong bảng có hai nút nhỏ trước nút xoá:
 
-1. Tick chọn dòng cần sửa ở cột đầu bảng (tick ô trên tiêu đề để chọn hết những dòng đang hiện theo bộ lọc)
-2. Bấm **Cập nhật** cạnh nút "+ Nhập khoản mới"
-3. **Chọn 1 dòng** → sửa được cả 4 ô: ngày, số tiền, nội dung, danh mục
-   **Chọn nhiều dòng** → chỉ đổi được **Ngày** và **Danh mục** cho cả nhóm (số tiền và nội dung phải sửa từng dòng)
-4. Bấm **Lưu thay đổi**
+1. Bấm nút **cây bút** (Cập nhật) ở dòng cần sửa → form hiện ra sẵn cả 4 ô: ngày, số tiền, nội dung, danh mục
+2. Sửa xong bấm **Lưu thay đổi**
 
-Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản gốc** trả dòng đang chọn về đúng như trong `data.json`.
+Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản gốc** trả dòng đang sửa về đúng như trong `data.json`.
+
+Bấm nút **sao chép** (cạnh nút cây bút) khi khoản mới gần giống một khoản đã có: form Cập nhật mở sẵn,
+điền sẵn cả 4 ô theo dòng gốc — sửa lại (thường chỉ cần đổi ngày) rồi bấm **Lưu thay đổi** mới thật sự
+tạo khoản mới. Bấm sao chép xong mà đóng form không lưu thì không có gì được ghi lại.
 
 > Khi có dòng cũ bị sửa, khối JSON xuất ra sẽ là **thay toàn bộ** danh sách `expenses` / `incomes`
 > chứ không phải dán thêm — vì không thể mô tả "sửa dòng thứ mấy" một cách an toàn.
@@ -212,7 +213,7 @@ tài liệu `settings/qr` của Firestore chứ không để trong `data.json`.
 
 ## Nhập khoản thu / chi mới
 
-Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:
+Vào tab **Sổ thu chi** → bấm **+ Thêm giao dịch**:
 
 1. Chọn **Khoản CHI** hoặc **Khoản THU**
 2. Điền ngày, số tiền, nội dung, chọn danh mục
