@@ -642,3 +642,16 @@ body.is-live .local-only {
 body:not(.is-live) .live-only {
   display: none !important;
 }
+
+/* Ba nút đầu Sổ thu chi định vị tuyệt đối để tách khỏi padding của tiêu đề
+   "Thêm giao dịch"; màn hẹp không đủ chỗ nên trả về dòng chảy bình thường,
+   nếu không sẽ đè lên tiêu đề và tràn ra ngoài card. !important vì phần tử
+   có sẵn style="position: absolute" ngay trong HTML — CSS ngoài không thắng
+   được style trực tiếp nếu thiếu !important. */
+@media (max-width: 560px) {
+  #ledger-quick-actions {
+    position: static !important;
+    flex-wrap: wrap;
+    padding: 10px 18px 16px;
+  }
+}
