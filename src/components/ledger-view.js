@@ -54,6 +54,9 @@ let filterType = 'all';
 /** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
 const DELETE_CONFIRM_MS = 4000;
 
+/** Nhãn mặc định của nút mở form thêm mới — khớp với chữ tĩnh trong index.html. */
+const ADD_TOGGLE_LABEL = '+ Thêm giao dịch';
+
 /** Chờ bản sao hiện ra trong dữ liệu chung: tối đa 20 lần, mỗi lần 150ms. */
 const COPY_WAIT_TRIES = 20;
 const COPY_WAIT_MS = 150;
@@ -217,7 +220,7 @@ function toggleNewEntryForm() {
   const isOpen = form.style.display !== 'none';
   setVisible(form, !isOpen);
   qs('#ledger-add-toggle').setAttribute('aria-expanded', String(!isOpen));
-  qs('#ledger-add-toggle').textContent = isOpen ? '+ Nhập khoản mới' : 'Đóng';
+  qs('#ledger-add-toggle').textContent = isOpen ? ADD_TOGGLE_LABEL : 'Đóng';
   if (isOpen) return;
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
   if (!qs('#new-amount').value) resetNewEntryFields();
@@ -258,7 +261,7 @@ function openUpdateForm() {
   const [firstRow] = rows;
 
   setVisible(qs('#new-entry-form'), false);
-  qs('#ledger-add-toggle').textContent = '+ Nhập khoản mới';
+  qs('#ledger-add-toggle').textContent = ADD_TOGGLE_LABEL;
   qs('#ledger-add-toggle').setAttribute('aria-expanded', 'false');
   setVisible(qs('#update-form'), true);
   qs('#update-message').textContent = '';

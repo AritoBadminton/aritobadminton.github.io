@@ -645,9 +645,8 @@ body:not(.is-live) .live-only {
   display: none !important;
 }
 
-/* Màn hẹp không đủ chỗ cho ba nút nằm một hàng cùng tiêu đề "Thêm giao dịch"
-   (đã tự xuống hàng nhờ flex-wrap của .card__header) — ba nút cũng cần tự
-   xuống dòng với nhau, không thì tràn ra ngoài card. */
+/* Màn hẹp không đủ chỗ cho ba nút "+ Thêm giao dịch"/Cập nhật/Sao chép nằm
+   chung một hàng, nên tự xuống dòng với nhau thay vì tràn ra ngoài card. */
 @media (max-width: 560px) {
   #ledger-quick-actions {
     flex-wrap: wrap;

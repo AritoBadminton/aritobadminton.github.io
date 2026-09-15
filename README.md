@@ -182,7 +182,7 @@ Bấm **Lưu chung lên GitHub** để lấy khối `"roster"` dán đè vào `d
 Tab **Sổ thu chi**, cần đăng nhập Admin:
 
 1. Tick chọn dòng cần sửa ở cột đầu bảng (tick ô trên tiêu đề để chọn hết những dòng đang hiện theo bộ lọc)
-2. Bấm **Cập nhật** cạnh nút "+ Nhập khoản mới"
+2. Bấm **Cập nhật** cạnh nút "+ Thêm giao dịch"
 3. **Chọn 1 dòng** → sửa được cả 4 ô: ngày, số tiền, nội dung, danh mục
    **Chọn nhiều dòng** → chỉ đổi được **Ngày** và **Danh mục** cho cả nhóm (số tiền và nội dung phải sửa từng dòng)
 4. Bấm **Lưu thay đổi**
@@ -212,7 +212,7 @@ tài liệu `settings/qr` của Firestore chứ không để trong `data.json`.
 
 ## Nhập khoản thu / chi mới
 
-Vào tab **Sổ thu chi** → bấm **+ Nhập khoản mới**:
+Vào tab **Sổ thu chi** → bấm **+ Thêm giao dịch**:
 
 1. Chọn **Khoản CHI** hoặc **Khoản THU**
 2. Điền ngày, số tiền, nội dung, chọn danh mục
