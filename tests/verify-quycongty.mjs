@@ -234,6 +234,23 @@ check(
   await page.$$eval('#new-category option', (els) => els.length),
   4,
 );
+
+/* ---------- 7. Chọn danh mục thì gán tên danh mục vào nội dung ---------- */
+
+await page.selectOption('#new-category', 'Tiền nước');
+await page.waitForTimeout(200);
+check('chọn danh mục Chi gán nội dung theo tên', await page.inputValue('#new-desc'), 'Tiền nước');
+
+await page.click('#new-type-toggle [data-type="thu"]');
+await page.waitForTimeout(300);
+await page.selectOption('#new-category', 'Tiền được tài trợ cho CLB');
+await page.waitForTimeout(200);
+check(
+  'chọn danh mục Thu cũng gán nội dung theo tên',
+  await page.inputValue('#new-desc'),
+  'Tiền được tài trợ cho CLB',
+);
+
 await page.click('#ledger-add-toggle');
 await page.waitForTimeout(300);
 

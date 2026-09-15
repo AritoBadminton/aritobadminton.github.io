@@ -11,7 +11,6 @@ import {
 import { getDuesTotal } from '../services/dues-service.js';
 import {
   addTransaction,
-  copyTransactions,
   countPendingLedgerChanges,
   discardAllLedgerChanges,
   getAllExpenses,
@@ -56,10 +55,6 @@ const DELETE_CONFIRM_MS = 4000;
 /** Nhãn mặc định của nút mở form thêm mới — khớp với chữ tĩnh trong index.html. */
 const ADD_TOGGLE_LABEL = '+ Thêm giao dịch';
 
-/** Chờ bản sao hiện ra trong dữ liệu chung: tối đa 20 lần, mỗi lần 150ms. */
-const COPY_WAIT_TRIES = 20;
-const COPY_WAIT_MS = 150;
-
 /** Biểu tượng cây bút cho nút "Cập nhật" ở mỗi dòng. */
 const EDIT_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>`;
 /** Biểu tượng hai ô chồng nhau cho nút "Sao chép" ở mỗi dòng. */
@@ -75,11 +70,16 @@ let sortField = 'date';
 let sortDirection = -1;
 let newEntryType = 'chi';
 
-/** Id dòng đang mở trong form cập nhật, rỗng khi form đang đóng. */
+/** Id dòng đang mở trong form cập nhật, rỗng khi form đang đóng hoặc đang ở chế độ sao chép. */
 let editingId = '';
 
-/** Đang chạy một lượt sao chép, chặn bấm chồng lên nhau. */
-let isCopying = false;
+/**
+ * Loại ('thu'/'chi') của dòng nguồn khi form đang mở ở chế độ sao chép, rỗng
+ * khi không sao chép. Khác `editingId`: bấm Lưu lúc này tạo dòng MỚI chứ không
+ * sửa dòng đã có — form chỉ mượn dữ liệu để điền sẵn, chưa đụng gì tới dữ liệu
+ * chung cho tới khi admin bấm Lưu.
+ */
+let copyType = '';
 
 /**
  * Các dòng khớp bộ lọc tháng, danh mục và từ khoá — chưa áp nút Thu/Chi.
@@ -178,9 +178,20 @@ function fillNewEntryCategories() {
     .join('');
 }
 
+/**
+ * Chọn danh mục thì gán luôn tên danh mục vào ô nội dung.
+ *
+ * Đa số khoản chi/thu trùng ngay tên danh mục ("Tiền nước", "Tiền quỹ công ty
+ * hàng tháng"…), gán sẵn đỡ phải gõ lại; ai cần nội dung khác cứ sửa đè lên.
+ */
+function handleNewCategoryChange() {
+  qs('#new-desc').value = qs('#new-category').value;
+}
+
 /** Đóng form cập nhật. */
 function closeUpdateForm() {
   editingId = '';
+  copyType = '';
   setVisible(qs('#update-form'), false);
 }
 
@@ -232,7 +243,41 @@ function openUpdateForm(id) {
   if (!row) return;
 
   editingId = id;
+  copyType = '';
 
+  fillUpdateForm(row, {
+    head: `Đang sửa: <b>${escapeHtml(row.desc)}</b> · ${formatDateLabel(row.date)} · ${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)}`,
+    showRevert: Boolean(row.edited),
+  });
+}
+
+/**
+ * Mở form với dữ liệu mượn từ một dòng có sẵn, nhưng bấm Lưu sẽ TẠO DÒNG MỚI
+ * chứ không sửa dòng nguồn — sao chép chỉ điền sẵn để đổi rồi lưu, không đụng
+ * gì tới dữ liệu chung cho tới lúc đó.
+ * @param {string} id
+ */
+function openCopyForm(id) {
+  const row = store.transactions.find((item) => item.id === id);
+  if (!row) return;
+
+  editingId = '';
+  copyType = row.type;
+
+  fillUpdateForm(row, {
+    head: `Đang sao chép: <b>${escapeHtml(row.desc)}</b> · ${formatDateLabel(row.date)} · ${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)}. Sửa rồi bấm "Lưu thay đổi" để tạo khoản mới.`,
+    showRevert: false,
+  });
+}
+
+/**
+ * Phần dựng giao diện dùng chung giữa mở form sửa và mở form sao chép: điền
+ * sẵn 4 ô từ dòng nguồn, chỉ khác nhau ở dòng đầu và có hiện nút Khôi phục hay
+ * không.
+ * @param {object} row
+ * @param {{head: string, showRevert: boolean}} options
+ */
+function fillUpdateForm(row, { head, showRevert }) {
   setVisible(qs('#new-entry-form'), false);
   qs('#ledger-add-toggle').textContent = ADD_TOGGLE_LABEL;
   qs('#ledger-add-toggle').setAttribute('aria-expanded', 'false');
@@ -244,19 +289,17 @@ function openUpdateForm(id) {
     .map((category) => `<option>${escapeHtml(category)}</option>`)
     .join('');
 
-  qs('#update-head').innerHTML =
-    `Đang sửa: <b>${escapeHtml(row.desc)}</b> · ${formatDateLabel(row.date)} · ` +
-    `${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)}`;
+  qs('#update-head').innerHTML = head;
   qs('#update-date').value = row.date;
   qs('#update-amount').value = formatNumber(row.amount);
   qs('#update-desc').value = row.desc;
   qs('#update-category').value = row.cat;
-  setVisible(qs('#update-revert'), Boolean(row.edited), 'inline-block');
+  setVisible(qs('#update-revert'), showRevert, 'inline-block');
 }
 
-/** Lưu nội dung form cập nhật vào dòng đang sửa. */
+/** Lưu nội dung form cập nhật: sửa dòng đang sửa, hoặc tạo dòng mới nếu đang sao chép. */
 function handleSaveUpdate() {
-  if (!editingId) return;
+  if (!editingId && !copyType) return;
 
   const date = qs('#update-date').value;
   const category = qs('#update-category').value;
@@ -270,7 +313,9 @@ function handleSaveUpdate() {
     return;
   }
 
-  updateTransaction(editingId, { date, amount, desc, cat: category });
+  if (copyType) addTransaction(copyType, { date, amount, desc, cat: category });
+  else updateTransaction(editingId, { date, amount, desc, cat: category });
+
   closeUpdateForm();
   requestRender();
 }
@@ -296,60 +341,6 @@ function handleRowDelete(id) {
   pendingDeleteId = '';
   removeAddedTransaction(id);
   requestRender();
-}
-
-/* ---------- Sao chép ---------- */
-
-/**
- * Chờ các bản sao xuất hiện trong danh sách chung.
- *
- * Ở chế độ Firebase, dòng mới chỉ về qua onSnapshot chứ không có ngay sau khi
- * ghi, nên phải đợi rồi mới mở được form sửa cho chúng.
- *
- * @param {string[]} ids
- * @returns {Promise<boolean>} đã thấy đủ hay hết lượt chờ
- */
-async function waitForRows(ids) {
-  for (let attempt = 0; attempt < COPY_WAIT_TRIES; attempt += 1) {
-    const available = new Set(store.transactions.map((item) => item.id));
-    if (ids.every((id) => available.has(id))) return true;
-    await new Promise((resolve) => setTimeout(resolve, COPY_WAIT_MS));
-  }
-  return false;
-}
-
-/**
- * Nhân bản một dòng rồi mở sẵn form để đổi ngày cho bản sao.
- * @param {string} id
- */
-async function handleCopyRow(id) {
-  if (isCopying) return;
-  const row = store.transactions.find((item) => item.id === id);
-  if (!row) return;
-
-  isCopying = true;
-  renderLedger();
-
-  try {
-    const [newId] = await copyTransactions([row]);
-    const ready = await waitForRows([newId]);
-    requestRender();
-
-    if (!ready) {
-      window.alert('Đã tạo bản sao. Nó sẽ hiện trong bảng ngay khi dữ liệu chung về.');
-      return;
-    }
-
-    openUpdateForm(newId);
-    const message = qs('#update-message');
-    message.textContent = 'Đã tạo bản sao — đổi ngày rồi bấm "Lưu thay đổi".';
-    message.style.color = 'var(--good)';
-  } catch (error) {
-    window.alert(`Không sao chép được: ${error?.message ?? error}`);
-  } finally {
-    isCopying = false;
-    renderLedger();
-  }
 }
 
 /** Trả dòng đang sửa về đúng như trong data.json. */
@@ -551,7 +542,7 @@ export function renderLedger() {
         <td class="admin-only" style="white-space:nowrap">
           <button class="btn--row-action js-row-update" data-id="${row.id}" type="button"
             title="Sửa khoản này" aria-label="Sửa khoản ${escapeHtml(row.desc)}">${EDIT_ICON}</button>
-          <button class="btn--row-action js-row-copy" data-id="${row.id}" type="button" ${isCopying ? 'disabled' : ''}
+          <button class="btn--row-action js-row-copy" data-id="${row.id}" type="button"
             title="Sao chép thành khoản mới" aria-label="Sao chép khoản ${escapeHtml(row.desc)}">${COPY_ICON}</button>
           ${
             row.isNew || isFirebaseMode()
@@ -573,7 +564,7 @@ export function renderLedger() {
     button.addEventListener('click', () => openUpdateForm(button.dataset.id));
   });
   qsa('#ledger-table .js-row-copy').forEach((button) => {
-    button.addEventListener('click', () => handleCopyRow(button.dataset.id));
+    button.addEventListener('click', () => openCopyForm(button.dataset.id));
   });
 
   qs('#ledger-count').textContent = `${rows.length} giao dịch`;
@@ -634,6 +625,7 @@ export function initLedgerView() {
   });
 
   qs('#ledger-add-toggle').addEventListener('click', toggleNewEntryForm);
+  qs('#new-category').addEventListener('change', handleNewCategoryChange);
   qs('#new-submit').addEventListener('click', handleAddTransaction);
   qs('#update-save').addEventListener('click', handleSaveUpdate);
   qs('#update-cancel').addEventListener('click', closeUpdateForm);

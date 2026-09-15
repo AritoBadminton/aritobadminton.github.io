@@ -167,24 +167,6 @@ export async function addTransaction(type, fields) {
 }
 
 /**
- * Nhân bản các giao dịch đang chọn thành khoản mới, giữ nguyên mọi thông tin.
- *
- * Ghi tuần tự chứ không song song: ở chế độ Firebase mỗi lần ghi còn cập nhật
- * ngày mới nhất của quỹ, chạy chồng lên nhau dễ ghi đè lẫn nhau.
- *
- * @param {object[]} rows các dòng cần nhân bản
- * @returns {Promise<string[]>} id của các bản sao, theo đúng thứ tự đã truyền vào
- */
-export async function copyTransactions(rows) {
-  const ids = [];
-  for (const row of rows) {
-    const fields = { date: row.date, amount: row.amount, desc: row.desc, cat: row.cat };
-    ids.push(await addTransaction(row.type, fields));
-  }
-  return ids;
-}
-
-/**
  * Xoá một giao dịch mới nhập (không áp dụng cho dòng vốn có trong data.json).
  * @param {string} id
  */

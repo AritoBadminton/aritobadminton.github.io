@@ -186,8 +186,9 @@ Tab **Sổ thu chi**, cần đăng nhập Admin. Mỗi dòng trong bảng có ha
 
 Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản gốc** trả dòng đang sửa về đúng như trong `data.json`.
 
-Bấm nút **sao chép** (cạnh nút cây bút) để nhân bản một dòng thành khoản mới — hữu ích khi khoản mới gần giống
-một khoản đã có. Form Cập nhật mở sẵn cho bản sao để đổi ngày rồi lưu.
+Bấm nút **sao chép** (cạnh nút cây bút) khi khoản mới gần giống một khoản đã có: form Cập nhật mở sẵn,
+điền sẵn cả 4 ô theo dòng gốc — sửa lại (thường chỉ cần đổi ngày) rồi bấm **Lưu thay đổi** mới thật sự
+tạo khoản mới. Bấm sao chép xong mà đóng form không lưu thì không có gì được ghi lại.
 
 > Khi có dòng cũ bị sửa, khối JSON xuất ra sẽ là **thay toàn bộ** danh sách `expenses` / `incomes`
 > chứ không phải dán thêm — vì không thể mô tả "sửa dòng thứ mấy" một cách an toàn.

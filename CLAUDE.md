@@ -192,6 +192,13 @@ giờ chỉ sửa được đúng một dòng, không còn nhánh sửa hàng lo
 Danh mục cho cả nhóm). `store.selectedTransactionIds`, `KEEP_UNCHANGED` và cột
 tick chọn (`cell-select`) đã xoá khỏi mã nguồn — **đừng thêm lại**.
 
+**Nút Sao chép không tạo dòng ngay khi bấm.** Bấm chỉ mở form Cập nhật, điền sẵn
+dữ liệu mượn từ dòng nguồn (`openCopyForm`) — chưa ghi gì vào dữ liệu chung. Dòng
+mới chỉ thật sự được tạo (`addTransaction`) khi admin sửa xong và bấm "Lưu thay
+đổi" (`handleSaveUpdate`, rẽ nhánh theo biến trạng thái `copyType` thay vì
+`editingId`). Hàm `copyTransactions` (từng nhân bản và ghi ngay) đã xoá khỏi
+`ledger-service.js` — đừng thêm lại kiểu ghi-trước-sửa-sau đó.
+
 **Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
 cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"
 ở Tổng quan. Chủ trang đổi ý: ô này đổi tên thành "Số dư quỹ của tháng" và tính
@@ -213,8 +220,6 @@ hiển thị "Cập nhật lần cuối" ở footer, "Cập nhật ..." dưới 
 
 - `addMemberToOpenMonths` chỉ đụng các tháng **từ tháng hiện tại trở đi**. Fixture
   test dùng tháng quá khứ sẽ hỏng vì lý do này, không phải lỗi code.
-- `copyTransactions` ghi **tuần tự**, không song song: ở chế độ Firebase mỗi lần
-  ghi còn cập nhật `settings/club.updated`, chạy chồng lên nhau dễ ghi đè nhau.
 - Trong test, mỗi `browser.newPage()` là một context riêng nên **localStorage
   không dùng chung**; trang khách phải được gieo dữ liệu của chính nó.
 - Flex item có `min-width: auto` bằng bề rộng nội tại của `<input>`; muốn ô nhập
