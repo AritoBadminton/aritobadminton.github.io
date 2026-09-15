@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=17`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=18`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -182,6 +182,24 @@ Chi thì mỗi khoản khác nhau, điền sẵn số của Thu vào chỉ gây 
 tài trợ cho CLB" — khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng
 thu bình thường, chỉ khác là **không** được `getCompanyFundTotal` xem là tiền
 công ty cấp hàng tháng (chỉ lọc đúng danh mục quỹ công ty).
+
+**Sổ thu chi không còn chọn nhiều dòng cùng lúc (09/2026).** Trước đây mỗi dòng
+có ô tick, một nút "Cập nhật" và một nút "Sao chép" dùng chung ở đầu bảng thao
+tác trên các dòng đang chọn. Chủ trang yêu cầu bỏ hẳn cơ chế chọn nhiều dòng: giờ
+mỗi dòng có sẵn hai nút riêng — Cập nhật (bút chì) và Sao chép — đặt trước nút xoá
+(`renderLedger` trong `ledger-view.js`, class `.btn--row-action`). Form cập nhật
+giờ chỉ sửa được đúng một dòng, không còn nhánh sửa hàng loạt (giữ nguyên Ngày/
+Danh mục cho cả nhóm). `store.selectedTransactionIds`, `KEEP_UNCHANGED` và cột
+tick chọn (`cell-select`) đã xoá khỏi mã nguồn — **đừng thêm lại**.
+
+**Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
+cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"
+ở Tổng quan. Chủ trang đổi ý: ô này đổi tên thành "Số dư quỹ của tháng" và tính
+số dư **luỹ kế đến hết tháng đang xem** qua `getFundBalanceUpTo(monthKey)`
+(`ledger-service.js`) — không chọn tháng (hoặc chọn "Tất cả các tháng") thì ra
+đúng số dư hiện tại, khớp `getFundBalance()`. Ô "Số dư quỹ hiện tại" ở Tổng quan
+(`#kpi-balance`, `dashboard-view.js`) **không đổi**, vẫn luôn là số dư mới nhất
+bất kể ai đang lọc gì ở tab Sổ thu chi.
 
 **Phụ đề dưới tiêu đề và các dòng "Cập nhật ..." đã bỏ (09/2026).** Trước đây
 `renderDashboard` tự tính `firstDate`/`lastDate` từ ngày giao dịch mới nhất để

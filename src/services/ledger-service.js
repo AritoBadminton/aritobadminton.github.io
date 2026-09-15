@@ -61,15 +61,40 @@ export function getCompanyFundTotal(monthKey = '') {
  * Số dư quỹ hiện tại: tổng thu (đã gộp tiền đóng quỹ từ bảng Đóng quỹ theo
  * tháng, loại trừ dòng gõ tay ngày xưa để khỏi đếm hai lần) trừ tổng chi.
  *
- * Một nguồn tính duy nhất để ô "Số dư quỹ hiện tại" ở Tổng quan và ô "Số dư
- * quỹ" ở Sổ thu chi luôn khớp nhau, không lệch mỗi khi có ai sửa công thức.
+ * Một nguồn tính duy nhất để ô "Số dư quỹ hiện tại" ở Tổng quan luôn khớp với
+ * `getFundBalanceUpTo()` không tham số, không lệch mỗi khi có ai sửa công thức.
  *
  * @returns {number}
  */
 export function getFundBalance() {
-  const otherIncomes = getAllIncomes().filter((item) => !isDuesEntry({ ...item, type: INCOME_PREFIX }));
-  const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + getDuesTotal();
-  const totalExpense = getAllExpenses().reduce((sum, item) => sum + item.amount, 0);
+  return getFundBalanceUpTo();
+}
+
+/**
+ * Số dư quỹ luỹ kế tính đến hết một tháng cụ thể — dùng cho ô "Số dư quỹ của
+ * tháng" ở Sổ thu chi, đổi theo bộ lọc tháng đang xem.
+ *
+ * Không truyền `monthKey` (hoặc để rỗng, ứng với lựa chọn "Tất cả các tháng")
+ * thì không giới hạn ngày, ra đúng số dư hiện tại — khớp `getFundBalance()`.
+ *
+ * @param {string} [monthKey] dạng "2026-09"; bỏ trống thì không giới hạn ngày
+ * @returns {number}
+ */
+export function getFundBalanceUpTo(monthKey = '') {
+  const withinMonth = (item) => !monthKey || item.date.slice(0, 7) <= monthKey;
+
+  const otherIncomes = getAllIncomes()
+    .filter((item) => !isDuesEntry({ ...item, type: INCOME_PREFIX }))
+    .filter(withinMonth);
+  const duesUpTo = monthKey
+    ? store.months
+        .filter((month) => month.month <= monthKey)
+        .reduce((sum, month) => sum + getDuesTotal(month.month), 0)
+    : getDuesTotal();
+  const totalIncome = otherIncomes.reduce((sum, item) => sum + item.amount, 0) + duesUpTo;
+  const totalExpense = getAllExpenses()
+    .filter(withinMonth)
+    .reduce((sum, item) => sum + item.amount, 0);
   return totalIncome - totalExpense;
 }
 
@@ -112,17 +137,12 @@ export function persistLocalLedgerChanges() {
 }
 
 /**
- * Lưu xuống máy, dựng lại danh sách gộp và bỏ những dòng đã chọn nhưng không
- * còn tồn tại. Mọi hàm ghi bên dưới đều kết thúc bằng lời gọi này để giao diện
- * không bao giờ đọc phải dữ liệu cũ.
+ * Lưu xuống máy rồi dựng lại danh sách gộp. Mọi hàm ghi bên dưới đều kết thúc
+ * bằng lời gọi này để giao diện không bao giờ đọc phải dữ liệu cũ.
  */
 function commitLedgerChange() {
   persistLocalLedgerChanges();
   rebuildTransactions();
-  const availableIds = new Set(store.transactions.map((item) => item.id));
-  [...store.selectedTransactionIds].forEach((id) => {
-    if (!availableIds.has(id)) store.selectedTransactionIds.delete(id);
-  });
 }
 
 /**
@@ -221,7 +241,6 @@ export function revertTransactions(ids) {
 export function discardAllLedgerChanges() {
   store.addedTransactions = { incomes: [], expenses: [] };
   store.editedTransactions = {};
-  store.selectedTransactionIds.clear();
   commitLedgerChange();
 }
 

@@ -600,10 +600,6 @@ tr.row--edited td {
   background: color-mix(in srgb, var(--series-1) 7%, transparent);
 }
 
-tr.row--selected td {
-  background: color-mix(in srgb, var(--series-1) 10%, transparent);
-}
-
 tr.row--inactive td.cell-name,
 tr.row--inactive td.cell-num {
   opacity: 0.5;
@@ -631,11 +627,6 @@ tr.row--added td.cell-name::after {
   text-align: center;
 }
 
-body:not(.is-admin) td.cell-select,
-body:not(.is-admin) th.admin-only {
-  display: none;
-}
-
 /* Chế độ Firebase: sửa là lưu ngay, nên bỏ hết thanh "Lưu chung" và khối dán JSON. */
 body.is-live .local-only {
   display: none !important;
@@ -643,12 +634,4 @@ body.is-live .local-only {
 
 body:not(.is-live) .live-only {
   display: none !important;
-}
-
-/* Màn hẹp không đủ chỗ cho ba nút "+ Thêm giao dịch"/Cập nhật/Sao chép nằm
-   chung một hàng, nên tự xuống dòng với nhau thay vì tràn ra ngoài card. */
-@media (max-width: 560px) {
-  #ledger-quick-actions {
-    flex-wrap: wrap;
-  }
 }

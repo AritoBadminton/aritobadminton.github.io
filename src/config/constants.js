@@ -108,9 +108,6 @@ export const DUES_STATUS_LABELS = {
   [DUES_STATUS.SKIPPED]: 'Không chơi',
 };
 
-/** Giá trị đại diện cho lựa chọn "giữ nguyên" khi sửa nhiều dòng cùng lúc. */
-export const KEEP_UNCHANGED = '__keep-unchanged__';
-
 /** Số tháng hiển thị sẵn trong ô chọn tháng; phần cũ hơn nằm sau "Xem thêm". */
 export const MONTH_OPTION_LIMIT = 5;
 

@@ -242,9 +242,7 @@ await page.waitForTimeout(300);
 await page.selectOption('#filter-month', '');
 await page.fill('#filter-keyword', 'gõ tay');
 await page.waitForTimeout(700);
-await page.click('#ledger-table tr:first-child input[type="checkbox"]');
-await page.waitForTimeout(400);
-await page.click('#ledger-update');
+await page.click('#ledger-table tr:first-child .js-row-update');
 await page.waitForTimeout(600);
 check(
   'form sửa giữ đúng danh mục cũ',

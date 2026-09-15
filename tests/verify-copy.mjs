@@ -106,33 +106,21 @@ await page.selectOption('#filter-category', '');
 await page.click('#ledger-type-toggle [data-type="all"]');
 await page.waitForTimeout(400);
 
-/* ---------- 2. Nút Sao chép ---------- */
+/* ---------- 2. Nút Sao chép trên từng dòng ---------- */
 
-check('có nút sao chép', await page.isVisible('#ledger-copy'), true);
-check('nút chỉ có biểu tượng, không có chữ', (await page.textContent('#ledger-copy')).trim(), '');
-check('có svg bên trong', await page.$eval('#ledger-copy', (e) => Boolean(e.querySelector('svg'))), true);
-check('chưa chọn dòng nào → nút mờ', await page.isDisabled('#ledger-copy'), true);
-check(
-  'nhãn trợ năng nhắc tick chọn',
-  (await page.getAttribute('#ledger-copy', 'aria-label')).includes('tick chọn'),
-  true,
-);
-
-// Tick dòng "Thuê sân 2 tiếng" rồi sao chép.
+// Dòng "Thuê sân 2 tiếng" có nút sao chép riêng, đặt trước nút xoá.
 const rowIndex = await page.$$eval('#ledger-table tr', (els) =>
   els.findIndex((e) => e.textContent.includes('Thuê sân 2 tiếng')),
 );
-await page.click(`#ledger-table tr:nth-child(${rowIndex + 1}) .js-row-select`);
-await page.waitForTimeout(300);
-check('chọn 1 dòng → nút bật', await page.isDisabled('#ledger-copy'), false);
-check(
-  'nhãn nêu rõ số dòng',
-  (await page.getAttribute('#ledger-copy', 'aria-label')).includes('Sao chép 1 dòng'),
-  true,
-);
+const rowSelector = `#ledger-table tr:nth-child(${rowIndex + 1})`;
+const copyButtonSelector = `${rowSelector} .js-row-copy`;
+
+check('có nút sao chép trên dòng', await page.isVisible(copyButtonSelector), true);
+check('nút chỉ có biểu tượng, không có chữ', (await page.textContent(copyButtonSelector)).trim(), '');
+check('có svg bên trong', await page.$eval(copyButtonSelector, (e) => Boolean(e.querySelector('svg'))), true);
 
 const before = await rowCount();
-await page.click('#ledger-copy');
+await page.click(copyButtonSelector);
 await page.waitForTimeout(1800);
 
 check('bảng thêm đúng 1 dòng', await rowCount(), before + 1);
@@ -156,9 +144,8 @@ check('tổng chi tăng đúng 200.000', (await tiles()).chi, '460.000 đ');
 
 check('form sửa mở sẵn', await page.isVisible('#update-form'), true);
 check('form nhắc đổi ngày', (await page.textContent('#update-message')).includes('đổi ngày'), true);
-check('nút Cập nhật trỏ vào 1 dòng', (await page.textContent('#ledger-update')).trim(), 'Cập nhật (1)');
 
-// Bản sao phải là dòng đang chọn, không phải bản gốc: sửa ngày chỉ đổi bản sao.
+// Bản sao phải là dòng đang mở trong form, không phải bản gốc: sửa ngày chỉ đổi bản sao.
 await page.fill('#update-date', '2026-08-27');
 await page.click('#update-save');
 await page.waitForTimeout(1500);
@@ -169,14 +156,6 @@ const dates = await page.$$eval('#ledger-table tr', (els) =>
     .sort(),
 );
 check('bản gốc giữ ngày, bản sao đổi ngày', dates, ['14/08/2026', '27/08/2026']);
-
-// Sao chép nhiều dòng cùng lúc.
-await page.click('#ledger-select-all');
-await page.waitForTimeout(400);
-const totalBefore = await rowCount();
-await page.click('#ledger-copy');
-await page.waitForTimeout(2500);
-check('sao chép hàng loạt nhân đôi bảng', await rowCount(), totalBefore * 2);
 
 check('không có lỗi javascript', errors, []);
 
