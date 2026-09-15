@@ -53,15 +53,16 @@ Tiêu đề khối và dòng "Lưu ý" phía dưới vẫn sửa trực tiếp t
 
 Trang chia hai mức: **khách** (mặc định) và **admin** (đã đăng nhập).
 
-| Nội dung                             | Khách | Admin |
-| ------------------------------------ | :---: | :---: |
-| Số dư quỹ, số thành viên             |  ✅   |  ✅   |
-| Quy định đóng quỹ, giao dịch gần đây |  ✅   |  ✅   |
-| Bảng đóng quỹ theo tháng, mã QR      |  ✅   |  ✅   |
-| **Tổng thu, tổng chi**               |  ❌   |  ✅   |
-| **Tab Thành viên**                   |  ❌   |  ✅   |
-| **Sổ thu chi: "Tất cả các tháng"**   |  ❌   |  ✅   |
-| Nhập, sửa, đánh dấu đóng quỹ         |  ❌   |  ✅   |
+| Nội dung                           | Khách | Admin |
+| ---------------------------------- | :---: | :---: |
+| Số dư quỹ, số thành viên           |  ✅   |  ✅   |
+| Quy định đóng quỹ                  |  ✅   |  ✅   |
+| Bảng đóng quỹ theo tháng, mã QR    |  ✅   |  ✅   |
+| **Tổng thu, tổng chi**             |  ❌   |  ✅   |
+| **Bảng "Giao dịch gần đây"**       |  ❌   |  ✅   |
+| **Tab Thành viên**                 |  ❌   |  ✅   |
+| **Sổ thu chi: "Tất cả các tháng"** |  ❌   |  ✅   |
+| Nhập, sửa, đánh dấu đóng quỹ       |  ❌   |  ✅   |
 
 Khách vào Sổ thu chi sẽ được lọc sẵn theo tháng gần nhất và chỉ đổi được sang từng tháng một.
 

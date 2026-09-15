@@ -57,10 +57,10 @@ const tabsHien = () =>
 
 check('không còn thanh "chế độ chỉ xem"', await page.isVisible('#readonly-bar'), false);
 check('không còn nút Đăng nhập trong thanh đó', await page.$('#readonly-login'), null);
-check('khách chỉ thấy hai tab', await tabsHien(), ['Tổng quan', 'Đóng quỹ theo tháng']);
+check('khách thấy ba tab công khai', await tabsHien(), ['Tổng quan', 'Đóng quỹ theo tháng', 'Sổ thu chi']);
 check(
-  'tab Sổ thu chi bị ẩn',
-  await page.$eval('[data-panel="ledger"]', (e) => getComputedStyle(e).display),
+  'chỉ tab Thành viên là của riêng admin',
+  await page.$eval('[data-panel="members"]', (e) => getComputedStyle(e).display),
   'none',
 );
 check('khách không thấy bảng Giao dịch gần đây', await page.isVisible('#recent-card'), false);
@@ -68,10 +68,22 @@ check('nhưng vẫn thấy các ô số liệu ở Tổng quan', await page.isVi
 check('vẫn còn nút đăng nhập trên đầu trang', await page.isVisible('#auth-toggle'), true);
 check('nút đó ghi rõ là để đăng nhập', (await page.textContent('#auth-toggle')).includes('Đăng nhập'), true);
 
-// Bấm thẳng vào tab bị ẩn cũng không mở được panel Sổ thu chi.
-await page.evaluate(() => document.querySelector('[data-panel="ledger"]').click());
+// Sổ thu chi mở cho cả khách đọc — đó là điểm minh bạch cố ý — nhưng mọi lối
+// ghi vào sổ vẫn phải khoá.
+await page.click('[data-panel="ledger"]');
 await page.waitForTimeout(500);
-check('không mở được tab Sổ thu chi', await page.isVisible('#panel-ledger'), false);
+check('khách mở được Sổ thu chi', await page.isVisible('#panel-ledger'), true);
+check('khách đọc được bảng giao dịch', await page.isVisible('#ledger-table'), true);
+check('nhưng khách không có khu Thêm giao dịch', await page.isVisible('#ledger-add-toggle'), false);
+
+// Bấm thẳng vào tab đang ẩn thì vẫn không mở được — nay chỉ còn Thành viên.
+await page.evaluate(() => document.querySelector('[data-panel="members"]').click());
+await page.waitForTimeout(500);
+check('không mở được tab Thành viên', await page.isVisible('#panel-members'), false);
+
+// Trả về Tổng quan, không thì các phép kiểm sau lại đo nhầm tab đang mở.
+await page.click('[data-panel="dashboard"]');
+await page.waitForTimeout(500);
 
 /* ---------- 2. Đăng nhập admin thì thấy đủ ---------- */
 
@@ -95,10 +107,16 @@ check('admin mở được Sổ thu chi', await page.isVisible('#panel-ledger'),
 
 /* ---------- 3. Đăng xuất khi đang ở tab admin thì bị đẩy về Tổng quan ---------- */
 
+// Phải đứng ở Thành viên: Sổ thu chi nay ai cũng xem được nên đăng xuất không
+// đẩy ra khỏi đó, không còn kiểm được cơ chế này nữa.
+await page.click('[data-panel="members"]');
+await page.waitForTimeout(700);
+check('admin mở được Thành viên', await page.isVisible('#panel-members'), true);
+
 await page.click('#auth-toggle');
 await page.waitForTimeout(1800);
 check('đăng xuất thì quay về Tổng quan', await page.isVisible('#panel-dashboard'), true);
-check('đăng xuất thì Sổ thu chi đóng lại', await page.isVisible('#panel-ledger'), false);
+check('đăng xuất thì Thành viên đóng lại', await page.isVisible('#panel-members'), false);
 check('đăng xuất thì bảng Giao dịch gần đây ẩn lại', await page.isVisible('#recent-card'), false);
 check('đăng xuất vẫn không có thanh nhắc', await page.isVisible('#readonly-bar'), false);
 
@@ -121,7 +139,11 @@ check(
   (await page.textContent('#readonly-bar')).includes('danh sách quản trị'),
   true,
 );
-check('người này vẫn không thấy tab admin', await tabsHien(), ['Tổng quan', 'Đóng quỹ theo tháng']);
+check('người này vẫn không thấy tab admin', await tabsHien(), [
+  'Tổng quan',
+  'Đóng quỹ theo tháng',
+  'Sổ thu chi',
+]);
 check('người này cũng không thấy Giao dịch gần đây', await page.isVisible('#recent-card'), false);
 
 await page.click('#auth-toggle');

@@ -150,9 +150,14 @@ còn phân biệt admin hay không** — không dùng công tắc, `renderCompan
 lọc. Người bị lọc ra vẫn giữ số của mình và **số đó không được nhảy sang người
 khác**. Trùng số thì báo đỏ nhưng vẫn cho lưu, kèm nút "Đánh số lại".
 
-**Tab chỉ dành cho admin:** Thành viên và Sổ thu chi. `tab-nav.js` từ chối kích
-hoạt tab đang `display: none`, nên bấm thẳng vào tab ẩn cũng không mở được.
-Bảng "Giao dịch gần đây" ở Tổng quan cũng mang class `admin-only`.
+**Tab chỉ dành cho admin: chỉ còn Thành viên.** Sổ thu chi từng là tab admin
+nhưng đã mở cho mọi người xem (`4f9bc0b`, 09/2026) — khách đọc được bảng giao
+dịch, còn khu "Thêm giao dịch" và các nút sửa/xoá/sao chép vẫn mang `admin-only`
+nên không ai ngoài admin ghi được vào sổ. **Đừng thêm lại `admin-only` vào tab
+`data-panel="ledger"`**, đó là lật ngược một quyết định đã chốt. `tab-nav.js` từ
+chối kích hoạt tab đang `display: none`, nên bấm thẳng vào tab Thành viên khi
+chưa đăng nhập cũng không mở được. Bảng "Giao dịch gần đây" ở Tổng quan vẫn mang
+class `admin-only`.
 
 **Ghi chú ở Tổng quan** (`settings/club.notes[]`) chỉ hiện khi `settings/rules.items`
 rỗng và người xem không phải admin (`renderRules` trong `dashboard-view.js`) —
