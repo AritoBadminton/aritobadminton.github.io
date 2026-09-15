@@ -623,6 +623,12 @@ tr.row--added td.cell-name::after {
   white-space: nowrap;
 }
 
+/* Chủ trang muốn tiêu đề cột tab Đóng quỹ theo tháng căn giữa, khác quy ước
+   căn trái/phải mặc định của bảng dùng chung — chỉ đổi ở bảng này. */
+#dues-thead th {
+  text-align: center;
+}
+
 body:not(.is-admin) td.cell-select,
 body:not(.is-admin) th.admin-only {
   display: none;
