@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=14`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=15`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
