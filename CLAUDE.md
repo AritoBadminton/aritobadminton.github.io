@@ -2,8 +2,9 @@
 
 Trang quản lý quỹ CLB cầu lông công ty Arito. Đây là **quỹ thật, tiền thật của
 một nhóm người thật** — mỗi lần đẩy code lên là đổi luôn trang mà cả nhóm đang
-dùng. Không có môi trường thử. Chạy hết bộ kiểm thử trước khi đẩy, và để dành
-mọi thao tác xoá dữ liệu cho chủ trang tự bấm.
+dùng. Không có môi trường thử. Để dành mọi thao tác xoá dữ liệu cho chủ trang tự
+bấm. Chạy `npm run check` trước khi đẩy; bộ kiểm thử Playwright thì chủ trang tự
+test tay sau khi Claude cập nhật xong — xem thêm mục "Kiểm thử" bên dưới.
 
 - Trang chạy: https://aritobadminton.github.io/
 - Repo: `AritoBadminton/aritobadminton.github.io` (**public**)
@@ -92,11 +93,18 @@ npm run format     # prettier --write
 bash tests/chay-tat-ca.sh
 ```
 
-260 test, chạy hết mất khoảng 12 phút, tất cả phải xanh. Chi tiết trong
-`tests/README.md`. Bộ test dùng Firebase giả lập nên không đụng dữ liệu thật.
+260+ test, chạy hết mất khoảng 12-20 phút. Chi tiết trong `tests/README.md`. Bộ
+test dùng Firebase giả lập nên không đụng dữ liệu thật.
 
-Sửa gì cũng nên **thêm test cho đúng phần đó** rồi mới đẩy lên. Các màn hình
-dùng chung store nên một thay đổi nhỏ rất dễ làm hỏng chỗ khác.
+**Từ 09/2026, Claude không cần tự chạy cả bộ này trước khi đẩy nữa — chủ trang
+tự test tay sau khi Claude cập nhật xong.** Trước đó đây là bước bắt buộc; chủ
+trang chủ động đổi vì thấy chạy lâu và muốn tự kiểm tra trực tiếp. Vẫn luôn chạy
+`npm run check` (prettier + eslint) trước khi đẩy — nhanh, không phải chạy trình
+duyệt, và bắt được lỗi cú pháp/biến thừa mà việc bấm tay không chắc phát hiện ra.
+Sửa gì cũng nên **thêm test cho đúng phần đó** vào bộ Playwright dù không tự
+chạy — hỏng ở đâu chủ trang test tay vẫn thấy, và test có sẵn giúp session sau
+không giẫm lại đúng lỗi cũ. Nếu chủ trang yêu cầu chạy lại kiểm thử (ví dụ sau
+một đợt sửa lớn) thì chạy như bình thường.
 
 ## Đẩy code lên
 
