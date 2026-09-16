@@ -123,7 +123,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=18`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=19`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -173,10 +173,15 @@ tiền. Chữ đậm trong "Lưu ý" ra `<strong>`, không phải `<b>`, nên CS
 cùng màu với nhãn "Lưu ý:". Chưa có màn hình admin nào để sửa `notes` hay
 `footer`; đổi nội dung phải sửa thẳng trong Firebase Console.
 
-**Ô nhập khoản mới ở Sổ thu chi chỉ Thu mới có mặc định** (`DEFAULT_ENTRY_AMOUNT`,
-`DEFAULT_ENTRY_DESC`) — đó là khoản quỹ công ty lặp lại gần như y hệt mỗi tháng.
-Chi thì mỗi khoản khác nhau, điền sẵn số của Thu vào chỉ gây nhầm nên để trống;
-đổi qua lại giữa Thu/Chi ở `#new-type-toggle` sẽ tự căn lại theo đúng quy tắc này.
+**Ô nhập khoản mới ở Sổ thu chi: số tiền chỉ Thu mới có mặc định, nội dung thì
+cả hai đều có, lấy theo danh mục (09/2026).** Số tiền dùng `DEFAULT_ENTRY_AMOUNT`,
+chỉ áp cho Thu — đó là khoản quỹ công ty lặp lại gần như y hệt mỗi tháng, Chi thì
+mỗi khoản một số khác nhau nên để trống. Nội dung không còn hằng số riêng
+(`DEFAULT_ENTRY_DESC` đã xoá khỏi `constants.js`) — `resetNewEntryFields` gán
+thẳng theo **danh mục đang chọn trong `#new-category`**, giống hệt việc tự chọn
+lại danh mục (`handleNewCategoryChange`), chỉ khác là chạy ngay lúc mở form/đổi
+Thu-Chi thay vì phải đợi bấm chọn lại mới có. Đổi qua lại Thu/Chi ở
+`#new-type-toggle` sẽ tự căn lại theo đúng hai quy tắc này.
 
 **Danh mục Thu có hai lựa chọn:** "Tiền quỹ công ty hàng tháng" và "Tiền được
 tài trợ cho CLB" — khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng
@@ -198,6 +203,32 @@ mới chỉ thật sự được tạo (`addTransaction`) khi admin sửa xong v
 đổi" (`handleSaveUpdate`, rẽ nhánh theo biến trạng thái `copyType` thay vì
 `editingId`). Hàm `copyTransactions` (từng nhân bản và ghi ngay) đã xoá khỏi
 `ledger-service.js` — đừng thêm lại kiểu ghi-trước-sửa-sau đó.
+
+**Form Thêm/Sửa/Sao chép giao dịch và xác nhận xoá đều là popup, không còn mở
+inline trong thẻ (09/2026).** Trước đây `#new-entry-form`/`#update-form` là
+`.card__body` mở rộng ngay dưới nút bấm trong cùng khối thẻ. Nay là ba hộp thoại
+riêng — `#new-entry-modal`, `#update-modal`, `#delete-confirm-modal` — theo đúng
+mẫu `.modal`/`.modal__box` đã dùng cho đăng nhập/đổi mật khẩu (khai báo cạnh hai
+hộp đó trong `index.html`, ngoài mọi `<section>` tab). `.modal__box` mặc định
+rộng 380px chỉ đủ một cột; hộp chứa `.field-grid` 4 ô (thêm/sửa) dùng thêm class
+`.modal__box--wide` (560px) và ép cứng `.field-grid` về 2 cột bằng chọn lọc
+`.modal__box--wide .field-grid` — mốc `@media (max-width: 820px)` của
+`.field-grid` gốc đo theo bề rộng **cửa sổ**, không đo theo bề rộng hộp thoại,
+nên không tự áp dụng dù hộp chỉ rộng 560px. Đóng bằng bấm Huỷ, bấm ra ngoài lớp
+phủ (so `event.target.id` với chính id hộp thoại, giống `login-modal.js`), hoặc
+phím Escape — cả ba cách đều gắn trong `initLedgerView`. Nút "+ Thêm giao dịch"
+giờ luôn hiện đúng một chữ tĩnh, không còn tự đổi thành "Đóng" — `ADD_TOGGLE_LABEL`
+đã xoá khỏi mã nguồn.
+
+**Xoá giao dịch dùng popup xác nhận + toast, không còn kiểu bấm hai lần
+(09/2026).** Trước đây bấm nút × đổi ngay thành "Xoá?" rồi phải bấm lần hai trong
+4 giây mới xoá thật (`pendingDeleteId`/`pendingDeleteTimer`, class
+`.btn--delete-armed`) — cơ chế đó **vẫn còn** ở tab Thành viên
+(`members-view.js`, xoá thành viên), nhưng ở Sổ thu chi đã đổi sang bấm một cái
+mở `#delete-confirm-modal` hỏi rõ tên/ngày/số tiền khoản sắp xoá; Đồng ý mới xoá
+thật, Huỷ chỉ đóng popup không đụng gì. Xoá xong gọi `showToast()` (`utils/dom.js`)
+hiện chữ "Đã xoá thành công" ở `#toast` rồi tự ẩn sau 3 giây — hàm này dùng
+chung được cho các thông báo nổi khác sau này nếu cần, không riêng cho xoá.
 
 **Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
 cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"

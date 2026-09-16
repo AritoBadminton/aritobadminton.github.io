@@ -3,7 +3,6 @@
 import {
   CATEGORIES,
   DEFAULT_ENTRY_AMOUNT,
-  DEFAULT_ENTRY_DESC,
   MEMBER_DUES_CATEGORY,
   MONTH_OPTION_LIMIT,
   MONTH_OPTION_MORE,
@@ -35,6 +34,7 @@ import {
   qs,
   qsa,
   setVisible,
+  showToast,
 } from '../utils/dom.js';
 import {
   formatCurrency,
@@ -49,20 +49,13 @@ import {
 
 let filterType = 'all';
 
-/** Bấm xoá lần đầu rồi bao lâu thì tự huỷ xác nhận. */
-const DELETE_CONFIRM_MS = 4000;
-
-/** Nhãn mặc định của nút mở form thêm mới — khớp với chữ tĩnh trong index.html. */
-const ADD_TOGGLE_LABEL = '+ Thêm giao dịch';
-
 /** Biểu tượng cây bút cho nút "Cập nhật" ở mỗi dòng. */
 const EDIT_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>`;
 /** Biểu tượng hai ô chồng nhau cho nút "Sao chép" ở mỗi dòng. */
 const COPY_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h8" /></svg>`;
 
-/** Dòng đang chờ xác nhận xoá, và hẹn giờ tự huỷ xác nhận đó. */
-let pendingDeleteId = '';
-let pendingDeleteTimer = 0;
+/** Id dòng đang chờ xác nhận xoá ở hộp thoại, rỗng khi hộp thoại đang đóng. */
+let deleteTargetId = '';
 
 /** Tháng đang lọc, giữ lại khi mở rộng danh sách tháng. */
 let selectedMonthFilter = '';
@@ -146,14 +139,18 @@ function renderPendingBar() {
 /**
  * Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới.
  *
- * Chỉ Thu mới có giá trị mặc định — đó là khoản quỹ công ty lặp lại gần như y
- * hệt nhau mỗi tháng. Chi thì mỗi khoản một số tiền, một nội dung khác nhau nên
+ * Số tiền: chỉ Thu mới có giá trị mặc định — đó là khoản quỹ công ty lặp lại
+ * gần như y hệt nhau mỗi tháng. Chi thì mỗi khoản một số tiền khác nhau nên
  * điền sẵn số của Thu vào chỉ gây nhầm; để trống cho admin gõ tay.
+ *
+ * Nội dung: gán sẵn theo đúng danh mục đang chọn trong ô — giống hệt việc tự
+ * chọn lại danh mục (`handleNewCategoryChange`), chỉ khác là chạy ngay lúc mở
+ * form/đổi Thu-Chi thay vì phải đợi người dùng bấm chọn lại mới có.
  */
 function resetNewEntryFields() {
   const isThu = newEntryType === 'thu';
   qs('#new-amount').value = isThu ? formatNumber(DEFAULT_ENTRY_AMOUNT) : '';
-  qs('#new-desc').value = isThu ? DEFAULT_ENTRY_DESC : '';
+  qs('#new-desc').value = qs('#new-category').value;
 }
 
 /**
@@ -188,26 +185,26 @@ function handleNewCategoryChange() {
   qs('#new-desc').value = qs('#new-category').value;
 }
 
-/** Đóng form cập nhật. */
+/** Đóng hộp thoại cập nhật/sao chép. */
 function closeUpdateForm() {
   editingId = '';
   copyType = '';
-  setVisible(qs('#update-form'), false);
+  qs('#update-modal').hidden = true;
 }
 
-/** Mở hoặc đóng form thêm mới. */
-function toggleNewEntryForm() {
-  closeUpdateForm();
-  const form = qs('#new-entry-form');
-  const isOpen = form.style.display !== 'none';
-  setVisible(form, !isOpen);
-  qs('#ledger-add-toggle').setAttribute('aria-expanded', String(!isOpen));
-  qs('#ledger-add-toggle').textContent = isOpen ? ADD_TOGGLE_LABEL : 'Đóng';
-  if (isOpen) return;
+/** Mở hộp thoại thêm giao dịch mới. */
+function openNewEntryModal() {
+  qs('#new-message').textContent = '';
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
   if (!qs('#new-amount').value) resetNewEntryFields();
+  qs('#new-entry-modal').hidden = false;
   // Bôi đen sẵn để gõ đè lên nội dung mặc định, khỏi phải xoá tay.
   qs('#new-desc').select();
+}
+
+/** Đóng hộp thoại thêm giao dịch mới. */
+function closeNewEntryModal() {
+  qs('#new-entry-modal').hidden = true;
 }
 
 /** Ghi nhận một khoản thu/chi mới. */
@@ -278,10 +275,7 @@ function openCopyForm(id) {
  * @param {{head: string, showRevert: boolean}} options
  */
 function fillUpdateForm(row, { head, showRevert }) {
-  setVisible(qs('#new-entry-form'), false);
-  qs('#ledger-add-toggle').textContent = ADD_TOGGLE_LABEL;
-  qs('#ledger-add-toggle').setAttribute('aria-expanded', 'false');
-  setVisible(qs('#update-form'), true);
+  qs('#update-modal').hidden = false;
   qs('#update-message').textContent = '';
 
   const categories = buildCategoryOptions(CATEGORIES[row.type], [row]);
@@ -321,26 +315,34 @@ function handleSaveUpdate() {
 }
 
 /**
- * Xoá một dòng: bấm lần đầu chỉ hỏi lại, bấm lần hai mới xoá thật.
- * Ở chế độ Firebase đây là xoá khỏi dữ liệu chung nên không cho lỡ tay.
+ * Mở hộp thoại hỏi xác nhận trước khi xoá — ở chế độ Firebase đây là xoá khỏi
+ * dữ liệu chung nên không cho lỡ tay bấm một cái là mất luôn.
  * @param {string} id
  */
-function handleRowDelete(id) {
-  clearTimeout(pendingDeleteTimer);
+function openDeleteConfirm(id) {
+  const row = store.transactions.find((item) => item.id === id);
+  if (!row) return;
 
-  if (pendingDeleteId !== id) {
-    pendingDeleteId = id;
-    pendingDeleteTimer = setTimeout(() => {
-      pendingDeleteId = '';
-      renderLedger();
-    }, DELETE_CONFIRM_MS);
-    renderLedger();
-    return;
-  }
+  deleteTargetId = id;
+  qs('#delete-confirm-text').textContent =
+    `Bạn có chắc muốn xoá khoản "${row.desc}" · ${formatDateLabel(row.date)} · ` +
+    `${row.type === 'thu' ? 'Thu' : 'Chi'} ${formatCurrency(row.amount)} không? Không thể hoàn tác.`;
+  qs('#delete-confirm-modal').hidden = false;
+}
 
-  pendingDeleteId = '';
-  removeAddedTransaction(id);
+/** Đóng hộp thoại xác nhận xoá mà không làm gì cả. */
+function closeDeleteConfirm() {
+  deleteTargetId = '';
+  qs('#delete-confirm-modal').hidden = true;
+}
+
+/** Xác nhận xoá: xoá dòng, vẽ lại bảng, rồi báo thành công bằng toast tự ẩn. */
+function handleConfirmDelete() {
+  if (!deleteTargetId) return;
+  removeAddedTransaction(deleteTargetId);
+  closeDeleteConfirm();
   requestRender();
+  showToast('Đã xoá thành công');
 }
 
 /** Trả dòng đang sửa về đúng như trong data.json. */
@@ -546,9 +548,9 @@ export function renderLedger() {
             title="Sao chép thành khoản mới" aria-label="Sao chép khoản ${escapeHtml(row.desc)}">${COPY_ICON}</button>
           ${
             row.isNew || isFirebaseMode()
-              ? `<button class="btn--delete js-row-delete${pendingDeleteId === row.id ? ' btn--delete-armed' : ''}"
-                data-id="${row.id}" title="${row.isNew ? 'Xoá khoản vừa thêm' : 'Xoá khoản này khỏi dữ liệu chung'}"
-                aria-label="Xoá khoản ${escapeHtml(row.desc)}">${pendingDeleteId === row.id ? 'Xoá?' : '×'}</button>`
+              ? `<button class="btn--delete js-row-delete" data-id="${row.id}"
+                title="${row.isNew ? 'Xoá khoản vừa thêm' : 'Xoá khoản này khỏi dữ liệu chung'}"
+                aria-label="Xoá khoản ${escapeHtml(row.desc)}">×</button>`
               : ''
           }
         </td>
@@ -558,7 +560,7 @@ export function renderLedger() {
     : '<tr><td colspan="6" class="table-empty text-muted">Không có giao dịch nào khớp bộ lọc</td></tr>';
 
   qsa('#ledger-table .js-row-delete').forEach((button) => {
-    button.addEventListener('click', () => handleRowDelete(button.dataset.id));
+    button.addEventListener('click', () => openDeleteConfirm(button.dataset.id));
   });
   qsa('#ledger-table .js-row-update').forEach((button) => {
     button.addEventListener('click', () => openUpdateForm(button.dataset.id));
@@ -624,18 +626,39 @@ export function initLedgerView() {
     });
   });
 
-  qs('#ledger-add-toggle').addEventListener('click', toggleNewEntryForm);
+  qs('#ledger-add-toggle').addEventListener('click', openNewEntryModal);
+  qs('#new-cancel').addEventListener('click', closeNewEntryModal);
   qs('#new-category').addEventListener('change', handleNewCategoryChange);
   qs('#new-submit').addEventListener('click', handleAddTransaction);
   qs('#update-save').addEventListener('click', handleSaveUpdate);
   qs('#update-cancel').addEventListener('click', closeUpdateForm);
   qs('#update-revert').addEventListener('click', handleRevert);
+  qs('#delete-confirm-cancel').addEventListener('click', closeDeleteConfirm);
+  qs('#delete-confirm-ok').addEventListener('click', handleConfirmDelete);
   qs('#ledger-export-toggle').addEventListener('click', handleSave);
   qs('#ledger-discard').addEventListener('click', () => {
     if (!window.confirm('Bỏ toàn bộ khoản mới và các chỉnh sửa chưa lưu chung?')) return;
     discardAllLedgerChanges();
     setVisible(qs('#ledger-export'), false);
     requestRender();
+  });
+
+  // Bấm ra ngoài hộp thoại hoặc bấm Escape thì đóng, giống ba hộp thoại đăng
+  // nhập/đổi mật khẩu đã có — nhất quán cách đóng trên cả trang.
+  [
+    ['#new-entry-modal', closeNewEntryModal],
+    ['#update-modal', closeUpdateForm],
+    ['#delete-confirm-modal', closeDeleteConfirm],
+  ].forEach(([selector, close]) => {
+    qs(selector).addEventListener('click', (event) => {
+      if (event.target.id === selector.slice(1)) close();
+    });
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!qs('#new-entry-modal').hidden) closeNewEntryModal();
+    if (!qs('#update-modal').hidden) closeUpdateForm();
+    if (!qs('#delete-confirm-modal').hidden) closeDeleteConfirm();
   });
 
   fillNewEntryCategories();

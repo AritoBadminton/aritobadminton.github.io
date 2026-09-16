@@ -58,6 +58,7 @@ Tài khoản admin trong bản giả lập: `nghia@arito.vn` / `MatKhauRatDai#20
 | `verify-addmember.mjs`, `verify-delmember.mjs`           | Thêm và xoá thành viên                                                              |
 | `verify-createmonth.mjs`, `verify-delmonth.mjs`          | Tạo và xoá tháng đóng quỹ                                                           |
 | `verify-copy.mjs`                                        | Nhân bản giao dịch ở Sổ thu chi                                                     |
+| `verify-ledger-popup.mjs`                                | Popup thêm/sửa/xoá giao dịch ở Sổ thu chi, toast báo xoá thành công                 |
 
 Chạy hết bộ mất khoảng 12 phút. Sửa mã nguồn xong vẫn nên chạy lại **cả bộ**
 trước khi đẩy lên, vì các màn hình dùng

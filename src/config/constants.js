@@ -37,9 +37,6 @@ export const COMPANY_FUND_CATEGORY = 'Tiền quỹ công ty hàng tháng';
 /** Số tiền điền sẵn ở ô nhập khoản mới; sửa lại được. */
 export const DEFAULT_ENTRY_AMOUNT = 1000000;
 
-/** Nội dung điền sẵn ở ô nhập khoản mới; sửa lại được. */
-export const DEFAULT_ENTRY_DESC = 'Tiền quỹ thành viên hàng tháng';
-
 /**
  * Danh mục thu do bảng "Đóng quỹ theo tháng" cung cấp.
  *

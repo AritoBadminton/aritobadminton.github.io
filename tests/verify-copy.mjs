@@ -125,7 +125,8 @@ await page.waitForTimeout(500);
 
 // Bấm sao chép chỉ mở form điền sẵn — chưa ghi gì, bảng chưa đổi.
 check('bấm sao chép chưa tạo dòng nào', await rowCount(), before);
-check('form sửa mở sẵn', await page.isVisible('#update-form'), true);
+check('hộp thoại sửa/sao chép hiện ra dạng popup', await page.isVisible('#update-modal'), true);
+check('popup có role dialog', await page.getAttribute('#update-modal', 'role'), 'dialog');
 check(
   'form nhắc sẽ tạo khoản mới khi lưu',
   (await page.textContent('#update-head')).includes('Lưu thay đổi'),
