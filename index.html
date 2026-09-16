@@ -25,10 +25,10 @@
       }
     </script>
 
-    <link rel="stylesheet" href="src/assets/styles/base.css?v=18" />
-    <link rel="stylesheet" href="src/assets/styles/layout.css?v=18" />
-    <link rel="stylesheet" href="src/assets/styles/components.css?v=18" />
-    <link rel="stylesheet" href="src/assets/styles/features.css?v=18" />
+    <link rel="stylesheet" href="src/assets/styles/base.css?v=19" />
+    <link rel="stylesheet" href="src/assets/styles/layout.css?v=19" />
+    <link rel="stylesheet" href="src/assets/styles/components.css?v=19" />
+    <link rel="stylesheet" href="src/assets/styles/features.css?v=19" />
   </head>
 
   <body>
@@ -147,6 +147,60 @@
       </div>
     </div>
 
+    <!-- ==================== Hộp thoại thêm giao dịch (Sổ thu chi) ==================== -->
+    <div class="modal" id="new-entry-modal" role="dialog" aria-modal="true" aria-labelledby="new-entry-heading" hidden>
+      <div class="modal__box modal__box--wide">
+        <h3 id="new-entry-heading">Thêm giao dịch</h3>
+        <div class="segmented" id="new-type-toggle" style="margin: 14px 0 12px; max-width: 320px">
+          <button class="segmented__item" data-type="chi" aria-pressed="true" style="flex: 1" type="button">Khoản CHI</button>
+          <button class="segmented__item" data-type="thu" aria-pressed="false" style="flex: 1" type="button">Khoản THU</button>
+        </div>
+        <div class="field-grid">
+          <label>Ngày<input type="date" id="new-date" /></label>
+          <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="new-amount" placeholder="200.000" /></label>
+          <label>Nội dung<input type="text" id="new-desc" placeholder="Thuê sân 2 tiếng" /></label>
+          <label>Danh mục<select id="new-category"></select></label>
+        </div>
+        <div class="modal__error" id="new-message"></div>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" id="new-cancel" type="button">Huỷ</button>
+          <button class="btn" id="new-submit" type="button">Thêm vào sổ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Hộp thoại sửa / sao chép giao dịch (Sổ thu chi) ==================== -->
+    <div class="modal" id="update-modal" role="dialog" aria-modal="true" aria-labelledby="update-heading" hidden>
+      <div class="modal__box modal__box--wide">
+        <h3 id="update-heading">Cập nhật giao dịch</h3>
+        <div class="callout" style="margin: 14px 0" id="update-head"></div>
+        <div class="field-grid">
+          <label>Ngày<input type="date" id="update-date" /></label>
+          <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="update-amount" /></label>
+          <label>Nội dung<input type="text" id="update-desc" /></label>
+          <label>Danh mục<select id="update-category"></select></label>
+        </div>
+        <div class="modal__error" id="update-message"></div>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" id="update-revert" style="display: none" type="button">Khôi phục bản gốc</button>
+          <button class="btn btn--ghost" id="update-cancel" type="button">Huỷ</button>
+          <button class="btn" id="update-save" type="button">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Hộp thoại xác nhận xoá giao dịch (Sổ thu chi) ==================== -->
+    <div class="modal" id="delete-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-heading" hidden>
+      <div class="modal__box">
+        <h3 id="delete-confirm-heading">Xoá giao dịch</h3>
+        <p class="text-muted" style="margin: 10px 0 0" id="delete-confirm-text"></p>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" id="delete-confirm-cancel" type="button">Huỷ</button>
+          <button class="btn btn--danger" id="delete-confirm-ok" type="button">Xoá</button>
+        </div>
+      </div>
+    </div>
+
     <div class="callout callout--bar sync-error" id="sync-error" style="display: none">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
@@ -230,40 +284,7 @@
       <section class="tab-panel" id="panel-ledger" role="tabpanel" aria-label="Sổ thu chi">
         <div class="card admin-only" style="margin-bottom: 16px">
           <div class="card__header" style="padding-bottom: 11px">
-            <button class="btn admin-only" id="ledger-add-toggle" aria-expanded="false" type="button">+ Thêm giao dịch</button>
-          </div>
-
-          <div class="card__body" id="new-entry-form" style="display: none">
-            <div class="segmented" id="new-type-toggle" style="margin-bottom: 12px; max-width: 320px">
-              <button class="segmented__item" data-type="chi" aria-pressed="true" style="flex: 1" type="button">Khoản CHI</button>
-              <button class="segmented__item" data-type="thu" aria-pressed="false" style="flex: 1" type="button">Khoản THU</button>
-            </div>
-            <div class="field-grid">
-              <label>Ngày<input type="date" id="new-date" /></label>
-              <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="new-amount" placeholder="200.000" /></label>
-              <label>Nội dung<input type="text" id="new-desc" placeholder="Thuê sân 2 tiếng" /></label>
-              <label>Danh mục<select id="new-category"></select></label>
-            </div>
-            <div class="form-actions">
-              <button class="btn" id="new-submit" type="button">Thêm vào sổ</button>
-              <span class="text-muted" id="new-message"></span>
-            </div>
-          </div>
-
-          <div class="card__body" id="update-form" style="display: none; border-top: 1px solid var(--border)">
-            <div class="callout" style="margin-bottom: 14px" id="update-head"></div>
-            <div class="field-grid">
-              <label>Ngày<input type="date" id="update-date" /></label>
-              <label>Số tiền (đồng)<input type="text" inputmode="numeric" id="update-amount" /></label>
-              <label>Nội dung<input type="text" id="update-desc" /></label>
-              <label>Danh mục<select id="update-category"></select></label>
-            </div>
-            <div class="form-actions">
-              <button class="btn" id="update-save" type="button">Lưu thay đổi</button>
-              <button class="btn btn--ghost" id="update-cancel" type="button">Huỷ</button>
-              <button class="btn btn--ghost" id="update-revert" style="display: none" type="button">Khôi phục bản gốc</button>
-              <span class="text-muted" id="update-message"></span>
-            </div>
+            <button class="btn admin-only" id="ledger-add-toggle" type="button">+ Thêm giao dịch</button>
           </div>
         </div>
 
@@ -560,6 +581,8 @@
         </div>
       </section>
     </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
     <script type="module" src="src/main.js"></script>
   </body>

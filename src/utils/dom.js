@@ -71,6 +71,29 @@ export function flashButtonLabel(button, message = 'Đã sao chép ✓') {
   }, 1800);
 }
 
+/** Hẹn giờ tự ẩn của lần gọi showToast gần nhất. */
+let toastTimer = 0;
+
+/**
+ * Hiện thông báo nổi ở dưới màn hình rồi tự ẩn sau một khoảng thời gian.
+ *
+ * Gọi liên tiếp thì lần sau huỷ hẹn giờ của lần trước — tránh toast mới vừa
+ * hiện đã bị timer của toast cũ ẩn mất.
+ *
+ * @param {string} message
+ * @param {number} [duration=3000] mili giây trước khi tự ẩn
+ */
+export function showToast(message, duration = 3000) {
+  const toast = qs('#toast');
+  if (!toast) return;
+  clearTimeout(toastTimer);
+  toast.textContent = message;
+  toast.hidden = false;
+  toastTimer = setTimeout(() => {
+    toast.hidden = true;
+  }, duration);
+}
+
 /**
  * Dựng dòng "Xem thêm" cho ô chọn tháng khi danh sách bị rút gọn.
  * @param {number} hiddenCount số tháng đang bị ẩn bớt

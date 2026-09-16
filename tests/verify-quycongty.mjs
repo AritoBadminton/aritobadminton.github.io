@@ -181,21 +181,25 @@ check(
   'true',
 );
 check('Chi không có số tiền mặc định', await page.inputValue('#new-amount'), '');
-check('Chi không có nội dung mặc định', await page.inputValue('#new-desc'), '');
+check('Chi mặc định nội dung theo danh mục đầu tiên', await page.inputValue('#new-desc'), 'Tiền thuê sân');
 
 await page.click('#new-type-toggle [data-type="thu"]');
 await page.waitForTimeout(300);
 check('đổi sang Thu thì hiện mặc định 1 triệu', await page.inputValue('#new-amount'), '1.000.000');
 check(
-  'đổi sang Thu thì hiện nội dung mặc định',
+  'đổi sang Thu thì nội dung mặc định theo danh mục đầu tiên',
   await page.inputValue('#new-desc'),
-  'Tiền quỹ thành viên hàng tháng',
+  'Tiền quỹ công ty hàng tháng',
 );
 
 await page.click('#new-type-toggle [data-type="chi"]');
 await page.waitForTimeout(300);
-check('đổi lại Chi thì xoá mặc định của Thu', await page.inputValue('#new-amount'), '');
-check('đổi lại Chi thì xoá nội dung mặc định của Thu', await page.inputValue('#new-desc'), '');
+check('đổi lại Chi thì xoá mặc định số tiền của Thu', await page.inputValue('#new-amount'), '');
+check(
+  'đổi lại Chi thì nội dung theo đúng danh mục Chi đầu tiên',
+  await page.inputValue('#new-desc'),
+  'Tiền thuê sân',
+);
 
 await page.fill('#new-amount', '250000');
 await page.fill('#new-desc', 'Khoản thử');
@@ -207,7 +211,11 @@ await page.fill('#new-date', THIS + '-09');
 await page.click('#new-submit');
 await page.waitForTimeout(1600);
 check('thêm xong Chi vẫn để trống, không tự điền mặc định của Thu', await page.inputValue('#new-amount'), '');
-check('thêm xong Chi vẫn để trống nội dung', await page.inputValue('#new-desc'), '');
+check(
+  'thêm xong nội dung quay lại đúng danh mục đang chọn',
+  await page.inputValue('#new-desc'),
+  'Tiền thuê sân',
+);
 check(
   'vẫn ghi đúng nội dung đã gõ',
   await page.evaluate(() =>
@@ -251,10 +259,10 @@ check(
   'Tiền được tài trợ cho CLB',
 );
 
-await page.click('#ledger-add-toggle');
+await page.click('#new-cancel');
 await page.waitForTimeout(300);
 
-/* ---------- 7. Dòng mang danh mục cũ không bị đổi khi sửa ---------- */
+/* ---------- 8. Dòng mang danh mục cũ không bị đổi khi sửa ---------- */
 
 await page.selectOption('#filter-month', '');
 await page.fill('#filter-keyword', 'gõ tay');

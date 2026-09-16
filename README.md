@@ -179,16 +179,22 @@ Bấm **Lưu chung lên GitHub** để lấy khối `"roster"` dán đè vào `d
 
 ## Sửa một khoản thu / chi đã có
 
-Tab **Sổ thu chi**, cần đăng nhập Admin. Mỗi dòng trong bảng có hai nút nhỏ trước nút xoá:
+Tab **Sổ thu chi**, cần đăng nhập Admin. Mỗi dòng trong bảng có ba nút nhỏ: **Cập nhật** (bút chì),
+**Sao chép**, rồi đến nút xoá **×**.
 
-1. Bấm nút **cây bút** (Cập nhật) ở dòng cần sửa → form hiện ra sẵn cả 4 ô: ngày, số tiền, nội dung, danh mục
+1. Bấm nút **cây bút** (Cập nhật) ở dòng cần sửa → một hộp thoại nổi lên hiện sẵn cả 4 ô: ngày, số tiền, nội dung, danh mục
 2. Sửa xong bấm **Lưu thay đổi**
 
 Dòng đã sửa có nhãn **đã sửa** màu vàng. Nút **Khôi phục bản gốc** trả dòng đang sửa về đúng như trong `data.json`.
+Bấm **Huỷ**, bấm ra ngoài hộp thoại, hoặc bấm phím Esc để đóng mà không lưu gì.
 
-Bấm nút **sao chép** (cạnh nút cây bút) khi khoản mới gần giống một khoản đã có: form Cập nhật mở sẵn,
+Bấm nút **sao chép** khi khoản mới gần giống một khoản đã có: cùng hộp thoại Cập nhật hiện ra,
 điền sẵn cả 4 ô theo dòng gốc — sửa lại (thường chỉ cần đổi ngày) rồi bấm **Lưu thay đổi** mới thật sự
-tạo khoản mới. Bấm sao chép xong mà đóng form không lưu thì không có gì được ghi lại.
+tạo khoản mới. Bấm sao chép xong mà đóng hộp thoại không lưu thì không có gì được ghi lại.
+
+Bấm nút **×** để xoá một khoản: một hộp thoại hỏi xác nhận hiện ra, nêu rõ tên/ngày/số tiền khoản sắp xoá.
+Bấm **Xoá** mới xoá thật (không thể hoàn tác) và có thông báo "Đã xoá thành công" hiện vài giây rồi tự tắt;
+bấm **Huỷ** chỉ đóng hộp thoại, không đụng gì tới dữ liệu.
 
 > Khi có dòng cũ bị sửa, khối JSON xuất ra sẽ là **thay toàn bộ** danh sách `expenses` / `incomes`
 > chứ không phải dán thêm — vì không thể mô tả "sửa dòng thứ mấy" một cách an toàn.
@@ -213,10 +219,11 @@ tài liệu `settings/qr` của Firestore chứ không để trong `data.json`.
 
 ## Nhập khoản thu / chi mới
 
-Vào tab **Sổ thu chi** → bấm **+ Thêm giao dịch**:
+Vào tab **Sổ thu chi** → bấm **+ Thêm giao dịch**, một hộp thoại nổi lên:
 
 1. Chọn **Khoản CHI** hoặc **Khoản THU**
-2. Điền ngày, số tiền, nội dung, chọn danh mục
+2. Điền ngày, số tiền, nội dung, chọn danh mục — chọn danh mục thì nội dung tự điền theo đúng tên
+   danh mục đó (ví dụ chọn "Tiền nước" thì nội dung tự thành "Tiền nước"), sửa đè lên được nếu cần khác
 3. Bấm **Thêm vào sổ**
 
 Khoản mới hiện ngay trong sổ (có nhãn **mới**) và cộng luôn vào số dư và thống kê tháng.
