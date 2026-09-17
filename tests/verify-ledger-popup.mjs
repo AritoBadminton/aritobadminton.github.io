@@ -62,6 +62,21 @@ await page.waitForTimeout(500);
 const rowCount = () =>
   page.$$eval('#ledger-table tr', (els) => els.filter((e) => !e.querySelector('.table-empty')).length);
 
+/* ---------- 0. Cột Giao dịch (trước là Danh mục) đứng trước cột Nội dung ---------- */
+
+check(
+  'thứ tự cột đúng: Ngày, Loại, Giao dịch, Nội dung, Số tiền',
+  await page.$$eval('#panel-ledger thead th', (els) => els.map((e) => e.textContent.trim())),
+  ['Ngày ⇅', 'Loại', 'Giao dịch', 'Nội dung', 'Số tiền ⇅', ''],
+);
+
+const rowWithThueSan = await page.$$eval('#ledger-table tr', (els) => {
+  const row = els.find((e) => e.textContent.includes('Thuê sân'));
+  return [...row.querySelectorAll('td')].map((e) => e.textContent.replace(/\s+/g, ' ').trim());
+});
+check('cột thứ 3 (Giao dịch) là danh mục', rowWithThueSan[2], 'Tiền thuê sân');
+check('cột thứ 4 (Nội dung) là tên khoản', rowWithThueSan[3].includes('Thuê sân'), true);
+
 /* ---------- 1. Hộp thoại "Thêm giao dịch" hiện dạng popup ---------- */
 
 check('lúc chưa bấm, popup thêm giao dịch còn ẩn', await page.isVisible('#new-entry-modal'), false);

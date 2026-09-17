@@ -210,6 +210,8 @@ check('nội dung sửa lại được', await page.inputValue('#new-desc'), 'Kh
 await page.fill('#new-date', THIS + '-09');
 await page.click('#new-submit');
 await page.waitForTimeout(1600);
+check('thêm xong hiện toast báo đã thực hiện', await page.isVisible('#toast'), true);
+check('toast đúng nội dung', (await page.textContent('#toast')).trim(), 'Đã thực hiện xong');
 check('thêm xong Chi vẫn để trống, không tự điền mặc định của Thu', await page.inputValue('#new-amount'), '');
 check(
   'thêm xong nội dung quay lại đúng danh mục đang chọn',
@@ -283,6 +285,8 @@ check(
   await page.evaluate(() => JSON.parse(localStorage.getItem('__fakestore__')).transactions.t4.cat),
   'Tiền quỹ thành viên hàng tháng',
 );
+check('sửa xong hiện toast báo đã thực hiện', await page.isVisible('#toast'), true);
+check('toast đúng nội dung', (await page.textContent('#toast')).trim(), 'Đã thực hiện xong');
 
 check('không có lỗi javascript', errors, []);
 

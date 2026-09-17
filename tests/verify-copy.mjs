@@ -142,6 +142,9 @@ await page.fill('#update-date', '2026-08-27');
 await page.click('#update-save');
 await page.waitForTimeout(1500);
 
+check('lưu xong hiện toast báo đã thực hiện', await page.isVisible('#toast'), true);
+check('toast đúng nội dung', (await page.textContent('#toast')).trim(), 'Đã thực hiện xong');
+
 check('lưu xong bảng mới thêm đúng 1 dòng', await rowCount(), before + 1);
 const copies = await page.$$eval('#ledger-table tr', (els) =>
   els

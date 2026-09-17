@@ -235,8 +235,18 @@ giờ luôn hiện đúng một chữ tĩnh, không còn tự đổi thành "Đ�
 (`members-view.js`, xoá thành viên), nhưng ở Sổ thu chi đã đổi sang bấm một cái
 mở `#delete-confirm-modal` hỏi rõ tên/ngày/số tiền khoản sắp xoá; Đồng ý mới xoá
 thật, Huỷ chỉ đóng popup không đụng gì. Xoá xong gọi `showToast()` (`utils/dom.js`)
-hiện chữ "Đã xoá thành công" ở `#toast` rồi tự ẩn sau 3 giây — hàm này dùng
-chung được cho các thông báo nổi khác sau này nếu cần, không riêng cho xoá.
+hiện chữ "Đã xoá thành công" ở `#toast` rồi tự ẩn sau 3 giây.
+
+**Bấm "Thêm vào sổ"/"Lưu thay đổi" cũng hiện toast, dùng chung `showToast()`
+(09/2026).** Ba chỗ gọi `addTransaction`/`updateTransaction` thành công —
+`handleAddTransaction`, và `handleSaveUpdate` (dùng chung cho cả sửa lẫn sao
+chép) — đều gọi thêm `showToast('Đã thực hiện xong')` sau khi lưu, cùng cơ chế
+toast của nút xoá ở trên. Chữ khác nhau theo hành động (`'Đã xoá thành công'` so
+với `'Đã thực hiện xong'`), không dùng chung một hằng số — nếu sau này thêm chỗ
+gọi mới thì nhớ chọn đúng câu, đừng gộp lại thành một chuỗi chung chung. Riêng
+form Thêm giao dịch vẫn giữ nguyên hành vi **không đóng popup** sau khi lưu
+(để nhập liên tiếp nhiều khoản), form Cập nhật/Sao chép thì đóng popup như cũ —
+toast không đổi phần đó, chỉ thêm thông báo.
 
 **Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
 cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"
@@ -246,6 +256,16 @@ số dư **luỹ kế đến hết tháng đang xem** qua `getFundBalanceUpTo(mo
 đúng số dư hiện tại, khớp `getFundBalance()`. Ô "Số dư quỹ hiện tại" ở Tổng quan
 (`#kpi-balance`, `dashboard-view.js`) **không đổi**, vẫn luôn là số dư mới nhất
 bất kể ai đang lọc gì ở tab Sổ thu chi.
+
+**Bảng Sổ thu chi: cột "Giao dịch" (trước là "Danh mục") đứng trước cột "Nội
+dung" (09/2026).** Thứ tự cột cũ là Ngày, Loại, Nội dung, Danh mục, Số tiền;
+chủ trang yêu cầu đảo hai cột giữa và đổi tên cột danh mục thành "Giao dịch" —
+giờ là Ngày, Loại, **Giao dịch**, Nội dung, Số tiền. Đây chỉ là đổi vị trí `<td>`
+trong `renderLedger` (`ledger-view.js`) và thứ tự `<th>` khớp theo trong
+`index.html`; dữ liệu bên dưới (`row.cat`/`row.desc`) không đổi, `colspan` dòng
+trống vẫn là 6. **Đừng nhầm với bảng "Giao dịch gần đây" ở Tổng quan
+(`#recent-table`, `dashboard-view.js`)** — bảng đó vẫn giữ thứ tự Nội dung rồi
+Danh mục như cũ, chưa được yêu cầu đổi.
 
 **Phụ đề dưới tiêu đề và các dòng "Cập nhật ..." đã bỏ (09/2026).** Trước đây
 `renderDashboard` tự tính `firstDate`/`lastDate` từ ngày giao dịch mới nhất để
