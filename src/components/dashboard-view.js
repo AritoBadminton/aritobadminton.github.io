@@ -1,6 +1,13 @@
-/** Trang Tổng quan: ô số liệu, khối quy định, mã QR và giao dịch gần đây. */
+/** Trang Tổng quan: ô số liệu, khối quy định, địa chỉ CLB và giao dịch gần đây. */
 
 import { RECENT_TRANSACTION_COUNT } from '../config/constants.js';
+import {
+  buildAddressJson,
+  getEffectiveAddress,
+  hasAddressChanges,
+  resetAddress,
+  setAddressField,
+} from '../services/address-service.js';
 import { getDuesTotal } from '../services/dues-service.js';
 import { getAllExpenses, getAllIncomes, getFundBalance, isDuesEntry } from '../services/ledger-service.js';
 import {
@@ -21,6 +28,7 @@ import { formatCurrency, formatDateLabel, formatNoteHtml } from '../utils/format
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>`;
 const TRASH_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>`;
 const CHAT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4 9.9 9.9 0 01-4.2-.9L3 20.5l1.5-4.4A8.4 8.4 0 1121 11.5z"/></svg>`;
+const PIN_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
 
 /* ---------- Xử lý sự kiện ---------- */
 
@@ -69,6 +77,39 @@ function handleSaveRules() {
   });
 }
 
+/** Sửa một ô của địa chỉ CLB rồi cập nhật thanh lưu. */
+function handleEditAddress(field, value) {
+  setAddressField(field, value);
+  renderAddressSaveBar();
+}
+
+/** Bỏ mọi thay đổi, quay lại địa chỉ trong data.json. */
+function handleResetAddress() {
+  resetAddress();
+  setVisible(qs('#address-export'), false);
+  requestRender('dashboard');
+}
+
+/** Hiện khối "address"/"mapLink" để dán tay vào data.json. */
+async function showAddressManualBlock() {
+  const block = buildAddressJson();
+  qs('#address-export-code').textContent = block;
+  setVisible(qs('#address-export'), true);
+  await copyToClipboard(block);
+  qs('#address-export').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/** Lưu địa chỉ lên dữ liệu chung. */
+function handleSaveAddress() {
+  return saveSection({
+    buttonSelector: '#address-export-toggle',
+    statusSelector: '#address-pending-state',
+    section: 'address',
+    buildPayload: () => getEffectiveAddress(),
+    showManualBlock: showAddressManualBlock,
+  });
+}
+
 /* ---------- Vẽ giao diện ---------- */
 
 /** Cập nhật thanh lưu chung của khối quy định. */
@@ -80,6 +121,73 @@ function renderRulesSaveBar() {
   qs('#rules-export-toggle').disabled = !changed;
   qs('#rules-export-toggle').style.opacity = changed ? '1' : '0.45';
   setVisible(qs('#rules-reset'), changed, 'inline-block');
+}
+
+/** Cập nhật thanh lưu chung của địa chỉ CLB. */
+function renderAddressSaveBar() {
+  const changed = hasAddressChanges();
+  qs('#address-pending-state').textContent = changed
+    ? 'Đang có thay đổi chưa lưu chung — bấm "Lưu chung lên GitHub" để cả nhóm cùng thấy.'
+    : 'Chưa thay đổi gì so với dữ liệu chung.';
+  qs('#address-export-toggle').disabled = !changed;
+  qs('#address-export-toggle').style.opacity = changed ? '1' : '0.45';
+  setVisible(qs('#address-reset'), changed, 'inline-block');
+}
+
+/**
+ * Khối địa chỉ CLB. Admin sửa được ngay tại chỗ, người xem thường chỉ thấy khi
+ * đã có nội dung — như khối mã QR, tự ẩn hẳn khi chưa admin nào nhập gì.
+ */
+function renderAddressPanel() {
+  const address = getEffectiveAddress();
+  const panel = qs('#address-panel');
+
+  if (!store.isAdmin && !address.text && !address.mapLink) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = '';
+
+  const mapLinkHtml = address.mapLink
+    ? ` — <a href="${escapeHtml(address.mapLink)}" target="_blank" rel="noopener">Xem trên Google Maps →</a>`
+    : '';
+
+  const pinSpan = (size) =>
+    `<span style="display:inline-flex;flex:0 0 auto;width:${size}px;height:${size}px;color:var(--text-3)">${PIN_ICON}</span>`;
+
+  if (!store.isAdmin) {
+    panel.innerHTML = `
+      <div class="card__body" style="display:flex;align-items:center;gap:10px">
+        ${pinSpan(22)}
+        <span>${escapeHtml(address.text)}${mapLinkHtml}</span>
+      </div>`;
+    return;
+  }
+
+  panel.innerHTML = `
+    <div class="card__header" style="display:flex;align-items:center;gap:10px">
+      ${pinSpan(20)}
+      <div>
+        <h3>Địa chỉ CLB</h3>
+        <p>Chỉ admin thấy hai ô sửa dưới đây; người xem thường chỉ thấy dòng địa chỉ kèm link.</p>
+      </div>
+    </div>
+    <div class="card__body">
+      <div class="field-grid address-panel__fields">
+        <label>Địa chỉ<input type="text" id="address-text-input" value="${escapeHtml(address.text)}" placeholder="Số nhà, đường, phường/xã, tỉnh/thành…"></label>
+        <label>Link Google Maps<input type="url" id="address-maplink-input" value="${escapeHtml(address.mapLink)}" placeholder="https://maps.app.goo.gl/…"></label>
+      </div>
+      ${address.text || address.mapLink ? `<p class="text-muted mt-sm">Xem trước: ${escapeHtml(address.text)}${mapLinkHtml}</p>` : ''}
+    </div>`;
+
+  qs('#address-text-input').addEventListener('input', (event) =>
+    handleEditAddress('text', event.target.value),
+  );
+  qs('#address-maplink-input').addEventListener('input', (event) =>
+    handleEditAddress('mapLink', event.target.value),
+  );
+
+  renderAddressSaveBar();
 }
 
 /** Một mức đóng ở chế độ chỉ xem. */
@@ -231,11 +339,14 @@ export function renderDashboard() {
     .join('');
 
   renderRules();
+  renderAddressPanel();
   renderQrPanel();
 }
 
-/** Gắn sự kiện cho các nút lưu chung của khối quy định. */
+/** Gắn sự kiện cho các nút lưu chung của khối quy định và địa chỉ CLB. */
 export function initDashboardView() {
   qs('#rules-export-toggle').addEventListener('click', handleSaveRules);
   qs('#rules-reset').addEventListener('click', handleResetRules);
+  qs('#address-export-toggle').addEventListener('click', handleSaveAddress);
+  qs('#address-reset').addEventListener('click', handleResetAddress);
 }

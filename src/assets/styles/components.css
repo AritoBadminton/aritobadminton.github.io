@@ -309,9 +309,15 @@ select:focus {
   grid-template-columns: 1fr 1fr;
 }
 
+/* Khối sửa địa chỉ CLB chỉ có 2 ô — cùng lý do trên, luôn ép 2 cột thay vì 4. */
+.address-panel__fields {
+  grid-template-columns: 1fr 1fr;
+}
+
 @media (max-width: 520px) {
   .field-grid,
-  .modal__box--wide .field-grid {
+  .modal__box--wide .field-grid,
+  .address-panel__fields {
     grid-template-columns: 1fr;
   }
 }

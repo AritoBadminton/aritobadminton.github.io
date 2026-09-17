@@ -74,6 +74,7 @@ export const STORAGE_KEYS = {
   LEDGER_ADDED: 'clb-tx-v1',
   LEDGER_EDITED: 'clb-txedit-v1',
   RULES: 'clb-rules-v1',
+  ADDRESS: 'clb-address-v1',
   API_SESSION: 'clb-session-v1',
 };
 

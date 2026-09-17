@@ -19,7 +19,7 @@ const SUCCESS_LABEL_MS = 2200;
  * @param {object} options
  * @param {string} options.buttonSelector nút "Lưu chung"
  * @param {string} options.statusSelector ô chữ báo trạng thái
- * @param {'rules'|'roster'|'month'|'ledger'} options.section
+ * @param {'rules'|'address'|'roster'|'month'|'ledger'} options.section
  * @param {() => object} options.buildPayload dựng nội dung gửi lên
  * @param {() => void} options.showManualBlock hiện khối JSON để dán tay
  * @param {string} [options.monthKey] chỉ dùng cho section 'month'
