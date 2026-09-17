@@ -59,8 +59,13 @@ check('không còn thanh "chế độ chỉ xem"', await page.isVisible('#readon
 check('không còn nút Đăng nhập trong thanh đó', await page.$('#readonly-login'), null);
 check('khách thấy ba tab công khai', await tabsHien(), ['Tổng quan', 'Đóng quỹ theo tháng', 'Sổ thu chi']);
 check(
-  'chỉ tab Thành viên là của riêng admin',
+  'tab Thành viên chỉ dành cho admin',
   await page.$eval('[data-panel="members"]', (e) => getComputedStyle(e).display),
+  'none',
+);
+check(
+  'tab Danh mục giao dịch cũng chỉ dành cho admin',
+  await page.$eval('[data-panel="categories"]', (e) => getComputedStyle(e).display),
   'none',
 );
 check('khách không thấy bảng Giao dịch gần đây', await page.isVisible('#recent-card'), false);
@@ -76,10 +81,14 @@ check('khách mở được Sổ thu chi', await page.isVisible('#panel-ledger')
 check('khách đọc được bảng giao dịch', await page.isVisible('#ledger-table'), true);
 check('nhưng khách không có khu Thêm giao dịch', await page.isVisible('#ledger-add-toggle'), false);
 
-// Bấm thẳng vào tab đang ẩn thì vẫn không mở được — nay chỉ còn Thành viên.
+// Bấm thẳng vào tab đang ẩn thì vẫn không mở được — cả hai tab riêng admin.
 await page.evaluate(() => document.querySelector('[data-panel="members"]').click());
 await page.waitForTimeout(500);
 check('không mở được tab Thành viên', await page.isVisible('#panel-members'), false);
+
+await page.evaluate(() => document.querySelector('[data-panel="categories"]').click());
+await page.waitForTimeout(500);
+check('không mở được tab Danh mục giao dịch', await page.isVisible('#panel-categories'), false);
 
 // Trả về Tổng quan, không thì các phép kiểm sau lại đo nhầm tab đang mở.
 await page.click('[data-panel="dashboard"]');
@@ -93,17 +102,22 @@ await page.fill('#login-password', 'MatKhauRatDai#2026');
 await page.click('#login-submit');
 await page.waitForTimeout(1800);
 
-check('admin thấy đủ bốn tab', await tabsHien(), [
+check('admin thấy đủ năm tab', await tabsHien(), [
   'Tổng quan',
   'Thành viên',
   'Đóng quỹ theo tháng',
   'Sổ thu chi',
+  'Danh mục giao dịch',
 ]);
 check('admin không thấy thanh nhắc nào', await page.isVisible('#readonly-bar'), false);
 check('admin thấy bảng Giao dịch gần đây', await page.isVisible('#recent-card'), true);
 await page.click('[data-panel="ledger"]');
 await page.waitForTimeout(700);
 check('admin mở được Sổ thu chi', await page.isVisible('#panel-ledger'), true);
+
+await page.click('[data-panel="categories"]');
+await page.waitForTimeout(700);
+check('admin mở được Danh mục giao dịch', await page.isVisible('#panel-categories'), true);
 
 /* ---------- 3. Đăng xuất khi đang ở tab admin thì bị đẩy về Tổng quan ---------- */
 

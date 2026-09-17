@@ -50,6 +50,24 @@ service cloud.firestore {
         && request.resource.data.cat.size() <= 120;
     }
 
+    // Mỗi danh mục giao dịch (tab "Danh mục giao dịch") một tài liệu.
+    match /categories/{catId} {
+      allow read: if true;
+      allow delete: if isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.type in ['thu', 'chi']
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.code is string
+        && request.resource.data.code.size() <= 20
+        && request.resource.data.color is string
+        && request.resource.data.color.matches('^#[0-9a-fA-F]{6}$')
+        && isCleanAmount(request.resource.data.defaultAmount)
+        && request.resource.data.defaultDesc is string
+        && request.resource.data.defaultDesc.size() <= 300;
+    }
+
     // Ai là quản trị viên: chỉ người đã đăng nhập mới đọc được, không ai ghi được
     // từ trang web. Thêm hoặc bớt admin làm trực tiếp trong Firebase Console.
     match /admins/{uid} {

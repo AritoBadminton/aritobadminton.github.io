@@ -158,14 +158,56 @@ còn phân biệt admin hay không** — không dùng công tắc, `renderCompan
 lọc. Người bị lọc ra vẫn giữ số của mình và **số đó không được nhảy sang người
 khác**. Trùng số thì báo đỏ nhưng vẫn cho lưu, kèm nút "Đánh số lại".
 
-**Tab chỉ dành cho admin: chỉ còn Thành viên.** Sổ thu chi từng là tab admin
-nhưng đã mở cho mọi người xem (`4f9bc0b`, 09/2026) — khách đọc được bảng giao
-dịch, còn khu "Thêm giao dịch" và các nút sửa/xoá/sao chép vẫn mang `admin-only`
-nên không ai ngoài admin ghi được vào sổ. **Đừng thêm lại `admin-only` vào tab
-`data-panel="ledger"`**, đó là lật ngược một quyết định đã chốt. `tab-nav.js` từ
-chối kích hoạt tab đang `display: none`, nên bấm thẳng vào tab Thành viên khi
-chưa đăng nhập cũng không mở được. Bảng "Giao dịch gần đây" ở Tổng quan vẫn mang
-class `admin-only`.
+**Tab chỉ dành cho admin: Thành viên và Danh mục giao dịch.** Sổ thu chi từng
+là tab admin nhưng đã mở cho mọi người xem (`4f9bc0b`, 09/2026) — khách đọc
+được bảng giao dịch, còn khu "Thêm giao dịch" và các nút sửa/xoá/sao chép vẫn
+mang `admin-only` nên không ai ngoài admin ghi được vào sổ. **Đừng thêm lại
+`admin-only` vào tab `data-panel="ledger"`**, đó là lật ngược một quyết định đã
+chốt. `tab-nav.js` từ chối kích hoạt tab đang `display: none`, nên bấm thẳng
+vào một trong hai tab admin khi chưa đăng nhập cũng không mở được. Bảng "Giao
+dịch gần đây" ở Tổng quan vẫn mang class `admin-only`.
+
+**Tab "Danh mục giao dịch" (chỉ admin, 09/2026), đặt sau tab Sổ thu chi.**
+Quản lý danh mục thu/chi tự phục vụ thay vì hằng số cứng trong code —
+`src/services/category-service.js` + `src/components/category-view.js`, dữ
+liệu ở collection Firestore `categories/<id>` (`{ type: 'thu'|'chi', code,
+name, color, defaultAmount, defaultDesc, protected? }`). Giao diện kiểu Grid +
+popup New/Edit + popup xác nhận xoá, giống hệt mẫu đã dùng ở Sổ thu chi.
+
+- **Giao dịch vẫn lưu danh mục theo TÊN** (`transactions/<id>.cat`), không đổi
+  sang tham chiếu id — tránh phải đụng vào toàn bộ giao dịch đã có. Tra màu
+  (`getCategoryColorMap`) và mặc định tiền/nội dung cũng theo tên.
+- **Chỉ quản lý được (thêm/sửa/xoá) ở chế độ Firebase** — `canManageCategories()`
+  = `isFirebaseMode()`. Không dựng luồng ghi-đè-cục-bộ-rồi-dán-tay-JSON như
+  `rules`/`address`, vì đường `data.json`-mode đã là lối cũ không hoạt động
+  trên trang thật (`api.baseUrl` rỗng) — không đáng công nhân đôi. `data.json`
+  vẫn có sẵn mảng `"categories"` để chế độ đó còn đọc/hiển thị được, chỉ là
+  không sửa được qua giao diện.
+- **Xoá bị chặn nếu danh mục đã phát sinh giao dịch** (`isCategoryInUse`, so
+  theo tên với `store.transactions`) — nút Xoá ở dòng đó không hiện ra, chỉ
+  còn nút Sửa.
+- **`Tiền quỹ công ty hàng tháng` đánh dấu `protected: true`.** `getCompanyFundTotal()`
+  (`ledger-service.js`) so khớp theo đúng tên hằng `COMPANY_FUND_CATEGORY`
+  (`constants.js`) — đổi tên danh mục này sẽ làm lệch công thức đó ngay. Ô Tên
+  bị khoá (disabled) trên form Sửa khi `protected` là true; đây chỉ là khoá ở
+  giao diện, `firestore.rules` không ép field này vì trang đã chọn "tin admin"
+  cho mọi thao tác ghi khác.
+- **Mã danh mục ("THU-001"/"CHI-001") do hệ thống tự sinh** (`generateCategoryCode`),
+  không phải ô admin gõ tay — cột Mã trong bảng Grid mặc định ẩn, tick "Hiện
+  mã" mới thấy.
+- **Firestore thật đang có collection `categories` trống** — tab Danh mục giao
+  dịch sẽ trống trơn cho tới khi có admin đăng nhập lần đầu sau khi tính năng
+  này lên trang thật. `seedDefaultCategoriesIfEmpty()` tự chạy trong
+  `applyAuthState()` (`login-modal.js`) mỗi lần `store.isAdmin` thành `true`,
+  nhưng tự kiểm rỗng trước nên chỉ thật sự ghi đúng một lần — gieo lại đúng 6
+  danh mục đang chạy trước khi có tab này (`DEFAULT_CATEGORIES` trong
+  `category-service.js`), để ô chọn danh mục ở Sổ thu chi không bị trống ngay
+  sau khi triển khai.
+- Ô chọn danh mục ở form "Thêm giao dịch" (`#new-category`) đôi khi được dựng
+  lúc collection `categories` trên Firestore chưa kịp về tới máy (mở form ngay
+  sau lần đăng nhập admin đầu tiên, lúc gieo mặc định còn đang chạy) —
+  `openNewEntryModal` (`ledger-view.js`) tự nạp lại danh mục nếu ô đang trống
+  hẳn, tránh admin thấy ô chọn danh mục rỗng.
 
 **Ghi chú ở Tổng quan** (`settings/club.notes[]`) chỉ hiện khi `settings/rules.items`
 rỗng và người xem không phải admin (`renderRules` trong `dashboard-view.js`) —
@@ -181,20 +223,24 @@ tiền. Chữ đậm trong "Lưu ý" ra `<strong>`, không phải `<b>`, nên CS
 cùng màu với nhãn "Lưu ý:". Chưa có màn hình admin nào để sửa `notes` hay
 `footer`; đổi nội dung phải sửa thẳng trong Firebase Console.
 
-**Ô nhập khoản mới ở Sổ thu chi: số tiền chỉ Thu mới có mặc định, nội dung thì
-cả hai đều có, lấy theo danh mục (09/2026).** Số tiền dùng `DEFAULT_ENTRY_AMOUNT`,
-chỉ áp cho Thu — đó là khoản quỹ công ty lặp lại gần như y hệt mỗi tháng, Chi thì
-mỗi khoản một số khác nhau nên để trống. Nội dung không còn hằng số riêng
-(`DEFAULT_ENTRY_DESC` đã xoá khỏi `constants.js`) — `resetNewEntryFields` gán
-thẳng theo **danh mục đang chọn trong `#new-category`**, giống hệt việc tự chọn
-lại danh mục (`handleNewCategoryChange`), chỉ khác là chạy ngay lúc mở form/đổi
-Thu-Chi thay vì phải đợi bấm chọn lại mới có. Đổi qua lại Thu/Chi ở
-`#new-type-toggle` sẽ tự căn lại theo đúng hai quy tắc này.
+**Ô nhập khoản mới ở Sổ thu chi: số tiền và nội dung mặc định lấy theo đúng
+danh mục đang chọn (09/2026, đổi tiếp 09/2026 sang đọc từ tab Danh mục giao
+dịch thay vì hằng số cứng).** Từng dùng `DEFAULT_ENTRY_AMOUNT` áp chung cho mọi
+danh mục Thu — hằng số đó đã xoá khỏi `constants.js`; giờ mỗi danh mục tự có
+`defaultAmount`/`defaultDesc` riêng (sửa được ở tab Danh mục giao dịch, xem
+mục "Tab 'Danh mục giao dịch'" bên trên). `resetNewEntryFields`
+(`ledger-view.js`) tra `findCategoryByName` theo **danh mục đang chọn trong
+`#new-category`**, để trống số tiền nếu danh mục đó không có `defaultAmount`
+(hoặc bằng 0) — đa số danh mục Chi để trống vì mỗi khoản một số khác nhau.
+Cùng một hàm chạy cả lúc mở form/đổi Thu-Chi lẫn lúc tự chọn lại danh mục
+(`handleNewCategoryChange` gọi thẳng `resetNewEntryFields`), nên hai chỗ luôn
+khớp nhau.
 
-**Danh mục Thu có hai lựa chọn:** "Tiền quỹ công ty hàng tháng" và "Tiền được
-tài trợ cho CLB" — khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng
-thu bình thường, chỉ khác là **không** được `getCompanyFundTotal` xem là tiền
-công ty cấp hàng tháng (chỉ lọc đúng danh mục quỹ công ty).
+**Danh mục Thu mặc định có hai lựa chọn** (admin thêm/bớt được ở tab Danh mục
+giao dịch): "Tiền quỹ công ty hàng tháng" và "Tiền được tài trợ cho CLB" —
+khoản tài trợ là tiền thật có vào quỹ nên vẫn cộng vào tổng thu bình thường,
+chỉ khác là **không** được `getCompanyFundTotal` xem là tiền công ty cấp hàng
+tháng (chỉ lọc đúng danh mục quỹ công ty, theo tên hằng `COMPANY_FUND_CATEGORY`).
 
 **Sổ thu chi không còn chọn nhiều dòng cùng lúc (09/2026).** Trước đây mỗi dòng
 có ô tick, một nút "Cập nhật" và một nút "Sao chép" dùng chung ở đầu bảng thao

@@ -11,6 +11,7 @@
  *   settings/roster        { active: { "<tên>": true|false }, order: { "<tên>": số } }
  *   months/<YYYY-MM>       { label, dues: { "<tên>": { paid, note, skip } } }
  *   transactions/<id>      { type: 'thu'|'chi', date, amount, desc, cat }
+ *   categories/<id>        { type: 'thu'|'chi', code, name, color, defaultAmount, defaultDesc, protected? }
  *   admins/<uid>           { email, name }  — chỉ đọc, sửa trong Firebase Console
  */
 
@@ -172,9 +173,9 @@ export function watchClubData(onData, onError) {
   const { db } = getConnection();
   stopWatching();
 
-  const parts = { settings: {}, months: null, transactions: null };
+  const parts = { settings: {}, months: null, transactions: null, categories: null };
   const publish = () => {
-    if (parts.months && parts.transactions) onData(buildClubData(parts));
+    if (parts.months && parts.transactions && parts.categories) onData(buildClubData(parts));
   };
   const fail = () => onError('Mất kết nối tới Firebase. Số liệu đang xem có thể chưa mới nhất.');
 
@@ -212,6 +213,17 @@ export function watchClubData(onData, onError) {
       fail,
     ),
   );
+
+  unsubscribers.push(
+    onSnapshot(
+      collection(db, 'categories'),
+      (snapshot) => {
+        parts.categories = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+        publish();
+      },
+      fail,
+    ),
+  );
 }
 
 /** Ngừng mọi lắng nghe. */
@@ -225,7 +237,7 @@ export function stopWatching() {
  * nhờ vậy các màn hình không cần biết dữ liệu đến từ đâu.
  */
 function buildClubData(parts) {
-  const { settings, months, transactions } = parts;
+  const { settings, months, transactions, categories } = parts;
   const activeMap = settings.roster?.active ?? {};
   const orderMap = settings.roster?.order ?? {};
 
@@ -271,6 +283,7 @@ function buildClubData(parts) {
     months: monthList,
     incomes: pick('thu'),
     expenses: pick('chi'),
+    categories,
   };
 }
 
@@ -381,6 +394,40 @@ export async function updateTransaction(id, changes) {
 export function deleteTransaction(id) {
   const { db } = getConnection();
   return deleteDoc(doc(db, 'transactions', id));
+}
+
+/** Thêm một danh mục giao dịch mới, trả về mã tài liệu vừa tạo. */
+export async function addCategory(fields) {
+  const { db } = getConnection();
+  const created = await addDoc(collection(db, 'categories'), fields);
+  return created.id;
+}
+
+/** Sửa một danh mục giao dịch đã có. */
+export function updateCategory(id, changes) {
+  const { db } = getConnection();
+  return updateDoc(doc(db, 'categories', id), changes);
+}
+
+/** Xoá một danh mục giao dịch — gọi phía trên đã tự kiểm chưa có giao dịch nào dùng. */
+export function deleteCategory(id) {
+  const { db } = getConnection();
+  return deleteDoc(doc(db, 'categories', id));
+}
+
+/**
+ * Gieo danh mục mặc định một lần khi collection "categories" còn trống.
+ *
+ * Không dùng writeBatch: batch cần doc() sinh sẵn id, mà mỗi tài liệu ở đây
+ * cần một id tự sinh riêng — addDoc tuần tự đơn giản hơn và chỉ chạy đúng một
+ * lần lúc admin đầu tiên đăng nhập sau khi triển khai, không phải đường nóng.
+ * @param {object[]} categories
+ */
+export async function seedCategories(categories) {
+  const { db } = getConnection();
+  for (const fields of categories) {
+    await addDoc(collection(db, 'categories'), fields);
+  }
 }
 
 /** Cập nhật ngày giao dịch mới nhất, chỉ khi ngày mới thật sự muộn hơn. */

@@ -1,6 +1,6 @@
 /** Các hàm định dạng số tiền, ngày tháng và nhãn hiển thị. */
 
-import { CATEGORY_COLOR_FALLBACK, CATEGORY_COLORS } from '../config/constants.js';
+import { CATEGORY_COLOR_FALLBACK } from '../config/constants.js';
 import { escapeHtml } from './dom.js';
 
 const NUMBER_FORMATTER = new Intl.NumberFormat('vi-VN');
@@ -63,11 +63,16 @@ export function formatDateLabel(isoDate) {
 
 /**
  * Màu đại diện cho một danh mục thu/chi.
+ *
+ * Nhận màu từ ngoài (`getCategoryColorMap()` trong `category-service.js`)
+ * thay vì đọc thẳng store ở đây — utils giữ nguyên tắc hàm thuần, không phụ
+ * thuộc trạng thái ứng dụng.
  * @param {string} category
+ * @param {Record<string, string>} [colors]
  * @returns {string}
  */
-export function getCategoryColor(category) {
-  return CATEGORY_COLORS[category] ?? CATEGORY_COLOR_FALLBACK;
+export function getCategoryColor(category, colors = {}) {
+  return colors[category] ?? CATEGORY_COLOR_FALLBACK;
 }
 
 /**
