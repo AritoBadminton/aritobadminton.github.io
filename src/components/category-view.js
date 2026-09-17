@@ -32,6 +32,8 @@ let deleteTargetId = '';
 function openNewCategoryModal() {
   editingCategoryId = '';
   qs('#category-heading').textContent = 'Thêm danh mục';
+  // Danh mục mới chưa có id — Firestore tự sinh lúc lưu, chưa có gì để hiện.
+  qs('#category-id-note').textContent = '';
   qs('#category-message').textContent = '';
   qs('#category-name').value = '';
   qs('#category-name').disabled = false;
@@ -60,6 +62,7 @@ function openEditCategoryModal(id) {
 
   editingCategoryId = id;
   qs('#category-heading').textContent = 'Sửa danh mục';
+  qs('#category-id-note').textContent = `id: ${category.id}`;
   qs('#category-message').textContent = '';
   qs('#category-name').value = category.name;
   qs('#category-name').disabled = Boolean(category.protected);
@@ -164,6 +167,7 @@ export function renderCategoryGrid() {
           return `<tr>
         <td><i class="color-dot" style="background:${row.color}"></i></td>
         <td class="category-code-col" style="display:${showCode ? 'table-cell' : 'none'}">${escapeHtml(row.code ?? '')}</td>
+        <td class="category-code-col" style="display:${showCode ? 'table-cell' : 'none'}"><code>${escapeHtml(row.id)}</code></td>
         <td class="cell-name">${escapeHtml(row.name)}
           ${row.protected ? '<span class="pill pill--merged" title="Gắn với công thức Tiền quỹ công ty cấp">khoá tên</span>' : ''}
         </td>
@@ -187,7 +191,7 @@ export function renderCategoryGrid() {
       </tr>`;
         })
         .join('')
-    : '<tr><td colspan="7" class="table-empty text-muted">Chưa có danh mục nào</td></tr>';
+    : '<tr><td colspan="8" class="table-empty text-muted">Chưa có danh mục nào</td></tr>';
 
   qsa('#category-table .js-category-edit').forEach((button) => {
     button.addEventListener('click', () => openEditCategoryModal(button.dataset.id));

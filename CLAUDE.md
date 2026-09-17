@@ -193,8 +193,10 @@ popup New/Edit + popup xác nhận xoá, giống hệt mẫu đã dùng ở Sổ
   giao diện, `firestore.rules` không ép field này vì trang đã chọn "tin admin"
   cho mọi thao tác ghi khác.
 - **Mã danh mục ("THU-001"/"CHI-001") do hệ thống tự sinh** (`generateCategoryCode`),
-  không phải ô admin gõ tay — cột Mã trong bảng Grid mặc định ẩn, tick "Hiện
-  mã" mới thấy.
+  không phải ô admin gõ tay — cột Mã và cột ID (mã tài liệu Firestore thật)
+  trong bảng Grid mặc định ẩn, tick "Hiện mã & id" mới thấy cả hai. ID cũng
+  hiện read-only ở đầu form Sửa (`#category-id-note`) để đối chiếu với
+  Firebase Console; form Thêm không có vì Firestore chỉ sinh id lúc lưu.
 - **Firestore thật đang có collection `categories` trống** — tab Danh mục giao
   dịch sẽ trống trơn cho tới khi có admin đăng nhập lần đầu sau khi tính năng
   này lên trang thật. `seedDefaultCategoriesIfEmpty()` tự chạy trong

@@ -100,20 +100,25 @@ const rowCount = () =>
 check('nạp đủ 3 danh mục có sẵn', await rowCount(), 3);
 
 check(
-  'mặc định cột Mã đang ẩn',
+  'mặc định cột Mã/ID đang ẩn',
   await page.$eval('.category-code-col', (e) => getComputedStyle(e).display),
   'none',
 );
 await page.check('#category-show-code');
 await page.waitForTimeout(200);
 check(
-  'tick "Hiện mã" thì cột Mã hiện ra',
-  await page.$eval('.category-code-col', (e) => getComputedStyle(e).display !== 'none'),
+  'tick "Hiện mã & id" thì cả hai cột hiện ra',
+  await page.$$eval('.category-code-col', (els) => els.every((e) => getComputedStyle(e).display !== 'none')),
   true,
 );
 check(
   'cột Mã hiện đúng mã hệ thống',
   await page.$$eval('#category-table tr', (els) => els.some((e) => e.textContent.includes('CHI-001'))),
+  true,
+);
+check(
+  'cột ID hiện đúng id tài liệu Firestore',
+  await page.$$eval('#category-table tr', (els) => els.some((e) => e.textContent.includes('c1'))),
   true,
 );
 await page.uncheck('#category-show-code');
@@ -146,6 +151,7 @@ await page.click('#category-add-toggle');
 await page.waitForTimeout(300);
 check('bấm "+ Thêm danh mục" thì popup hiện ra', await page.isVisible('#category-modal'), true);
 check('mặc định ô Tên không bị khoá', await page.isDisabled('#category-name'), false);
+check('form Thêm chưa có id để hiện', await page.textContent('#category-id-note'), '');
 
 await page.fill('#category-name', 'Tiền khác');
 await page.fill('#category-amount', '150000');
@@ -176,6 +182,11 @@ await page.click(`#category-table tr:nth-child(${protectedRowIndex}) .js-categor
 await page.waitForTimeout(300);
 check('danh mục khoá tên: ô Tên bị disable khi sửa', await page.isDisabled('#category-name'), true);
 check('hiện ghi chú giải thích lý do khoá tên', await page.isVisible('#category-protected-note'), true);
+check(
+  'form Sửa hiện đúng id danh mục đang sửa',
+  (await page.textContent('#category-id-note')).trim(),
+  'id: c3',
+);
 await page.fill('#category-amount', '1500000');
 await page.click('#category-save');
 await page.waitForTimeout(500);
