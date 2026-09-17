@@ -1,6 +1,7 @@
 /** Hộp thoại đăng nhập quản trị, đổi mật khẩu, và nút bật/tắt phiên trên header. */
 
 import { login, logout, restoreSession } from '../services/auth-service.js';
+import { seedDefaultCategoriesIfEmpty } from '../services/category-service.js';
 import { firebaseApi, isFirebaseMode } from '../services/data-source.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
@@ -32,7 +33,11 @@ export function applyAuthState() {
   const passwordButton = qs('#password-toggle');
   if (passwordButton) passwordButton.style.display = isFirebaseMode() && signedIn ? '' : 'none';
   enforceVisibleTab();
-  if (store.data) requestRender('dashboard', 'ledger', 'members', 'months');
+  if (store.data) requestRender('dashboard', 'ledger', 'members', 'months', 'categories');
+  // Gieo danh mục mặc định đúng một lần, vào lần admin đầu tiên đăng nhập sau
+  // khi tính năng này triển khai — collection "categories" trên Firestore
+  // thật đang trống nên ô chọn danh mục ở Sổ thu chi sẽ rỗng nếu không có bước này.
+  if (store.isAdmin) seedDefaultCategoriesIfEmpty();
 }
 
 /** Mở hộp thoại đăng nhập với ô mật khẩu trống. */

@@ -21,21 +21,15 @@ export const FUTURE_MONTH_COUNT = 0;
 export const RECENT_TRANSACTION_COUNT = 10;
 
 /**
- * Danh mục chọn được khi nhập giao dịch mới.
+ * Danh mục của khoản tiền công ty cấp cho quỹ.
  *
- * Nhóm "thu" chỉ còn quỹ công ty: tiền thành viên đóng nay ghi ở bảng Đóng quỹ
- * theo tháng, gõ thêm một dòng thu nữa là đếm hai lần cùng một số tiền.
+ * Danh mục giao dịch giờ do admin tự quản lý (tab "Danh mục giao dịch",
+ * `category-service.js`) nên tên có thể đổi — NHƯNG chuỗi này vẫn phải khớp
+ * đúng tên danh mục thật trên Firestore, vì `getCompanyFundTotal()` so khớp
+ * theo tên. Danh mục tương ứng được đánh dấu `protected: true` khi tạo, khoá
+ * ô Tên trên giao diện để không ai lỡ đổi tên làm lệch công thức này.
  */
-export const CATEGORIES = {
-  chi: ['Tiền thuê sân', 'Tiền cầu lông', 'Tiền nước', 'Tiền khác'],
-  thu: ['Tiền quỹ công ty hàng tháng', 'Tiền được tài trợ cho CLB'],
-};
-
-/** Danh mục của khoản tiền công ty cấp cho quỹ. */
 export const COMPANY_FUND_CATEGORY = 'Tiền quỹ công ty hàng tháng';
-
-/** Số tiền điền sẵn ở ô nhập khoản mới; sửa lại được. */
-export const DEFAULT_ENTRY_AMOUNT = 1000000;
 
 /**
  * Danh mục thu do bảng "Đóng quỹ theo tháng" cung cấp.
@@ -49,18 +43,8 @@ export const DEFAULT_ENTRY_AMOUNT = 1000000;
  */
 export const MEMBER_DUES_CATEGORY = 'Tiền quỹ thành viên hàng tháng';
 
-/** Màu biểu diễn cho từng danh mục, tham chiếu biến CSS trong base.css. */
-export const CATEGORY_COLORS = {
-  'Tiền thuê sân': 'var(--series-1)',
-  'Tiền cầu lông': 'var(--series-2)',
-  'Tiền nước': 'var(--series-3)',
-  'Tiền khác': 'var(--series-4)',
-  'Tiền quỹ công ty hàng tháng': 'var(--series-1)',
-  'Tiền quỹ thành viên hàng tháng': 'var(--series-2)',
-  'Tiền được tài trợ': 'var(--series-3)',
-};
-
-export const CATEGORY_COLOR_FALLBACK = 'var(--series-5)';
+/** Màu dùng khi một danh mục (thường là dòng cũ đã xoá khỏi danh sách) không còn màu riêng. */
+export const CATEGORY_COLOR_FALLBACK = '#9aa3af';
 
 /** Khoá lưu trữ trong localStorage / sessionStorage. */
 export const STORAGE_KEYS = {

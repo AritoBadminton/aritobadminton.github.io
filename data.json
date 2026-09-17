@@ -207,6 +207,31 @@
    "active": false
   }
  ],
+ "categories": [
+  { "id": "chi-1", "type": "chi", "code": "CHI-001", "name": "Tiền thuê sân", "color": "#2a78d6", "defaultAmount": 0, "defaultDesc": "Tiền thuê sân" },
+  { "id": "chi-2", "type": "chi", "code": "CHI-002", "name": "Tiền cầu lông", "color": "#eb6834", "defaultAmount": 0, "defaultDesc": "Tiền cầu lông" },
+  { "id": "chi-3", "type": "chi", "code": "CHI-003", "name": "Tiền nước", "color": "#1baf7a", "defaultAmount": 0, "defaultDesc": "Tiền nước" },
+  { "id": "chi-4", "type": "chi", "code": "CHI-004", "name": "Tiền khác", "color": "#eda100", "defaultAmount": 0, "defaultDesc": "Tiền khác" },
+  {
+   "id": "thu-1",
+   "type": "thu",
+   "code": "THU-001",
+   "name": "Tiền quỹ công ty hàng tháng",
+   "color": "#2a78d6",
+   "defaultAmount": 1000000,
+   "defaultDesc": "Tiền quỹ công ty hàng tháng",
+   "protected": true
+  },
+  {
+   "id": "thu-2",
+   "type": "thu",
+   "code": "THU-002",
+   "name": "Tiền được tài trợ cho CLB",
+   "color": "#e87ba4",
+   "defaultAmount": 1000000,
+   "defaultDesc": "Tiền được tài trợ cho CLB"
+  }
+ ],
  "expenses": [
   {
    "date": "2024-12-01",

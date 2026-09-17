@@ -12,6 +12,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                     |
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
+| **Danh mục giao dịch**  | *(chỉ admin)* Thêm/sửa/xoá danh mục thu-chi: màu, số tiền và nội dung mặc định cho form Thêm giao dịch                                      |
 
 ## Nơi lưu dữ liệu
 
@@ -61,6 +62,7 @@ Trang chia hai mức: **khách** (mặc định) và **admin** (đã đăng nh�
 | **Tổng thu, tổng chi**             |  ❌   |  ✅   |
 | **Bảng "Giao dịch gần đây"**       |  ❌   |  ✅   |
 | **Tab Thành viên**                 |  ❌   |  ✅   |
+| **Tab Danh mục giao dịch**         |  ❌   |  ✅   |
 | **Sổ thu chi: "Tất cả các tháng"** |  ❌   |  ✅   |
 | Nhập, sửa, đánh dấu đóng quỹ       |  ❌   |  ✅   |
 
@@ -232,8 +234,8 @@ tài liệu `settings/qr` của Firestore chứ không để trong `data.json`.
 Vào tab **Sổ thu chi** → bấm **+ Thêm giao dịch**, một hộp thoại nổi lên:
 
 1. Chọn **Khoản CHI** hoặc **Khoản THU**
-2. Điền ngày, số tiền, nội dung, chọn danh mục — chọn danh mục thì nội dung tự điền theo đúng tên
-   danh mục đó (ví dụ chọn "Tiền nước" thì nội dung tự thành "Tiền nước"), sửa đè lên được nếu cần khác
+2. Điền ngày, số tiền, nội dung, chọn danh mục — chọn danh mục thì số tiền và nội dung tự điền theo
+   mặc định của danh mục đó (đặt ở tab **Danh mục giao dịch**), sửa đè lên được nếu cần khác
 3. Bấm **Thêm vào sổ**
 
 Khoản mới hiện ngay trong sổ (có nhãn **mới**) và cộng luôn vào số dư và thống kê tháng.
@@ -243,6 +245,22 @@ Lúc này khoản mới chỉ nằm trên máy bạn. Để cả nhóm cùng th�
 trang sẽ hiện sẵn các khối JSON kèm nút **Sao chép** cho từng khối. Mở `data.json` trên GitHub,
 bấm ✏️, dán từng khối vào cuối danh sách tương ứng (nhớ thêm dấu phẩy `,` sau dấu `}` của dòng cuối cũ),
 sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web tự cập nhật.
+
+## Danh mục giao dịch
+
+Tab **Danh mục giao dịch** (chỉ admin thấy, ở sau Sổ thu chi) quản lý các danh mục thu/chi dùng
+trong ô chọn "Danh mục" ở trên — thay vì danh sách cố định trong mã nguồn.
+
+- Bảng liệt kê từng danh mục: màu, tên, loại (Thu/Chi), số tiền mặc định, nội dung mặc định.
+  Tick **Hiện mã** để thấy mã hệ thống tự sinh (`THU-001`, `CHI-002`…), bình thường ẩn cho gọn.
+- Bấm **+ Thêm danh mục** hoặc nút **cây bút** ở một dòng để mở hộp thoại thêm/sửa: chọn loại, đặt
+  tên, chọn màu, số tiền mặc định (để trống nếu mỗi khoản một số khác nhau), nội dung mặc định.
+- Danh mục **đã có giao dịch trong Sổ thu chi thì không xoá được**, dòng đó chỉ còn nút Sửa — xoá
+  một danh mục đang dùng sẽ làm các dòng cũ mất màu và không lọc lại được, nên trang chặn hẳn.
+- Danh mục "Tiền quỹ công ty hàng tháng" khoá ô Tên (đổi được màu/mặc định) vì ô "Tiền quỹ công ty
+  cấp" ở tab Đóng quỹ theo tháng tính theo đúng tên này.
+- Chỉ dùng được ở **chế độ Firebase** — chế độ `data.json` chỉ đọc danh mục có sẵn trong file, không
+  thêm/sửa/xoá qua giao diện được.
 
 ### Định dạng data.json
 
@@ -268,6 +286,19 @@ sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web 
     // phân loại đang / ngưng hoạt động
     { "name": "Văn Khánh", "active": true },
     { "name": "Kim Trinh", "active": false },
+  ],
+
+  "categories": [
+    // danh mục thu/chi — chỉ đọc ở chế độ data.json, sửa qua giao diện phải chạy chế độ Firebase
+    {
+      "id": "chi-1",
+      "type": "chi",
+      "code": "CHI-001",
+      "name": "Tiền thuê sân",
+      "color": "#2a78d6",
+      "defaultAmount": 0,
+      "defaultDesc": "Tiền thuê sân",
+    },
   ],
 
   "expenses": [

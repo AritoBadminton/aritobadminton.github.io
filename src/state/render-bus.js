@@ -10,7 +10,7 @@ const renderers = new Map();
 
 /**
  * Đăng ký hàm vẽ cho một vùng giao diện.
- * @param {string} scope tên vùng: 'dashboard' | 'ledger' | 'members' | 'months'
+ * @param {string} scope tên vùng: 'dashboard' | 'ledger' | 'members' | 'months' | 'categories'
  * @param {() => void} renderFn
  */
 export function registerRenderer(scope, renderFn) {

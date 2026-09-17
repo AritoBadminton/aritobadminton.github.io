@@ -5,6 +5,7 @@
  * Mọi nghiệp vụ nằm ở services/, mọi thao tác DOM nằm ở components/.
  */
 
+import { initCategoryView, renderCategoryGrid } from './components/category-view.js';
 import { initDashboardView, renderDashboard } from './components/dashboard-view.js';
 import { initLedgerView, renderLedger, renderLedgerFilters } from './components/ledger-view.js';
 import { applyAuthState, initLoginModal, restoreAuthState } from './components/login-modal.js';
@@ -37,6 +38,7 @@ function registerRenderers() {
   registerRenderer('ledger', renderLedgerWithFilters);
   registerRenderer('members', renderMembers);
   registerRenderer('months', renderMonthsWithPicker);
+  registerRenderer('categories', renderCategoryGrid);
 }
 
 /** Hiện thông báo khi không tải được dữ liệu. */
@@ -108,6 +110,7 @@ async function bootstrap() {
   initLedgerView();
   initMembersView();
   initMonthsView();
+  initCategoryView();
   registerRenderers();
 
   try {

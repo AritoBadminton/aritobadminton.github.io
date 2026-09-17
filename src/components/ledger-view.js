@@ -1,12 +1,11 @@
 /** Trang Sổ thu chi: bộ lọc, bảng giao dịch, form thêm mới và form cập nhật. */
 
+import { MEMBER_DUES_CATEGORY, MONTH_OPTION_LIMIT, MONTH_OPTION_MORE } from '../config/constants.js';
 import {
-  CATEGORIES,
-  DEFAULT_ENTRY_AMOUNT,
-  MEMBER_DUES_CATEGORY,
-  MONTH_OPTION_LIMIT,
-  MONTH_OPTION_MORE,
-} from '../config/constants.js';
+  findCategoryByName,
+  getCategoriesByType,
+  getCategoryColorMap,
+} from '../services/category-service.js';
 import { getDuesTotal } from '../services/dues-service.js';
 import {
   addTransaction,
@@ -137,20 +136,21 @@ function renderPendingBar() {
 /* ---------- Form thêm mới ---------- */
 
 /**
- * Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới.
+ * Điền lại số tiền và nội dung mặc định cho ô nhập khoản mới, theo đúng danh
+ * mục đang chọn trong `#new-category` (đặt ở tab "Danh mục giao dịch").
  *
- * Số tiền: chỉ Thu mới có giá trị mặc định — đó là khoản quỹ công ty lặp lại
- * gần như y hệt nhau mỗi tháng. Chi thì mỗi khoản một số tiền khác nhau nên
- * điền sẵn số của Thu vào chỉ gây nhầm; để trống cho admin gõ tay.
+ * Số tiền: danh mục không có `defaultAmount` (hoặc bằng 0) thì để trống — hầu
+ * hết danh mục Chi mỗi khoản một số khác nhau, điền sẵn số của danh mục khác
+ * vào chỉ gây nhầm.
  *
- * Nội dung: gán sẵn theo đúng danh mục đang chọn trong ô — giống hệt việc tự
- * chọn lại danh mục (`handleNewCategoryChange`), chỉ khác là chạy ngay lúc mở
- * form/đổi Thu-Chi thay vì phải đợi người dùng bấm chọn lại mới có.
+ * Cùng một hàm dùng cho cả lúc mở form/đổi Thu-Chi lẫn lúc tự chọn lại danh
+ * mục (`handleNewCategoryChange` gọi thẳng hàm này), để hai chỗ luôn khớp
+ * nhau và không có bản sao logic thứ hai dễ lệch dần theo thời gian.
  */
 function resetNewEntryFields() {
-  const isThu = newEntryType === 'thu';
-  qs('#new-amount').value = isThu ? formatNumber(DEFAULT_ENTRY_AMOUNT) : '';
-  qs('#new-desc').value = qs('#new-category').value;
+  const category = findCategoryByName(qs('#new-category').value);
+  qs('#new-amount').value = category?.defaultAmount ? formatNumber(category.defaultAmount) : '';
+  qs('#new-desc').value = category?.defaultDesc || qs('#new-category').value;
 }
 
 /**
@@ -170,19 +170,17 @@ function buildCategoryOptions(allowed, rows) {
 
 /** Nạp danh mục hợp lệ theo loại giao dịch đang chọn. */
 function fillNewEntryCategories() {
-  qs('#new-category').innerHTML = CATEGORIES[newEntryType]
-    .map((category) => `<option>${escapeHtml(category)}</option>`)
+  qs('#new-category').innerHTML = getCategoriesByType(newEntryType)
+    .map((category) => `<option>${escapeHtml(category.name)}</option>`)
     .join('');
 }
 
 /**
- * Chọn danh mục thì gán luôn tên danh mục vào ô nội dung.
- *
- * Đa số khoản chi/thu trùng ngay tên danh mục ("Tiền nước", "Tiền quỹ công ty
- * hàng tháng"…), gán sẵn đỡ phải gõ lại; ai cần nội dung khác cứ sửa đè lên.
+ * Chọn danh mục thì gán luôn số tiền và nội dung mặc định của danh mục đó.
+ * @see resetNewEntryFields
  */
 function handleNewCategoryChange() {
-  qs('#new-desc').value = qs('#new-category').value;
+  resetNewEntryFields();
 }
 
 /** Đóng hộp thoại cập nhật/sao chép. */
@@ -196,6 +194,12 @@ function closeUpdateForm() {
 function openNewEntryModal() {
   qs('#new-message').textContent = '';
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
+  // Phòng trường hợp mở form ngay lúc danh mục vừa gieo mặc định xong (đăng
+  // nhập admin lần đầu sau khi triển khai tab Danh mục giao dịch) — lúc
+  // initLedgerView() chạy, collection categories trên Firestore có thể vẫn
+  // còn trống. Chỉ nạp lại khi ô đang trống hẳn, để không xoá mất lựa chọn
+  // người dùng vừa chọn ở lần mở form trước.
+  if (!qs('#new-category').options.length) fillNewEntryCategories();
   if (!qs('#new-amount').value) resetNewEntryFields();
   qs('#new-entry-modal').hidden = false;
   // Bôi đen sẵn để gõ đè lên nội dung mặc định, khỏi phải xoá tay.
@@ -279,7 +283,10 @@ function fillUpdateForm(row, { head, showRevert }) {
   qs('#update-modal').hidden = false;
   qs('#update-message').textContent = '';
 
-  const categories = buildCategoryOptions(CATEGORIES[row.type], [row]);
+  const categories = buildCategoryOptions(
+    getCategoriesByType(row.type).map((category) => category.name),
+    [row],
+  );
   qs('#update-category').innerHTML = categories
     .map((category) => `<option>${escapeHtml(category)}</option>`)
     .join('');
@@ -496,6 +503,7 @@ export function renderLedgerFilters() {
 /** Vẽ lại bảng sổ thu chi và các số liệu kèm theo. */
 export function renderLedger() {
   const rows = getFilteredRows();
+  const categoryColors = getCategoryColorMap();
 
   // Cố ý lấy getScopedRows chứ không phải rows: nút Thu/Chi chỉ lọc bảng bên
   // dưới, ba ô tổng luôn hiện đủ cả thu lẫn chi của tháng đang xem.
@@ -529,7 +537,7 @@ export function renderLedger() {
         <td>${formatDateLabel(row.date)}</td>
         <td><span class="pill ${row.type === 'thu' ? 'pill--income' : 'pill--expense'}">${row.type === 'thu' ? 'Thu' : 'Chi'}</span></td>
         <td><span style="display:inline-flex;align-items:center;gap:7px">
-          <i class="color-dot" style="background:${getCategoryColor(row.cat)}"></i>${escapeHtml(row.cat)}
+          <i class="color-dot" style="background:${getCategoryColor(row.cat, categoryColors)}"></i>${escapeHtml(row.cat)}
         </span></td>
         <td class="cell-name">${escapeHtml(row.desc)}
           ${row.isNew ? '<span class="pill pill--new">mới</span>' : ''}
