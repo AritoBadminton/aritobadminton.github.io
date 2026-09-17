@@ -7,6 +7,7 @@
  */
 
 import { store } from '../state/store.js';
+import { loadLocalAddressChanges, resetAddress } from './address-service.js';
 import { loadLocalDuesChanges, resetMonth } from './dues-service.js';
 import { discardAllLedgerChanges, loadLocalLedgerChanges, rebuildTransactions } from './ledger-service.js';
 import { aggregateMembers, initActiveMembers, resetActiveMembers } from './member-service.js';
@@ -18,6 +19,7 @@ import { loadLocalRuleChanges, resetRuleItems } from './rules-service.js';
  */
 export function buildDerivedState() {
   loadLocalRuleChanges();
+  loadLocalAddressChanges();
   loadLocalLedgerChanges();
   rebuildTransactions();
   store.months = store.data.months;
@@ -31,11 +33,12 @@ export function buildDerivedState() {
 
 /**
  * Bỏ bản nháp của phần vừa lưu thành công — nó đã trở thành dữ liệu chung.
- * @param {'rules'|'roster'|'month'|'ledger'} section
+ * @param {'rules'|'address'|'roster'|'month'|'ledger'} section
  * @param {string} [monthKey] chỉ dùng cho section 'month'
  */
 function discardLocalDraft(section, monthKey) {
   if (section === 'rules') resetRuleItems();
+  else if (section === 'address') resetAddress();
   else if (section === 'roster') resetActiveMembers();
   else if (section === 'month') resetMonth(monthKey);
   else discardAllLedgerChanges();
@@ -44,7 +47,7 @@ function discardLocalDraft(section, monthKey) {
 /**
  * Nhận dữ liệu chung mới sau khi lưu, xoá bản nháp tương ứng rồi dựng lại trạng thái.
  * @param {object} freshData nội dung data.json mới
- * @param {'rules'|'roster'|'month'|'ledger'} section
+ * @param {'rules'|'address'|'roster'|'month'|'ledger'} section
  * @param {string} [monthKey]
  */
 export function applySavedData(freshData, section, monthKey) {

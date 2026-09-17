@@ -5,7 +5,7 @@
  * mọi máy đang mở trang, nên cả nhóm thấy cùng lúc mà không cần tải lại.
  *
  * Đường dẫn dữ liệu:
- *   settings/club          { name, updated }
+ *   settings/club          { name, updated, address, mapLink }
  *   settings/rules         { title, subtitle, items[], footer }
  *   settings/qr            { image, name, account, bank, note }
  *   settings/roster        { active: { "<tên>": true|false }, order: { "<tên>": số } }
@@ -262,6 +262,8 @@ function buildClubData(parts) {
   return {
     club: settings.club?.name ?? 'CLB Cầu Lông',
     updated: settings.club?.updated ?? '',
+    address: settings.club?.address ?? '',
+    mapLink: settings.club?.mapLink ?? '',
     rules: settings.rules ?? {},
     qr: settings.qr ?? {},
     notes: settings.club?.notes ?? [],
@@ -278,6 +280,12 @@ function buildClubData(parts) {
 export function saveRuleItems(items) {
   const { db } = getConnection();
   return setDoc(doc(db, 'settings', 'rules'), { items }, { merge: true });
+}
+
+/** Ghi lại địa chỉ CLB và link Google Maps. */
+export function saveClubAddress(address, mapLink) {
+  const { db } = getConnection();
+  return setDoc(doc(db, 'settings', 'club'), { address, mapLink }, { merge: true });
 }
 
 /** Đánh dấu một thành viên còn hoạt động hay không. */

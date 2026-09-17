@@ -48,6 +48,9 @@ export const store = {
   /** Quy định đóng quỹ do admin sửa tại chỗ; null nghĩa là dùng nguyên data.json. */
   ruleItemsOverride: null,
 
+  /** Địa chỉ CLB + link Google Maps do admin sửa tại chỗ; null nghĩa là dùng nguyên data.json. */
+  addressOverride: null,
+
   /** Ô lọc tháng ở sổ thu chi đang mở đầy đủ hay chỉ 5 tháng gần nhất. */
   showAllLedgerMonths: false,
 

@@ -53,7 +53,7 @@ cố ý chỉ hỗ trợ chế độ Firebase thì ghi rõ trong chú thích.
 ### Hình dạng dữ liệu trên Firestore
 
 ```
-settings/club     { name, updated, notes[] }
+settings/club     { name, updated, notes[], address, mapLink }
 settings/rules    { title, subtitle, items[], footer }
 settings/qr       { image, name, account, bank, note }
 settings/roster   { active: { "<tên>": bool }, order: { "<tên>": số } }
@@ -131,7 +131,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=19`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=20`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -274,6 +274,23 @@ hiển thị "Cập nhật lần cuối" ở footer, "Cập nhật ..." dưới 
 `#app-subtitle` giờ là **chữ tĩnh** "Từ tháng 11/2024 đến nay" viết thẳng trong
 `index.html`, không còn do JS tính. **Đừng thêm lại** các dòng ngày-cập-nhật tự
 động này nếu không được yêu cầu lại.
+
+**Địa chỉ CLB + link Google Maps ở Tổng quan, admin sửa trực tiếp trên trang
+(09/2026).** Hai trường mới `address`/`mapLink` nằm chung tài liệu
+`settings/club` (đã có sẵn `name`/`updated`) chứ không phải tài liệu riêng —
+`watchClubData` đã lắng nghe `'club'` từ trước nên không cần thêm listener.
+Dịch vụ mới `address-service.js` mô phỏng đúng `rules-service.js`: admin gõ vào
+ô là `setAddressField` ghi thẳng lên Firestore (`saveClubAddress`,
+`firebase-service.js`) ở chế độ Firebase, hoặc lưu `store.addressOverride` +
+localStorage rồi chờ "Lưu chung lên GitHub" ở chế độ `data.json`. `#address-panel`
+(`renderAddressPanel`, `dashboard-view.js`) dùng chung một `<div id="address-panel">`
+cho cả hai vai: admin thấy hai ô nhập (địa chỉ, link) và luôn thấy khối này kể cả
+khi còn trống; người xem thường chỉ thấy một dòng chữ kèm link, và **khối tự ẩn
+hẳn** nếu chưa admin nào nhập gì — giống hệt cách khối mã QR tự ẩn khi thiếu
+`qr.image`. Link chỉ hiện khi `mapLink` khác rỗng; có địa chỉ mà chưa có link thì
+chỉ hiện chữ, không tự bịa link. `.address-panel__fields` trong `components.css`
+ép `.field-grid` (vốn 4 cột ở màn rộng) xuống 2 cột — cùng lý do và cùng cách
+làm với `.modal__box--wide .field-grid` đã ghi ở trên.
 
 ## Cạm bẫy đã gặp
 
