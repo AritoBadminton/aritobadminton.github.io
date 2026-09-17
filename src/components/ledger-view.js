@@ -225,6 +225,7 @@ function handleAddTransaction() {
   requestRender();
   message.textContent = `Đã thêm: ${newEntryType === 'thu' ? 'thu' : 'chi'} ${formatCurrency(amount)} — ${desc}`;
   message.style.color = 'var(--good)';
+  showToast('Đã thực hiện xong');
   resetNewEntryFields();
   qs('#new-desc').select();
 }
@@ -312,6 +313,7 @@ function handleSaveUpdate() {
 
   closeUpdateForm();
   requestRender();
+  showToast('Đã thực hiện xong');
 }
 
 /**
@@ -526,6 +528,9 @@ export function renderLedger() {
           (row) => `<tr>
         <td>${formatDateLabel(row.date)}</td>
         <td><span class="pill ${row.type === 'thu' ? 'pill--income' : 'pill--expense'}">${row.type === 'thu' ? 'Thu' : 'Chi'}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:7px">
+          <i class="color-dot" style="background:${getCategoryColor(row.cat)}"></i>${escapeHtml(row.cat)}
+        </span></td>
         <td class="cell-name">${escapeHtml(row.desc)}
           ${row.isNew ? '<span class="pill pill--new">mới</span>' : ''}
           ${row.edited ? '<span class="pill pill--edited">đã sửa</span>' : ''}
@@ -535,9 +540,6 @@ export function renderLedger() {
               : ''
           }
         </td>
-        <td><span style="display:inline-flex;align-items:center;gap:7px">
-          <i class="color-dot" style="background:${getCategoryColor(row.cat)}"></i>${escapeHtml(row.cat)}
-        </span></td>
         <td class="cell-num" style="color:${row.type === 'thu' ? 'var(--good)' : 'var(--crit)'}">
           ${row.type === 'thu' ? '+' : '−'}${formatCurrency(row.amount)}
         </td>
