@@ -169,7 +169,6 @@ function renderAddressPanel() {
       ${pinSpan(20)}
       <div>
         <h3>Địa chỉ CLB</h3>
-        <p>Chỉ admin thấy hai ô sửa dưới đây; người xem thường chỉ thấy dòng địa chỉ kèm link.</p>
       </div>
     </div>
     <div class="card__body">
