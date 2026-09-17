@@ -12,7 +12,7 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                     |
 | **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
-| **Danh mục giao dịch**  | *(chỉ admin)* Thêm/sửa/xoá danh mục thu-chi: màu, số tiền và nội dung mặc định cho form Thêm giao dịch                                      |
+| **Danh mục giao dịch**  | _(chỉ admin)_ Thêm/sửa/xoá danh mục thu-chi: màu, số tiền và nội dung mặc định cho form Thêm giao dịch                                      |
 
 ## Nơi lưu dữ liệu
 

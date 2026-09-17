@@ -173,9 +173,9 @@ export function watchClubData(onData, onError) {
   const { db } = getConnection();
   stopWatching();
 
-  const parts = { settings: {}, months: null, transactions: null, categories: null };
+  const parts = { settings: {}, months: null, transactions: null, categories: [] };
   const publish = () => {
-    if (parts.months && parts.transactions && parts.categories) onData(buildClubData(parts));
+    if (parts.months && parts.transactions) onData(buildClubData(parts));
   };
   const fail = () => onError('Mất kết nối tới Firebase. Số liệu đang xem có thể chưa mới nhất.');
 
@@ -221,7 +221,14 @@ export function watchClubData(onData, onError) {
         parts.categories = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
         publish();
       },
-      fail,
+      // Không dùng `fail` chung: collection này không có trong dữ liệu bắt buộc
+      // để mở trang (khác months/transactions). Nếu firestore.rules trên
+      // Firebase Console chưa publish bản có rule cho "categories", lắng nghe
+      // này báo permission-denied — không được vì thế mà chặn cả trang hiện
+      // "Mất kết nối tới Firebase" hay treo mãi ở "Đang tải dữ liệu": để trống
+      // categories và cho phần còn lại chạy bình thường, chỉ tab Danh mục giao
+      // dịch tạm thời rỗng.
+      () => {},
     ),
   );
 }
