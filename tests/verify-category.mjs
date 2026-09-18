@@ -153,6 +153,45 @@ check('bấm "+ Thêm danh mục" thì popup hiện ra', await page.isVisible('#
 check('mặc định ô Tên không bị khoá', await page.isDisabled('#category-name'), false);
 check('form Thêm chưa có id để hiện', await page.textContent('#category-id-note'), '');
 
+// Bug đã gặp: ở bộ lọc Grid "Tất cả", bấm qua lại Thu/Chi trong popup Thêm
+// không đổi được gì (thiếu hẳn sự kiện click cho #category-type-toggle).
+check(
+  'bộ lọc Grid đang ở Tất cả',
+  await page.getAttribute('#category-filter-type [data-type="all"]', 'aria-pressed'),
+  'true',
+);
+check(
+  'popup Thêm mặc định chọn Chi',
+  await page.getAttribute('#category-type-toggle [data-type="chi"]', 'aria-pressed'),
+  'true',
+);
+await page.click('#category-type-toggle [data-type="thu"]');
+await page.waitForTimeout(200);
+check(
+  'bấm Thu thì chuyển sang chọn Thu',
+  await page.getAttribute('#category-type-toggle [data-type="thu"]', 'aria-pressed'),
+  'true',
+);
+check(
+  'bấm Thu thì Chi hết được chọn',
+  await page.getAttribute('#category-type-toggle [data-type="chi"]', 'aria-pressed'),
+  'false',
+);
+await page.click('#category-type-toggle [data-type="chi"]');
+await page.waitForTimeout(200);
+check(
+  'bấm lại Chi thì chuyển về Chi',
+  await page.getAttribute('#category-type-toggle [data-type="chi"]', 'aria-pressed'),
+  'true',
+);
+check(
+  'bấm lại Chi thì Thu hết được chọn',
+  await page.getAttribute('#category-type-toggle [data-type="thu"]', 'aria-pressed'),
+  'false',
+);
+
+// Lưu ở loại Thu để xác nhận việc bấm chuyển qua lại thật sự đổi được giá trị lưu, không chỉ đổi mỗi giao diện.
+await page.click('#category-type-toggle [data-type="thu"]');
 await page.fill('#category-name', 'Tiền khác');
 await page.fill('#category-amount', '150000');
 await page.fill('#category-desc', 'Chi phí phát sinh');
@@ -161,6 +200,14 @@ await page.waitForTimeout(500);
 
 check('lưu xong đóng popup', await page.isVisible('#category-modal'), false);
 check('bảng có thêm 1 dòng', await rowCount(), 4);
+check(
+  'danh mục mới lưu đúng loại Thu đã chuyển sang, không phải Chi mặc định ban đầu',
+  await page.$$eval('#category-table tr', (els) => {
+    const row = els.find((e) => e.textContent.includes('Tiền khác'));
+    return row.textContent.includes('Thu');
+  }),
+  true,
+);
 check('toast báo đã thực hiện xong', (await page.textContent('#toast')).trim(), 'Đã thực hiện xong');
 await page.waitForTimeout(3200);
 
