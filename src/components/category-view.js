@@ -207,6 +207,14 @@ export function renderCategoryGrid() {
 
 /** Gắn toàn bộ sự kiện cho trang Danh mục giao dịch. */
 export function initCategoryView() {
+  qsa('#category-type-toggle .segmented__item').forEach((button) => {
+    button.addEventListener('click', () => {
+      qsa('#category-type-toggle .segmented__item').forEach((item) => {
+        item.setAttribute('aria-pressed', String(item === button));
+      });
+    });
+  });
+
   qsa('#category-filter-type .segmented__item').forEach((button) => {
     button.addEventListener('click', () => {
       qsa('#category-filter-type .segmented__item').forEach((item) => {
