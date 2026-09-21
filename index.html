@@ -82,9 +82,9 @@
 
       <nav class="tab-nav" role="tablist" aria-label="Khu vực nội dung">
         <button class="tab-nav__item" role="tab" aria-selected="true" data-panel="dashboard" type="button">Tổng quan</button>
-        <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="members" type="button">Thành viên</button>
         <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="months" type="button">Đóng quỹ theo tháng</button>
         <button class="tab-nav__item" role="tab" aria-selected="false" data-panel="ledger" type="button">Sổ thu chi</button>
+        <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="members" type="button">Thành viên</button>
         <button class="tab-nav__item admin-only" role="tab" aria-selected="false" data-panel="categories" type="button">
           Danh mục giao dịch
         </button>
@@ -439,9 +439,6 @@
             <button class="segmented__item" data-type="thu" aria-pressed="false" type="button">Thu</button>
             <button class="segmented__item" data-type="chi" aria-pressed="false" type="button">Chi</button>
           </div>
-          <label style="display: inline-flex; align-items: center; gap: 6px; font-weight: 400"
-            ><input type="checkbox" id="category-show-code" /> Hiện mã &amp; id</label
-          >
         </div>
 
         <div class="table-scroll">
@@ -449,8 +446,6 @@
             <thead>
               <tr>
                 <th style="width: 40px"></th>
-                <th class="category-code-col" style="display: none">Mã</th>
-                <th class="category-code-col" style="display: none">ID</th>
                 <th>Tên danh mục</th>
                 <th>Loại</th>
                 <th class="cell-num">Số tiền mặc định</th>

@@ -104,9 +104,9 @@ await page.waitForTimeout(1800);
 
 check('admin thấy đủ năm tab', await tabsHien(), [
   'Tổng quan',
-  'Thành viên',
   'Đóng quỹ theo tháng',
   'Sổ thu chi',
+  'Thành viên',
   'Danh mục giao dịch',
 ]);
 check('admin không thấy thanh nhắc nào', await page.isVisible('#readonly-bar'), false);

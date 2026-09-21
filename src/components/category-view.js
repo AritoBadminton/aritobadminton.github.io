@@ -153,9 +153,6 @@ export function renderCategoryGrid() {
   const canManage = canManageCategories();
   setVisible(qs('#category-add-toggle'), canManage, 'inline-flex');
 
-  const showCode = qs('#category-show-code').checked;
-  qsa('.category-code-col').forEach((cell) => setVisible(cell, showCode, 'table-cell'));
-
   const rows = getAllCategories()
     .filter((item) => filterType === 'all' || item.type === filterType)
     .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
@@ -166,8 +163,6 @@ export function renderCategoryGrid() {
           const inUse = isCategoryInUse(row.name);
           return `<tr>
         <td><i class="color-dot" style="background:${row.color}"></i></td>
-        <td class="category-code-col" style="display:${showCode ? 'table-cell' : 'none'}">${escapeHtml(row.code ?? '')}</td>
-        <td class="category-code-col" style="display:${showCode ? 'table-cell' : 'none'}"><code>${escapeHtml(row.id)}</code></td>
         <td class="cell-name">${escapeHtml(row.name)}
           ${row.protected ? '<span class="pill pill--merged" title="Gắn với công thức Tiền quỹ công ty cấp">khoá tên</span>' : ''}
         </td>
@@ -191,7 +186,7 @@ export function renderCategoryGrid() {
       </tr>`;
         })
         .join('')
-    : '<tr><td colspan="8" class="table-empty text-muted">Chưa có danh mục nào</td></tr>';
+    : '<tr><td colspan="6" class="table-empty text-muted">Chưa có danh mục nào</td></tr>';
 
   qsa('#category-table .js-category-edit').forEach((button) => {
     button.addEventListener('click', () => openEditCategoryModal(button.dataset.id));
@@ -225,7 +220,6 @@ export function initCategoryView() {
     });
   });
 
-  qs('#category-show-code').addEventListener('change', renderCategoryGrid);
   qs('#category-amount').addEventListener('input', () => {
     const digits = parseAmount(qs('#category-amount').value);
     qs('#category-amount').value = digits ? formatNumber(digits) : '';
