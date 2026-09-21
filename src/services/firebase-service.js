@@ -302,7 +302,7 @@ export function saveRuleItems(items) {
   return setDoc(doc(db, 'settings', 'rules'), { items }, { merge: true });
 }
 
-/** Ghi lại địa chỉ CLB và link Google Maps. */
+/** Ghi lại địa chỉ sân và link Google Maps. */
 export function saveClubAddress(address, mapLink) {
   const { db } = getConnection();
   return setDoc(doc(db, 'settings', 'club'), { address, mapLink }, { merge: true });

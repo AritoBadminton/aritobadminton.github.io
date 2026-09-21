@@ -340,6 +340,28 @@ chỉ hiện chữ, không tự bịa link. `.address-panel__fields` trong `comp
 ép `.field-grid` (vốn 4 cột ở màn rộng) xuống 2 cột — cùng lý do và cùng cách
 làm với `.modal__box--wide .field-grid` đã ghi ở trên.
 
+**Tên khối đổi thành "Địa chỉ sân" (09/2026), và nhãn này giờ hiện cả với
+người xem thường** — trước đó dòng chữ khách thấy chỉ có giá trị địa chỉ, không
+có nhãn nào đứng trước, nên nhìn như "chỉ admin mới thấy tên khối". Cả hai vai
+(`renderAddressPanel`) giờ đều có tiền tố `<b>Địa chỉ sân:</b>` (admin) hoặc
+`<h3>Địa chỉ sân</h3>` (khách xem inline, admin xem trong card header).
+
+**`renderAddressPanel` không còn dựng lại toàn bộ `innerHTML` mỗi lần vẽ khi
+đang ở khung sửa của admin (09/2026, sửa lỗi mất focus).** `setAddressField`
+ghi thẳng lên Firestore trên từng ký tự gõ (không debounce), `onSnapshot` đẩy
+ngược lại gần như ngay lập tức khiến `renderDashboard()` chạy lại **trong lúc
+admin còn đang gõ** — dựng lại `innerHTML` như cũ sẽ huỷ và tạo mới hai
+`<input>`, mất focus ngay sau ký tự đầu tiên. Giờ hàm tự kiểm: khung sửa
+(`#address-text-input`/`#address-maplink-input`) đã có sẵn trên DOM thì chỉ cập
+nhật `.value` của ô KHÔNG đang có focus (`document.activeElement`) và dòng xem
+trước tại chỗ, không đụng gì tới ô người dùng đang gõ dở; chỉ dựng lại
+`innerHTML` đúng một lần lúc khung sửa chưa tồn tại (lần đầu vào trang, hoặc
+vừa đăng nhập). **`setRuleField` (`rules-service.js`, khối Quy định đóng quỹ)
+có cùng kiểu ghi-thẳng-mỗi-ký-tự này và `renderRules()` vẫn dựng lại toàn bộ
+`innerHTML` mỗi lần** — nhiều khả năng dính đúng lỗi mất focus tương tự, chỉ là
+chưa ai báo vì quy định ít khi gõ liên tục nhiều ký tự. Gặp báo lỗi tương tự ở
+khối Quy định thì áp đúng cách sửa này.
+
 ## Cạm bẫy đã gặp
 
 - `addMemberToOpenMonths` chỉ đụng các tháng **từ tháng hiện tại trở đi**. Fixture

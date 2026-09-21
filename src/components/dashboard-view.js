@@ -1,4 +1,4 @@
-/** Trang Tổng quan: ô số liệu, khối quy định, địa chỉ CLB và giao dịch gần đây. */
+/** Trang Tổng quan: ô số liệu, khối quy định, địa chỉ sân và giao dịch gần đây. */
 
 import { RECENT_TRANSACTION_COUNT } from '../config/constants.js';
 import {
@@ -77,7 +77,7 @@ function handleSaveRules() {
   });
 }
 
-/** Sửa một ô của địa chỉ CLB rồi cập nhật thanh lưu. */
+/** Sửa một ô của địa chỉ sân rồi cập nhật thanh lưu. */
 function handleEditAddress(field, value) {
   setAddressField(field, value);
   renderAddressSaveBar();
@@ -123,7 +123,7 @@ function renderRulesSaveBar() {
   setVisible(qs('#rules-reset'), changed, 'inline-block');
 }
 
-/** Cập nhật thanh lưu chung của địa chỉ CLB. */
+/** Cập nhật thanh lưu chung của địa chỉ sân. */
 function renderAddressSaveBar() {
   const changed = hasAddressChanges();
   qs('#address-pending-state').textContent = changed
@@ -135,7 +135,7 @@ function renderAddressSaveBar() {
 }
 
 /**
- * Khối địa chỉ CLB. Admin sửa được ngay tại chỗ, người xem thường chỉ thấy khi
+ * Khối địa chỉ sân. Admin sửa được ngay tại chỗ, người xem thường chỉ thấy khi
  * đã có nội dung — như khối mã QR, tự ẩn hẳn khi chưa admin nào nhập gì.
  */
 function renderAddressPanel() {
@@ -159,8 +159,26 @@ function renderAddressPanel() {
     panel.innerHTML = `
       <div class="card__body" style="display:flex;align-items:center;gap:10px">
         ${pinSpan(22)}
-        <span>${escapeHtml(address.text)}${mapLinkHtml}</span>
+        <span><b>Địa chỉ sân:</b> ${escapeHtml(address.text)}${mapLinkHtml}</span>
       </div>`;
+    return;
+  }
+
+  // Gõ vào ô là ghi thẳng lên Firestore (setAddressField, không debounce), rồi
+  // onSnapshot đẩy ngược về ngay trong lúc admin còn đang gõ, khiến
+  // renderDashboard() chạy lại. Dựng lại toàn bộ innerHTML mỗi lần như vậy sẽ
+  // huỷ và tạo mới hai <input>, làm mất focus ngay sau ký tự đầu tiên. Từ lần
+  // thứ hai trở đi (khung sửa đã có sẵn) chỉ cập nhật giá trị/dòng xem trước
+  // tại chỗ — không đụng DOM của ô đang gõ, và bỏ qua ô đang có focus để không
+  // ghi đè ký tự người dùng vừa gõ bằng giá trị cũ hơn từ snapshot.
+  const textInput = qs('#address-text-input');
+  const mapInput = qs('#address-maplink-input');
+  if (textInput && mapInput) {
+    if (document.activeElement !== textInput) textInput.value = address.text;
+    if (document.activeElement !== mapInput) mapInput.value = address.mapLink;
+    setVisible(qs('#address-preview'), Boolean(address.text || address.mapLink));
+    qs('#address-preview').innerHTML = `Xem trước: ${escapeHtml(address.text)}${mapLinkHtml}`;
+    renderAddressSaveBar();
     return;
   }
 
@@ -168,7 +186,7 @@ function renderAddressPanel() {
     <div class="card__header" style="display:flex;align-items:center;gap:10px">
       ${pinSpan(20)}
       <div>
-        <h3>Địa chỉ CLB</h3>
+        <h3>Địa chỉ sân</h3>
       </div>
     </div>
     <div class="card__body">
@@ -176,7 +194,7 @@ function renderAddressPanel() {
         <label>Địa chỉ<input type="text" id="address-text-input" value="${escapeHtml(address.text)}" placeholder="Số nhà, đường, phường/xã, tỉnh/thành…"></label>
         <label>Link Google Maps<input type="url" id="address-maplink-input" value="${escapeHtml(address.mapLink)}" placeholder="https://maps.app.goo.gl/…"></label>
       </div>
-      ${address.text || address.mapLink ? `<p class="text-muted mt-sm">Xem trước: ${escapeHtml(address.text)}${mapLinkHtml}</p>` : ''}
+      <p class="text-muted mt-sm" id="address-preview" style="display:${address.text || address.mapLink ? '' : 'none'}">Xem trước: ${escapeHtml(address.text)}${mapLinkHtml}</p>
     </div>`;
 
   qs('#address-text-input').addEventListener('input', (event) =>
@@ -342,7 +360,7 @@ export function renderDashboard() {
   renderQrPanel();
 }
 
-/** Gắn sự kiện cho các nút lưu chung của khối quy định và địa chỉ CLB. */
+/** Gắn sự kiện cho các nút lưu chung của khối quy định và địa chỉ sân. */
 export function initDashboardView() {
   qs('#rules-export-toggle').addEventListener('click', handleSaveRules);
   qs('#rules-reset').addEventListener('click', handleResetRules);
