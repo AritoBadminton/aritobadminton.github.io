@@ -68,6 +68,28 @@ check('admin thấy ô nhập địa chỉ', await admin.isVisible('#address-tex
 check('admin thấy ô nhập link Google Maps', await admin.isVisible('#address-maplink-input'), true);
 check('ô địa chỉ để trống ban đầu', await admin.inputValue('#address-text-input'), '');
 check('ô link để trống ban đầu', await admin.inputValue('#address-maplink-input'), '');
+check('tiêu đề khối đổi thành "Địa chỉ sân"', await admin.textContent('#address-panel h3'), 'Địa chỉ sân');
+
+/* ---------- 2b. Gõ từng ký tự không bị mất focus giữa chừng ---------- */
+
+// Bug đã gặp: mỗi ký tự ghi thẳng lên Firestore, onSnapshot đẩy ngược lại
+// khiến renderDashboard() dựng lại toàn bộ innerHTML của khối, huỷ luôn ô
+// đang gõ — mất focus ngay sau ký tự đầu tiên.
+await admin.focus('#address-text-input');
+await admin.type('#address-text-input', 'Sân A', { delay: 120 });
+await admin.waitForTimeout(500);
+check(
+  'gõ nhiều ký tự liên tiếp không bị mất focus',
+  await admin.evaluate(() => document.activeElement?.id),
+  'address-text-input',
+);
+check(
+  'gõ nhiều ký tự liên tiếp vẫn ra đủ chữ, không bị cắt cụt',
+  await admin.inputValue('#address-text-input'),
+  'Sân A',
+);
+await admin.fill('#address-text-input', '');
+await admin.waitForTimeout(400);
 
 /* ---------- 3. Admin gõ vào thì lưu ngay (chế độ Firebase: gõ là lưu) ---------- */
 
@@ -119,6 +141,11 @@ check('khách không thấy ô nhập địa chỉ', await khach2.isVisible('#ad
 check(
   'khách thấy đúng nội dung địa chỉ',
   (await khach2.textContent('#address-panel')).includes('123 Nguyễn Huệ, Quận 1, TP.HCM'),
+  true,
+);
+check(
+  'khách cũng thấy nhãn "Địa chỉ sân"',
+  (await khach2.textContent('#address-panel')).includes('Địa chỉ sân'),
   true,
 );
 check(

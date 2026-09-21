@@ -129,14 +129,14 @@ Khối này nằm ngay đầu tab **Tổng quan**. Sửa mục `"rules"` trong `
 thêm / bớt phần tử trong `items` (mỗi ô là một mức đóng), đổi `title`, `subtitle`, `footer` tuỳ ý.
 Nếu xoá hẳn `"rules"`, trang sẽ tự quay về hiển thị các dòng trong `"notes"`.
 
-## Sửa địa chỉ CLB + link Google Maps
+## Sửa "Địa chỉ sân" + link Google Maps
 
 Khối này cũng nằm ở tab **Tổng quan**, cần đăng nhập Admin. Bấm vào ô **Địa chỉ** gõ địa
-chỉ CLB, bấm vào ô **Link Google Maps** dán link (mở Google Maps, bấm Chia sẻ để lấy link) —
+chỉ sân, bấm vào ô **Link Google Maps** dán link (mở Google Maps, bấm Chia sẻ để lấy link) —
 gõ đến đâu lưu ngay đến đó, không cần bấm nút Lưu riêng. Ngay dưới hai ô có dòng xem trước
 đúng như người xem thường sẽ thấy: dòng địa chỉ kèm link "Xem trên Google Maps →" ở cuối.
 
-Người xem thường chỉ thấy dòng địa chỉ (không thấy hai ô sửa), và **khối này tự ẩn hẳn**
+Người xem thường cũng thấy nhãn "Địa chỉ sân" kèm dòng địa chỉ (không thấy hai ô sửa), và **khối này tự ẩn hẳn**
 nếu chưa admin nào nhập gì — không hiện khối trống cho khách thấy.
 
 ## Đánh dấu đóng quỹ theo tháng

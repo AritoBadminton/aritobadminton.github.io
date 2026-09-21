@@ -1,5 +1,5 @@
 /**
- * Địa chỉ CLB kèm link Google Maps, hiển thị ở trang Tổng quan.
+ * Địa chỉ sân kèm link Google Maps, hiển thị ở trang Tổng quan.
  *
  * Quản trị viên sửa ngay trên trang; ở chế độ Firebase ghi thẳng lên Firestore
  * (chung một tài liệu settings/club với tên CLB), ở chế độ data.json thì nằm

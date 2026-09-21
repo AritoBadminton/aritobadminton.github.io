@@ -309,7 +309,7 @@ select:focus {
   grid-template-columns: 1fr 1fr;
 }
 
-/* Khối sửa địa chỉ CLB chỉ có 2 ô — cùng lý do trên, luôn ép 2 cột thay vì 4. */
+/* Khối sửa địa chỉ sân chỉ có 2 ô — cùng lý do trên, luôn ép 2 cột thay vì 4. */
 .address-panel__fields {
   grid-template-columns: 1fr 1fr;
 }
