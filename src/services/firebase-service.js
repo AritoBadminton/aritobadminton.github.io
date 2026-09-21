@@ -12,6 +12,7 @@
  *   months/<YYYY-MM>       { label, dues: { "<tên>": { paid, note, skip } } }
  *   transactions/<id>      { type: 'thu'|'chi', date, amount, desc, cat }
  *   categories/<id>        { type: 'thu'|'chi', code, name, color, defaultAmount, defaultDesc, protected? }
+ *   presence/<sessionId>   { lastSeen, expiresAt } — nhịp "còn sống" ước lượng số người đang xem, không phải dữ liệu quỹ
  *   admins/<uid>           { email, name }  — chỉ đọc, sửa trong Firebase Console
  */
 
@@ -30,16 +31,21 @@ import {
 } from 'firebase/auth';
 import {
   FieldPath,
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
   deleteField,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
   onSnapshot,
+  query,
+  serverTimestamp,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 import { FIREBASE_CONFIG } from '../config/firebase-config.js';
@@ -480,4 +486,41 @@ export async function commitBatch(writes) {
     });
     await batch.commit();
   }
+}
+
+/* ---------- Ước lượng số người đang xem ---------- */
+
+/**
+ * Ghi một nhịp "còn sống" cho phiên xem trang này (một tab = một phiên).
+ *
+ * Dùng serverTimestamp() cho lastSeen để so khớp đúng `request.time` trong
+ * firestore.rules — chặn ai đó tự gửi lastSeen giả (rất cũ hoặc rất tương
+ * lai) qua thẳng REST API. expiresAt là mốc để bật TTL policy tự xoá tài
+ * liệu cũ trên Firebase Console (không bắt buộc — thiếu TTL thì tài liệu cũ
+ * vẫn nằm lại, chỉ là không còn được countOnlineViewers() đếm là đang xem).
+ * @param {string} sessionId
+ * @param {number} ttlMs
+ */
+export function saveHeartbeat(sessionId, ttlMs) {
+  const { db } = getConnection();
+  return setDoc(doc(db, 'presence', sessionId), {
+    lastSeen: serverTimestamp(),
+    expiresAt: Timestamp.fromMillis(Date.now() + ttlMs),
+  });
+}
+
+/**
+ * Đếm số phiên còn "sống" trong `windowMs` gần nhất — ước lượng số người
+ * đang xem trang cùng lúc. Dùng getDocs (hỏi một lần) chứ không onSnapshot,
+ * vì Firestore không tự báo lại khi một tài liệu "hết hạn" theo đồng hồ thực
+ * mà không có ghi mới — phải chủ động hỏi lại theo chu kỳ mới thấy người cũ
+ * rơi khỏi số đếm.
+ * @param {number} windowMs
+ * @returns {Promise<number>}
+ */
+export async function countOnlineViewers(windowMs) {
+  const { db } = getConnection();
+  const cutoff = Timestamp.fromMillis(Date.now() - windowMs);
+  const snapshot = await getDocs(query(collection(db, 'presence'), where('lastSeen', '>', cutoff)));
+  return snapshot.size;
 }

@@ -14,6 +14,11 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | **Thành viên**          | _(chỉ admin)_ Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                       |
 | **Danh mục giao dịch**  | _(chỉ admin)_ Thêm/sửa/xoá danh mục thu-chi: màu, số tiền và nội dung mặc định cho form Thêm giao dịch                                      |
 
+Góc phải trên cùng còn có huy hiệu **👀 N đang xem** — số người đang mở trang cùng lúc, tính gần
+đúng theo nhịp "còn sống" mỗi 20 giây (chỉ chạy ở chế độ Firebase, ai xem cũng thấy). Đóng tab
+đột ngột hoặc mất mạng thì người đó vẫn hiện diện tới khi hết khoảng 50 giây, nên đây là số ước
+lượng chứ không tuyệt đối chính xác.
+
 ## Nơi lưu dữ liệu
 
 Trang chạy được ở hai chế độ, đổi qua lại bằng một dòng cấu hình:

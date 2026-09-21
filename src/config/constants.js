@@ -46,6 +46,20 @@ export const MEMBER_DUES_CATEGORY = 'Tiền quỹ thành viên hàng tháng';
 /** Màu dùng khi một danh mục (thường là dòng cũ đã xoá khỏi danh sách) không còn màu riêng. */
 export const CATEGORY_COLOR_FALLBACK = '#9aa3af';
 
+/**
+ * Ước lượng số người đang xem trang (`presence-service.js`), không phải dữ
+ * liệu quỹ. Firebase không cho trang tĩnh đọc thẳng số "Active connections"
+ * nội bộ của chính nó (cần tài khoản dịch vụ + máy chủ), nên tự ước lượng
+ * bằng nhịp "còn sống" ghi vào Firestore.
+ */
+export const PRESENCE_HEARTBEAT_MS = 20000;
+export const PRESENCE_POLL_MS = 15000;
+/** Coi là "đang xem" nếu nhịp gần nhất còn trong khoảng này — nới hơn 2 lần
+ *  nhịp tim để một nhịp bị trễ/rớt mạng không làm người đó biến mất khỏi số đếm. */
+export const PRESENCE_ONLINE_WINDOW_MS = 50000;
+/** Mốc để bật TTL policy tự xoá tài liệu presence cũ trên Firebase Console (không bắt buộc). */
+export const PRESENCE_TTL_MS = 5 * 60 * 1000;
+
 /** Khoá lưu trữ trong localStorage / sessionStorage. */
 export const STORAGE_KEYS = {
   THEME: 'clb-theme',
@@ -60,6 +74,7 @@ export const STORAGE_KEYS = {
   RULES: 'clb-rules-v1',
   ADDRESS: 'clb-address-v1',
   API_SESSION: 'clb-session-v1',
+  PRESENCE_SESSION: 'clb-presence-v1',
 };
 
 /**

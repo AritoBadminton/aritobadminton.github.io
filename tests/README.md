@@ -35,13 +35,23 @@ theo đúng hình dạng Firestore thật:
   settings: { club: {...}, rules: {...}, qr: {...}, roster: { active: {}, order: {} } },
   months:   { '2026-09': { label, dues: { '<tên>': { paid, note, skip } } } },
   transactions: { '<id>': { type, date, amount, desc, cat } },
+  categories: { '<id>': { type, code, name, color, defaultAmount, defaultDesc, protected? } },
+  presence: { '<sessionId>': { lastSeen, expiresAt } },
   admins:   { '<uid>': { email, name } },
 }
 ```
 
+`fbstub/firestore.js` cũng có `Timestamp`, `serverTimestamp()`, `query()`/`where()` đủ dùng cho
+so sánh mili-giây (`presence-service.js` cần để lọc phiên còn "sống") — `Timestamp` qua một vòng
+`JSON.stringify`/`parse` (mọi lần đọc/ghi `__fakestore__`) chỉ còn field `_millis`, nên khi gieo
+sẵn một `presence` trong fixture test, viết thẳng dạng `{ lastSeen: { _millis: <số> } }` thay vì
+gọi `Timestamp.fromMillis(...)` (test chạy ở Node, không có class đó).
+
 Mỗi test tự gieo dữ liệu bằng `page.addInitScript` trước khi trang tải. Lưu ý:
 `browser.newPage()` tạo một context riêng nên **localStorage không dùng chung**
-giữa các page — trang khách phải được gieo lại dữ liệu của chính nó.
+giữa các page — trang khách phải được gieo lại dữ liệu của chính nó. Muốn hai
+trang chia sẻ cùng dữ liệu (ví dụ đếm số người đang xem cùng lúc) thì dùng
+`browser.newContext()` rồi `context.newPage()` hai lần, xem `verify-presence.mjs`.
 
 Tài khoản admin trong bản giả lập: `nghia@arito.vn` / `MatKhauRatDai#2026`.
 
@@ -61,6 +71,7 @@ Tài khoản admin trong bản giả lập: `nghia@arito.vn` / `MatKhauRatDai#20
 | `verify-ledger-popup.mjs`                                | Popup thêm/sửa/xoá giao dịch ở Sổ thu chi, toast báo xoá thành công                                                          |
 | `verify-address.mjs`                                     | "Địa chỉ sân" + link Google Maps ở Tổng quan: admin sửa, khách xem, tự ẩn khi trống, gõ liên tục không mất focus             |
 | `verify-category.mjs`                                    | Tab Danh mục giao dịch: Grid CRUD, chặn xoá danh mục đang dùng, khoá tên danh mục bảo vệ, tự điền tiền/nội dung ở Sổ thu chi |
+| `verify-presence.mjs`                                    | Huy hiệu số người đang xem: đếm đúng, loại phiên đã quá hạn, hai tab cùng thấy nhau                                          |
 
 Chạy hết bộ mất khoảng 12 phút. Sửa mã nguồn xong vẫn nên chạy lại **cả bộ**
 trước khi đẩy lên, vì các màn hình dùng

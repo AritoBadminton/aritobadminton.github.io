@@ -60,16 +60,77 @@ export async function getDoc(ref) {
   return { id: ref.id, exists: () => value !== undefined, data: () => value };
 }
 
+/** Giả lập Timestamp của Firestore — đủ để so sánh mili-giây trong query. */
+export class Timestamp {
+  constructor(millis) {
+    this._millis = millis;
+  }
+  static fromMillis(millis) {
+    return new Timestamp(millis);
+  }
+  static now() {
+    return new Timestamp(Date.now());
+  }
+  toMillis() {
+    return this._millis;
+  }
+}
+
+/** Đọc mili-giây từ cả Timestamp sống lẫn bản đã qua JSON.stringify (còn lại field _millis). */
+function millisOf(value) {
+  if (typeof value?.toMillis === 'function') return value.toMillis();
+  return typeof value?._millis === 'number' ? value._millis : null;
+}
+
+const SERVER_TIMESTAMP = { __serverTimestamp__: true };
+export function serverTimestamp() {
+  return SERVER_TIMESTAMP;
+}
+
+/** Thay mọi serverTimestamp() bằng giờ hiện tại, giống Firestore thật lúc ghi. */
+function resolveServerTimestamps(value) {
+  if (value === SERVER_TIMESTAMP) return Timestamp.now();
+  if (Array.isArray(value)) return value.map(resolveServerTimestamps);
+  if (value && typeof value === 'object' && !(value instanceof Timestamp)) {
+    const out = {};
+    Object.keys(value).forEach((key) => {
+      out[key] = resolveServerTimestamps(value[key]);
+    });
+    return out;
+  }
+  return value;
+}
+
+/** Chỉ đủ hỗ trợ where(field, '>' | '>=' | '<' | '<=' | '==', value) dùng cho đếm presence. */
+export function query(ref, ...clauses) {
+  return { ...ref, clauses };
+}
+export function where(field, op, value) {
+  return { field, op, value };
+}
+
 export async function getDocs(ref) {
   const bucket = readAll()[ref.name] ?? {};
-  const docs = Object.keys(bucket).map((id) => ({ id, data: () => bucket[id] }));
+  let docs = Object.keys(bucket).map((id) => ({ id, data: () => bucket[id] }));
+  (ref.clauses ?? []).forEach(({ field, op, value }) => {
+    const expected = millisOf(value) ?? value;
+    docs = docs.filter((item) => {
+      const actual = millisOf(item.data()[field]) ?? item.data()[field];
+      if (op === '>') return actual > expected;
+      if (op === '>=') return actual >= expected;
+      if (op === '<') return actual < expected;
+      if (op === '<=') return actual <= expected;
+      return actual === expected;
+    });
+  });
   return { docs, size: docs.length, empty: docs.length === 0 };
 }
 
 export async function setDoc(ref, data, options = {}) {
   const all = readAll();
   all[ref.name] = all[ref.name] ?? {};
-  all[ref.name][ref.id] = options.merge ? deepMerge(all[ref.name][ref.id], data) : data;
+  const resolved = resolveServerTimestamps(data);
+  all[ref.name][ref.id] = options.merge ? deepMerge(all[ref.name][ref.id], resolved) : resolved;
   writeAll(all);
 }
 
