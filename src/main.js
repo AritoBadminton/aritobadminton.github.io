@@ -11,10 +11,12 @@ import { initLedgerView, renderLedger, renderLedgerFilters } from './components/
 import { applyAuthState, initLoginModal, restoreAuthState } from './components/login-modal.js';
 import { initMembersView, renderMembers } from './components/members-view.js';
 import { initMonthsView, renderMonthPicker, renderMonths } from './components/months-view.js';
+import { renderPresenceBadge } from './components/presence-badge.js';
 import { initTabNav } from './components/tab-nav.js';
 import { initThemeToggle } from './components/theme-toggle.js';
 import { isFirebaseMode, loadFirebase } from './services/data-source.js';
 import { fetchClubData } from './services/data-service.js';
+import { startPresenceTracking } from './services/presence-service.js';
 import { buildDerivedState } from './services/sync-service.js';
 import { registerRenderer, requestRender } from './state/render-bus.js';
 import { store } from './state/store.js';
@@ -39,6 +41,7 @@ function registerRenderers() {
   registerRenderer('members', renderMembers);
   registerRenderer('months', renderMonthsWithPicker);
   registerRenderer('categories', renderCategoryGrid);
+  registerRenderer('presence', renderPresenceBadge);
 }
 
 /** Hiện thông báo khi không tải được dữ liệu. */
@@ -67,6 +70,7 @@ function showSyncError(message) {
 async function startFirebaseMode() {
   document.body.classList.add('is-live');
   const firebase = await loadFirebase();
+  startPresenceTracking();
 
   firebase.watchAuth((state) => {
     store.isAdmin = Boolean(state?.isAdmin);

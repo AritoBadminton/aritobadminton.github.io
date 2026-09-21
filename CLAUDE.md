@@ -131,7 +131,7 @@ Vài điều đã trả giá mới biết:
 
 **GitHub Pages phục vụ CSS với `max-age=600`.** Mọi thẻ `<link>` CSS mang
 `?v=N`; **đổi CSS là phải tăng N** ở cả bốn dòng, nếu không người dùng thấy giao
-diện vỡ và tưởng là lỗi code. Hiện tại `?v=20`.
+diện vỡ và tưởng là lỗi code. Hiện tại `?v=21`.
 
 ## Các quyết định nghiệp vụ đã chốt (đừng vô tình lật lại)
 
@@ -377,6 +377,42 @@ có cùng kiểu ghi-thẳng-mỗi-ký-tự này và `renderRules()` vẫn dựn
 `innerHTML` mỗi lần** — nhiều khả năng dính đúng lỗi mất focus tương tự, chỉ là
 chưa ai báo vì quy định ít khi gõ liên tục nhiều ký tự. Gặp báo lỗi tương tự ở
 khối Quy định thì áp đúng cách sửa này.
+
+**Huy hiệu "N đang xem" ở header (09/2026), ước lượng số người mở trang cùng
+lúc.** Firebase Console có sẵn biểu đồ "Subscription Metrics" (Active
+connections) cho đúng số này, nhưng đó là số liệu nội bộ qua Cloud Monitoring
+API — cần tài khoản dịch vụ + máy chủ mới đọc được, trang tĩnh không lấy thẳng
+được. Nên tự làm bản gần-đúng bằng nhịp "còn sống" (heartbeat) client-side, xem
+`src/services/presence-service.js` + `saveHeartbeat`/`countOnlineViewers`
+trong `firebase-service.js`.
+
+- **Đây là đường ghi công khai (không cần đăng nhập) DUY NHẤT trong
+  `firestore.rules`** — mọi collection khác chỉ `isAdmin()` mới ghi được. Rule
+  `match /presence/{sessionId}` validate chặt để hạn chế lạm dụng: khuôn dạng
+  id phiên, `lastSeen` phải khớp đúng `request.time` (ép dùng
+  `serverTimestamp()`, chặn gửi giờ giả qua thẳng REST API), `expiresAt` tối
+  đa 10 phút. **Rule này cũng phải tự tay publish lên Firebase Console** như
+  mọi lần đổi `firestore.rules` khác — thiếu bước đó thì heartbeat báo lỗi
+  quyền, nhưng `saveHeartbeat`/`countOnlineViewers` đều tự bọc try/catch nên
+  không ảnh hưởng gì tới phần còn lại của trang (bài học từ sự cố collection
+  `categories` — xem lịch sử PR #17).
+- Mỗi tab một session id riêng (`sessionStorage`, không dùng chung giữa các
+  tab — mở hai tab tính là hai người xem). Ghi nhịp mỗi
+  `PRESENCE_HEARTBEAT_MS` (20s); phía đọc `getDocs` (không `onSnapshot`) mỗi
+  `PRESENCE_POLL_MS` (15s) đếm số phiên có `lastSeen` còn trong
+  `PRESENCE_ONLINE_WINDOW_MS` (50s) gần nhất — phải hỏi lại theo chu kỳ vì
+  Firestore không tự báo khi một tài liệu "hết hạn" theo đồng hồ thực mà
+  không có ghi mới.
+- `expiresAt` chỉ là mốc để **bật TTL policy dọn rác** (Firestore Console →
+  collection `presence` → TTL, chọn field `expiresAt`) — bước này chưa làm,
+  cũng để chủ trang tự bấm. Thiếu TTL thì tài liệu cũ vẫn nằm lại mãi trong
+  Firestore, chỉ là không bị đếm là "đang xem" nữa (không ảnh hưởng số hiển
+  thị, chỉ tốn thêm dung lượng lưu trữ theo thời gian).
+- Số hiển thị là **gần đúng, không phải tuyệt đối** — khác chính xác so với
+  "Active connections" thật của Firebase (đóng tab đột ngột, mất mạng… vẫn
+  hiện diện tới khi `lastSeen` quá hạn cửa sổ 50s).
+- Chỉ chạy ở chế độ Firebase (`isFirebaseMode()`) — chế độ `data.json` không
+  có nơi ghi/đọc chung nên `store.onlineCount` luôn `null`, huy hiệu tự ẩn.
 
 ## Cạm bẫy đã gặp
 

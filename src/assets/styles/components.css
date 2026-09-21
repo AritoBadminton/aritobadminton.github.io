@@ -468,6 +468,13 @@ td.cell-name {
   border-color: var(--border);
 }
 
+/* Huy hiệu "N đang xem" ở header — số ước lượng, không phải trạng thái tài chính. */
+.pill--live {
+  color: var(--good);
+  background: color-mix(in srgb, var(--good) 12%, transparent);
+  border-color: color-mix(in srgb, var(--good) 30%, transparent);
+}
+
 /* ---------- Thanh tiến độ nhỏ ---------- */
 
 .progress-bar {

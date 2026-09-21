@@ -68,6 +68,23 @@ service cloud.firestore {
         && request.resource.data.defaultDesc.size() <= 300;
     }
 
+    // Nhịp "còn sống" để ước lượng số người đang xem trang cùng lúc — không
+    // phải dữ liệu quỹ, và là đường ghi công khai DUY NHẤT trong file này (mọi
+    // collection khác chỉ isAdmin() mới ghi được). Validate chặt để hạn chế
+    // lạm dụng: mã phiên phải đúng khuôn dạng do presence-service.js tự sinh,
+    // lastSeen phải khớp đúng request.time (ép dùng serverTimestamp(), chặn
+    // gửi giờ giả qua thẳng REST API), expiresAt tối đa 10 phút để không ai
+    // đặt hạn dùng vô tận.
+    match /presence/{sessionId} {
+      allow read: if true;
+      allow create, update: if sessionId.matches('^[a-z0-9]{6,60}$')
+        && request.resource.data.lastSeen == request.time
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt < request.time + duration.value(10, 'm');
+      allow delete: if false;
+    }
+
     // Ai là quản trị viên: chỉ người đã đăng nhập mới đọc được, không ai ghi được
     // từ trang web. Thêm hoặc bớt admin làm trực tiếp trong Firebase Console.
     match /admins/{uid} {

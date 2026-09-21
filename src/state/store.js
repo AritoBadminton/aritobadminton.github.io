@@ -65,6 +65,9 @@ export const store = {
 
   /** Người dùng đã đăng nhập quản trị hay chưa. */
   isAdmin: false,
+
+  /** Số người đang xem trang cùng lúc (ước lượng, `presence-service.js`); null = chưa có số hoặc không áp dụng (chế độ data.json). */
+  onlineCount: null,
 };
 
 /**
