@@ -70,7 +70,7 @@ await page.waitForTimeout(1300);
 check(
   'thứ tự tab đúng yêu cầu',
   await page.$$eval('.tab-nav__item', (els) => els.map((e) => e.textContent.trim())),
-  ['Tổng quan', 'Thành viên', 'Đóng quỹ theo tháng', 'Sổ thu chi'],
+  ['Tổng quan', 'Đóng quỹ theo tháng', 'Sổ thu chi', 'Thành viên', 'Danh mục giao dịch'],
 );
 
 /* ---------- 2. Logo ---------- */

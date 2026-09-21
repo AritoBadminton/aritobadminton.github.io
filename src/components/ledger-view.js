@@ -194,12 +194,15 @@ function closeUpdateForm() {
 function openNewEntryModal() {
   qs('#new-message').textContent = '';
   if (!qs('#new-date').value) qs('#new-date').value = getTodayIso();
-  // Phòng trường hợp mở form ngay lúc danh mục vừa gieo mặc định xong (đăng
-  // nhập admin lần đầu sau khi triển khai tab Danh mục giao dịch) — lúc
-  // initLedgerView() chạy, collection categories trên Firestore có thể vẫn
-  // còn trống. Chỉ nạp lại khi ô đang trống hẳn, để không xoá mất lựa chọn
-  // người dùng vừa chọn ở lần mở form trước.
-  if (!qs('#new-category').options.length) fillNewEntryCategories();
+  // Nạp lại danh mục mỗi lần mở form: danh mục có thể vừa được thêm/sửa/xoá ở
+  // tab Danh mục giao dịch trong lúc form này đang đóng, combobox dựng một lần
+  // lúc initLedgerView() chạy sẽ không tự biết mà cập nhật. Giữ nguyên lựa
+  // chọn cũ nếu danh mục đó vẫn còn trong danh sách mới.
+  const keptCategory = qs('#new-category').value;
+  fillNewEntryCategories();
+  if ([...qs('#new-category').options].some((option) => option.value === keptCategory)) {
+    qs('#new-category').value = keptCategory;
+  }
   if (!qs('#new-amount').value) resetNewEntryFields();
   qs('#new-entry-modal').hidden = false;
   // Bôi đen sẵn để gõ đè lên nội dung mặc định, khỏi phải xoá tay.

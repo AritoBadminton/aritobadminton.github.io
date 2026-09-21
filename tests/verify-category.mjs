@@ -100,28 +100,11 @@ const rowCount = () =>
 check('nạp đủ 3 danh mục có sẵn', await rowCount(), 3);
 
 check(
-  'mặc định cột Mã/ID đang ẩn',
-  await page.$eval('.category-code-col', (e) => getComputedStyle(e).display),
-  'none',
+  'không còn cột Mã/ID nào trong bảng Grid — luôn ẩn, không có nút bật lại',
+  await page.$('.category-code-col'),
+  null,
 );
-await page.check('#category-show-code');
-await page.waitForTimeout(200);
-check(
-  'tick "Hiện mã & id" thì cả hai cột hiện ra',
-  await page.$$eval('.category-code-col', (els) => els.every((e) => getComputedStyle(e).display !== 'none')),
-  true,
-);
-check(
-  'cột Mã hiện đúng mã hệ thống',
-  await page.$$eval('#category-table tr', (els) => els.some((e) => e.textContent.includes('CHI-001'))),
-  true,
-);
-check(
-  'cột ID hiện đúng id tài liệu Firestore',
-  await page.$$eval('#category-table tr', (els) => els.some((e) => e.textContent.includes('c1'))),
-  true,
-);
-await page.uncheck('#category-show-code');
+check('không còn công tắc "Hiện mã"', await page.$('#category-show-code'), null);
 
 /* ---------- 2. Danh mục đã có giao dịch: chỉ Sửa, không Xoá ---------- */
 
@@ -288,6 +271,31 @@ await page.selectOption('#new-category', 'Tiền quỹ công ty hàng tháng');
 await page.waitForTimeout(200);
 check('chọn danh mục tự điền số tiền mặc định', await page.inputValue('#new-amount'), '1.500.000');
 check('chọn danh mục tự điền nội dung mặc định', await page.inputValue('#new-desc'), 'Quỹ công ty');
+
+await page.click('#new-type-toggle .segmented__item[data-type="chi"]');
+await page.waitForTimeout(200);
+await page.click('#new-cancel');
+await page.waitForTimeout(300);
+
+/* ---------- 7. Thêm danh mục mới thì combobox ở Sổ thu chi thấy ngay, không cần tải lại trang ---------- */
+
+await page.click('[data-panel="categories"]');
+await page.waitForTimeout(500);
+await page.click('#category-add-toggle');
+await page.waitForTimeout(300);
+await page.fill('#category-name', 'Tiền vé gửi xe');
+await page.click('#category-save');
+await page.waitForTimeout(500);
+
+await page.click('[data-panel="ledger"]');
+await page.waitForTimeout(500);
+await page.click('#ledger-add-toggle');
+await page.waitForTimeout(300);
+check(
+  'mở lại form Thêm giao dịch (không đổi Thu/Chi) đã thấy ngay danh mục vừa thêm',
+  await page.$$eval('#new-category option', (els) => els.some((e) => e.textContent === 'Tiền vé gửi xe')),
+  true,
+);
 
 check('không có lỗi javascript', errors, []);
 

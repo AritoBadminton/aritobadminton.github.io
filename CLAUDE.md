@@ -167,6 +167,15 @@ chốt. `tab-nav.js` từ chối kích hoạt tab đang `display: none`, nên b�
 vào một trong hai tab admin khi chưa đăng nhập cũng không mở được. Bảng "Giao
 dịch gần đây" ở Tổng quan vẫn mang class `admin-only`.
 
+**Thứ tự tab (09/2026): Tổng quan, Đóng quỹ theo tháng, Sổ thu chi, Thành
+viên, Danh mục giao dịch.** Trước đó Thành viên đứng ngay sau Tổng quan; chủ
+trang yêu cầu dời ra sau Sổ thu chi. Chỉ đổi thứ tự các nút `.tab-nav__item`
+trong `index.html` — `tab-nav.js` chọn panel theo `data-panel` khớp id, không
+phụ thuộc thứ tự DOM, nên không cần đổi gì ở `<section class="tab-panel">`
+hay code. Đổi thứ tự tab thì nhớ sửa luôn mảng thứ tự tab trong
+`tests/verify-guest.mjs` và `tests/verify-delmember.mjs` — hai chỗ duy nhất
+so khớp cả danh sách tab theo đúng thứ tự.
+
 **Tab "Danh mục giao dịch" (chỉ admin, 09/2026), đặt sau tab Sổ thu chi.**
 Quản lý danh mục thu/chi tự phục vụ thay vì hằng số cứng trong code —
 `src/services/category-service.js` + `src/components/category-view.js`, dữ
@@ -193,10 +202,12 @@ popup New/Edit + popup xác nhận xoá, giống hệt mẫu đã dùng ở Sổ
   giao diện, `firestore.rules` không ép field này vì trang đã chọn "tin admin"
   cho mọi thao tác ghi khác.
 - **Mã danh mục ("THU-001"/"CHI-001") do hệ thống tự sinh** (`generateCategoryCode`),
-  không phải ô admin gõ tay — cột Mã và cột ID (mã tài liệu Firestore thật)
-  trong bảng Grid mặc định ẩn, tick "Hiện mã & id" mới thấy cả hai. ID cũng
-  hiện read-only ở đầu form Sửa (`#category-id-note`) để đối chiếu với
-  Firebase Console; form Thêm không có vì Firestore chỉ sinh id lúc lưu.
+  không phải ô admin gõ tay — **luôn ẩn khỏi bảng Grid** (09/2026: bỏ hẳn cột
+  Mã/ID và công tắc "Hiện mã & id" từng có, không còn cách nào bật lại qua giao
+  diện). ID (mã tài liệu Firestore thật) vẫn hiện read-only ở đầu form Sửa
+  (`#category-id-note`) để đối chiếu với Firebase Console khi cần — chỗ này
+  không nằm trong yêu cầu ẩn mã nên vẫn giữ nguyên; form Thêm không có vì
+  Firestore chỉ sinh id lúc lưu.
 - **Firestore thật đang có collection `categories` trống** — tab Danh mục giao
   dịch sẽ trống trơn cho tới khi có admin đăng nhập lần đầu sau khi tính năng
   này lên trang thật. `seedDefaultCategoriesIfEmpty()` tự chạy trong
@@ -205,11 +216,16 @@ popup New/Edit + popup xác nhận xoá, giống hệt mẫu đã dùng ở Sổ
   danh mục đang chạy trước khi có tab này (`DEFAULT_CATEGORIES` trong
   `category-service.js`), để ô chọn danh mục ở Sổ thu chi không bị trống ngay
   sau khi triển khai.
-- Ô chọn danh mục ở form "Thêm giao dịch" (`#new-category`) đôi khi được dựng
-  lúc collection `categories` trên Firestore chưa kịp về tới máy (mở form ngay
-  sau lần đăng nhập admin đầu tiên, lúc gieo mặc định còn đang chạy) —
-  `openNewEntryModal` (`ledger-view.js`) tự nạp lại danh mục nếu ô đang trống
-  hẳn, tránh admin thấy ô chọn danh mục rỗng.
+- **Ô chọn danh mục ở form "Thêm giao dịch" (`#new-category`) nạp lại mỗi lần
+  mở form (09/2026), không chỉ khi đang trống.** Trước đó `openNewEntryModal`
+  chỉ gọi `fillNewEntryCategories()` nếu ô đang trống hẳn (phòng lúc gieo mặc
+  định chưa xong) — nhưng vậy nghĩa là thêm danh mục mới ở tab Danh mục giao
+  dịch trong lúc form Sổ thu chi đang mở sẵn hoặc đã từng mở thì combobox
+  không bao giờ tự cập nhật nữa, phải tải lại trang mới thấy danh mục mới.
+  Giờ gọi `fillNewEntryCategories()` vô điều kiện mỗi lần mở, chỉ giữ lại lựa
+  chọn cũ nếu danh mục đó vẫn còn trong danh sách mới. `#update-category`
+  không có lỗi này vì `fillUpdateForm` vốn đã dựng lại từ `getCategoriesByType`
+  mỗi lần mở.
 
 **Ghi chú ở Tổng quan** (`settings/club.notes[]`) chỉ hiện khi `settings/rules.items`
 rỗng và người xem không phải admin (`renderRules` trong `dashboard-view.js`) —

@@ -9,9 +9,9 @@ Trang web thống kê & quản lý thu chi quỹ câu lạc bộ cầu lông cô
 | Tab                     | Nội dung                                                                                                                                    |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Tổng quan**           | Số dư quỹ, số thành viên, **khối Quy định đóng quỹ nổi bật**, giao dịch gần đây. Tổng thu và tổng chi chỉ hiện với admin                    |
-| **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                     |
-| **Thành viên**          | Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                                     |
 | **Đóng quỹ theo tháng** | **Dropdown Đã đóng / Chưa đóng / Không chơi cho từng người**, sửa được số tiền và ghi chú, mã QR chuyển khoản, + các khoản chi của tháng đó |
+| **Sổ thu chi**          | **Form nhập khoản thu/chi mới**, toàn bộ giao dịch, lọc theo loại / tháng / danh mục, tìm kiếm, sắp xếp                                     |
+| **Thành viên**          | _(chỉ admin)_ Tổng đóng góp từng người, số tháng tham gia, tỷ lệ đóng đủ, **ô tick phân loại đang / ngưng hoạt động**                       |
 | **Danh mục giao dịch**  | _(chỉ admin)_ Thêm/sửa/xoá danh mục thu-chi: màu, số tiền và nội dung mặc định cho form Thêm giao dịch                                      |
 
 ## Nơi lưu dữ liệu
@@ -251,8 +251,8 @@ sửa luôn dòng `"updated"`, rồi **Commit changes**. Sau ~1 phút trang web 
 Tab **Danh mục giao dịch** (chỉ admin thấy, ở sau Sổ thu chi) quản lý các danh mục thu/chi dùng
 trong ô chọn "Danh mục" ở trên — thay vì danh sách cố định trong mã nguồn.
 
-- Bảng liệt kê từng danh mục: màu, tên, loại (Thu/Chi), số tiền mặc định, nội dung mặc định.
-  Tick **Hiện mã** để thấy mã hệ thống tự sinh (`THU-001`, `CHI-002`…), bình thường ẩn cho gọn.
+- Bảng liệt kê từng danh mục: màu, tên, loại (Thu/Chi), số tiền mặc định, nội dung mặc định. Mã
+  hệ thống tự sinh (`THU-001`, `CHI-002`…) không hiện trong bảng, chỉ để nội bộ.
 - Bấm **+ Thêm danh mục** hoặc nút **cây bút** ở một dòng để mở hộp thoại thêm/sửa: chọn loại, đặt
   tên, chọn màu, số tiền mặc định (để trống nếu mỗi khoản một số khác nhau), nội dung mặc định.
 - Danh mục **đã có giao dịch trong Sổ thu chi thì không xoá được**, dòng đó chỉ còn nút Sửa — xoá
