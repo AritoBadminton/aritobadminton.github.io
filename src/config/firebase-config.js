@@ -26,3 +26,18 @@ export const FIREBASE_CONFIG = {
 export function isFirebaseConfigured() {
   return Boolean(FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.apiKey);
 }
+
+/**
+ * Site key reCAPTCHA v3 cho App Check — chặn request Firestore không đến từ
+ * đúng trang này (VD: gọi thẳng REST API bên ngoài trình duyệt). Cũng là giá
+ * trị công khai theo thiết kế (Google reCAPTCHA), không phải bí mật.
+ *
+ * Để trống thì App Check không bật — trang chạy y như trước, không đổi hành vi.
+ * Tạo ở https://console.firebase.google.com/ → project này → Build → App Check.
+ */
+export const RECAPTCHA_SITE_KEY = '6LdeJ8otAAAAAPWPvdjFbri2mWm5EYLsGkRW_qzu';
+
+/** Đã cấu hình App Check hay chưa. */
+export function isAppCheckConfigured() {
+  return RECAPTCHA_SITE_KEY.length > 0;
+}

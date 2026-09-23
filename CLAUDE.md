@@ -443,6 +443,22 @@ trong `firebase-service.js`.
   khoá riêng thì không** — đừng nhận và đừng yêu cầu chúng qua khung chat.
 - Việc xoá dữ liệu, publish rules, tạo tài khoản: nêu rõ các bước rồi để chủ
   trang tự bấm.
+- **App Check (09/2026)** — `RECAPTCHA_SITE_KEY` trong `firebase-config.js`,
+  khởi tạo trong `getConnection()` (`firebase-service.js`) trước khi lấy
+  Auth/Firestore. Chặn request Firestore không đến từ đúng trang này (VD:
+  gọi thẳng REST API bên ngoài trình duyệt) — bổ sung cho `firestore.rules`,
+  không thay thế. Site key là giá trị công khai (như `firebaseConfig`), an
+  toàn để đưa vào chat/commit; **secret key thì không** — không nằm trong code,
+  chỉ Firebase Console cần biết. Đang chạy ở chế độ **Monitor** trên Firebase
+  Console (chưa **Enforce**) — thiếu bước bật Enforce (chủ trang tự bấm sau khi
+  theo dõi vài ngày không lỗi) thì code này mới chỉ log số liệu, chưa chặn gì
+  thật. Bật Enforce rồi mà cần test cục bộ (`npm run dev`) thao tác cần quyền
+  ghi thì phải có debug token riêng (`self.FIREBASE_APPCHECK_DEBUG_TOKEN`),
+  chưa cấu hình. Test Playwright dùng stub riêng
+  (`tests/fbstub/app-check.js`, map trong `make-fbtest.sh`) — thêm import
+  `firebase/xxx` mới vào `firebase-service.js` thì nhớ thêm cả stub + map ở
+  đây, thiếu bước đó cả bộ test vỡ vì cố tải module thật từ CDN trong môi
+  trường test không có mạng.
 
 ## Lịch sử cần biết
 
