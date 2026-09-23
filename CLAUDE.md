@@ -428,9 +428,15 @@ trong `firebase-service.js`.
 ## Bảo mật
 
 - **Repo để public.** Số tài khoản ngân hàng của thủ quỹ đã gỡ khỏi `data.json`
-  và `README.md` nhưng **vẫn còn trong lịch sử git**, và ảnh
-  `src/assets/images/qr-transfer.png` vẫn mã hoá số tài khoản đó. Muốn sạch hẳn
-  phải viết lại lịch sử repo.
+  và `README.md`. Ảnh `src/assets/images/qr-transfer.png` (mã hoá số tài khoản
+  đó) **đã xoá khỏi cây hiện tại (09/2026)** — phát hiện file này vẫn đang
+  public sống trên trang thật (HTTP 200) dù không code nào tham chiếu tới,
+  không phải chỉ nằm trong lịch sử như tưởng ban đầu. **Vẫn còn trong lịch sử
+  git** (bản thân file, `data.json`/`README.md` bản cũ) — viết lại lịch sử
+  repo mới xoá sạch được, nhưng **không xoá được exposure đã xảy ra** (ai đã
+  clone/fork repo lúc còn public thì vẫn giữ bản cũ, GitHub có thể đã
+  cache/index). Cách duy nhất chắc chắn an toàn: đổi số tài khoản ngân hàng
+  thật, coi số cũ đã lộ vĩnh viễn.
 - **Không còn nhánh đăng nhập bằng mật khẩu cục bộ trong trình duyệt** (đã xoá
   09/2026 — `ADMIN_PASSWORD_HASH`/`ADMIN_USERNAME` trong `constants.js` và nhánh
   else trong `auth-service.js`). Chỉ còn hai đường: Firebase Auth (trang thật
