@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Quỹ CLB Cầu Lông Arito</title>
     <meta name="description" content="Trang thống kê và quản lý thu chi quỹ câu lạc bộ cầu lông công ty Arito." />
+    <!--
+      Content-Security-Policy: lớp phòng thủ phụ ở trình duyệt, không thay cho
+      firestore.rules. script-src dùng hash thật của khối importmap bên dưới
+      — SỬA IMPORTMAP THÌ PHẢI TÍNH LẠI HASH NÀY, chạy
+      `node scripts/check-csp-hash.mjs` (cũng chạy trong `npm run check`) để
+      biết hash đúng là gì. Quên bước đó là trình duyệt chặn luôn script đó,
+      trang trắng tinh. Không có frame-ancestors: directive này chỉ chạy được
+      qua HTTP header thật, GitHub Pages không cho set header nên khai báo
+      qua thẻ meta này chỉ khiến trình duyệt cảnh báo suông, không chặn gì cả
+      — đã thử và bỏ.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.gstatic.com 'sha256-3/7cEJYvrmvzNhMDfJ7iIyBRR9YHGAaYc7I3FisrRQk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com; font-src 'self'; object-src 'none'; base-uri 'self'"
+    />
     <link
       rel="icon"
       type="image/png"

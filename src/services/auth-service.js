@@ -1,30 +1,18 @@
 /**
  * Xác thực quản trị viên.
  *
- * CẢNH BÁO: trang chạy trên GitHub Pages, không có máy chủ, nên việc kiểm tra
- * diễn ra ngay trong trình duyệt. Đây là khoá chống bấm nhầm chứ không phải
- * bảo mật thật — dữ liệu chung vẫn được bảo vệ bởi quyền ghi vào repo GitHub.
+ * Chế độ Firebase (trang thật đang chạy chế độ này): Firebase Auth tự giữ
+ * phiên đăng nhập, watchAuth() trong main.js báo lại trạng thái isAdmin.
+ * Chế độ Worker (worker/, hiện không dùng, giữ phòng khi quay lại lưu bằng
+ * Git): phiên do Worker cấp một vé có hạn, xem api-service.js.
  */
 
-import { ADMIN_PASSWORD_HASH, ADMIN_USERNAME, STORAGE_KEYS } from '../config/constants.js';
 import { store } from '../state/store.js';
 import { apiLogin, clearApiSession, isApiConfigured, loadApiSession } from './api-service.js';
 import { firebaseApi, isFirebaseMode } from './data-source.js';
-import { readRaw, readSessionRaw, removeKey, writeRaw } from './storage-service.js';
-
-/**
- * Băm SHA-256 một chuỗi, trả về dạng hex.
- * @param {string} text
- * @returns {Promise<string>}
- */
-async function hashText(text) {
-  const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
 
 /**
  * Khôi phục phiên đăng nhập đã lưu từ lần trước.
- * Có máy chủ lưu trữ thì phiên do máy chủ cấp mới tính, khoá cục bộ bị bỏ qua.
  * @returns {boolean}
  */
 export function restoreSession() {
@@ -34,8 +22,7 @@ export function restoreSession() {
     store.isAdmin = Boolean(loadApiSession());
     return store.isAdmin;
   }
-  const stored = readRaw(STORAGE_KEYS.AUTH) ?? readSessionRaw(STORAGE_KEYS.AUTH);
-  store.isAdmin = stored === ADMIN_PASSWORD_HASH;
+  store.isAdmin = false;
   return store.isAdmin;
 }
 
@@ -43,30 +30,21 @@ export function restoreSession() {
  * Kiểm tra thông tin đăng nhập và mở phiên nếu đúng.
  * @param {string} username tên tài khoản (không phân biệt hoa thường)
  * @param {string} password
- * @param {boolean} remember true thì nhớ qua nhiều phiên, false chỉ giữ trong phiên hiện tại
  * @returns {Promise<{ok: boolean, error?: string}>}
  */
-export async function login(username, password, remember) {
-  const normalizedUser = username.trim().toLowerCase();
-
+export async function login(username, password) {
   if (isFirebaseMode()) {
     // Firebase tự giữ phiên; trạng thái isAdmin do watchAuth cập nhật.
     return firebaseApi().firebaseLogin(username, password);
   }
 
   if (isApiConfigured()) {
-    const result = await apiLogin(normalizedUser, password);
+    const result = await apiLogin(username.trim().toLowerCase(), password);
     store.isAdmin = result.ok;
     return result;
   }
 
-  const passwordHash = await hashText(password);
-  if (normalizedUser !== ADMIN_USERNAME || passwordHash !== ADMIN_PASSWORD_HASH) {
-    return { ok: false, error: 'Sai tài khoản hoặc mật khẩu.' };
-  }
-  store.isAdmin = true;
-  writeRaw(STORAGE_KEYS.AUTH, ADMIN_PASSWORD_HASH, remember);
-  return { ok: true };
+  return { ok: false, error: 'Chưa cấu hình nơi đăng nhập (Firebase hoặc máy chủ lưu trữ).' };
 }
 
 /** Đóng phiên đăng nhập và xoá dấu vết đã lưu. */
@@ -75,6 +53,5 @@ export function logout() {
     return firebaseApi().firebaseLogout();
   }
   store.isAdmin = false;
-  removeKey(STORAGE_KEYS.AUTH);
   clearApiSession();
 }

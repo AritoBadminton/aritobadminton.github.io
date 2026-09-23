@@ -166,6 +166,21 @@ check(
 );
 await khach3.close();
 
+/* ---------- 7. mapLink kiểu javascript: bị chặn, không gán vào href ---------- */
+
+// Phòng khi tài khoản admin bị chiếm và mapLink bị đổi thành scheme nguy hiểm
+// thay vì link Google Maps thật — xem isSafeUrl trong utils/dom.js.
+const khach4 = await moTrang({
+  address: 'Có địa chỉ, link là javascript:',
+  mapLink: "javascript:alert('x')",
+});
+check(
+  'không có thẻ <a> khi mapLink không phải http(s)',
+  await khach4.$eval('#address-panel', (e) => e.querySelector('a')),
+  null,
+);
+await khach4.close();
+
 check('không có lỗi javascript', errors, []);
 
 await browser.close();

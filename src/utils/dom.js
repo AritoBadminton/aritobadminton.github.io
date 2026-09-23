@@ -31,6 +31,25 @@ export function escapeHtml(value) {
 }
 
 /**
+ * Chặn scheme nguy hiểm (VD `javascript:`) trước khi gán vào href/src.
+ *
+ * Chỉ dùng cho giá trị admin gõ trực tiếp trên Firebase Console (`settings/qr`,
+ * `settings/club.mapLink`) — nếu tài khoản admin bị chiếm, kẻ tấn công có thể
+ * đặt `javascript:...` thay vì link thật để chạy script khi người khác bấm vào.
+ * Đường dẫn tương đối (không có `:` trước dấu `/` đầu tiên, VD ảnh trong repo)
+ * và `http(s):` đều coi là an toàn.
+ * @param {string} url
+ * @returns {string} url gốc nếu an toàn, rỗng nếu không
+ */
+export function isSafeUrl(url) {
+  const value = String(url ?? '').trim();
+  if (!value) return '';
+  const schemeMatch = value.match(/^([a-z][a-z0-9+.-]*):/i);
+  if (!schemeMatch) return value;
+  return /^https?$/i.test(schemeMatch[1]) ? value : '';
+}
+
+/**
  * Bật/tắt trạng thái ẩn của một phần tử bằng thuộc tính display.
  * @param {HTMLElement} element
  * @param {boolean} visible

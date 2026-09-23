@@ -105,28 +105,14 @@ npm run check   # kiểm tra format + lint trước khi commit
 
 ## Đăng nhập quản trị
 
-Bấm nút **Đăng nhập** ở góc phải trên cùng.
-
-|           |                                      |
-| --------- | ------------------------------------ |
-| Tài khoản | `Admin` (không phân biệt hoa thường) |
-| Mật khẩu  | `Badminton2808`                      |
+Bấm nút **Đăng nhập** ở góc phải trên cùng, nhập email + mật khẩu tài khoản Firebase
+Auth của mình (tạo trong Firebase Console, xem
+[docs/TRIEN-KHAI-FIREBASE.md](docs/TRIEN-KHAI-FIREBASE.md)). Có tài khoản Firebase
+thôi chưa đủ quyền ghi — phải có thêm một tài liệu `admins/<uid>` tương ứng.
 
 - **Chưa đăng nhập** → chỉ xem: mọi ô nhập, dropdown, nút xoá và thanh "Lưu chung lên GitHub" đều bị khoá, có banner vàng nhắc ở đầu trang.
 - **Đã đăng nhập** → nhập liệu và chỉnh sửa bình thường. Nút góc phải chuyển thành **✓ Admin**, bấm lại để đăng xuất.
-- Tick "Ghi nhớ trên máy này" để không phải đăng nhập lại; bỏ tick thì chỉ giữ trong phiên làm việc.
-
-> ⚠️ **Đây không phải bảo mật thật.** Trang chạy trên GitHub Pages, không có máy chủ,
-> nên việc kiểm tra mật khẩu chạy bằng JavaScript ngay trong trình duyệt và repo lại
-> để public — người rành kỹ thuật xem mã nguồn vẫn vượt qua được. Mục đích của nó là
-> **chống bấm nhầm**, không phải chống người cố tình.
->
-> Dữ liệu chung vẫn an toàn: mọi chỉnh sửa trên web chỉ lưu trong máy người đó, muốn
-> đổi số liệu chung thì phải commit vào `data.json` — việc này cần quyền ghi vào repo GitHub.
->
-> **Đừng dùng lại mật khẩu này cho email, ngân hàng hay bất kỳ tài khoản nào khác.**
-> Muốn đổi mật khẩu: tính SHA-256 của mật khẩu mới (ví dụ trên trang emn178.github.io/online-tools/sha256.html)
-> rồi thay `ADMIN_PASSWORD_HASH` trong `src/config/constants.js`.
+- Thu hồi quyền của ai thì xoá tài liệu `admins/<uid>` của người đó trên Firebase Console — không cần đổi mật khẩu của ai khác.
 
 ## Sửa khối Quy định đóng quỹ
 

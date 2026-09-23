@@ -431,13 +431,57 @@ trong `firebase-service.js`.
   và `README.md` nhưng **vẫn còn trong lịch sử git**, và ảnh
   `src/assets/images/qr-transfer.png` vẫn mã hoá số tài khoản đó. Muốn sạch hẳn
   phải viết lại lịch sử repo.
-- `ADMIN_PASSWORD_HASH` trong `constants.js` là tàn dư của cách đăng nhập cũ chạy
-  ngay trong trình duyệt — **không phải bảo mật thật**. Bảo vệ thật nằm ở Firebase
-  Auth và `firestore.rules`.
+- **Không còn nhánh đăng nhập bằng mật khẩu cục bộ trong trình duyệt** (đã xoá
+  09/2026 — `ADMIN_PASSWORD_HASH`/`ADMIN_USERNAME` trong `constants.js` và nhánh
+  else trong `auth-service.js`). Chỉ còn hai đường: Firebase Auth (trang thật
+  đang dùng) và Worker (`worker/`, hiện không chạy, giữ phòng khi quay lại lưu
+  bằng Git). **Đừng thêm lại kiểu hash-mật-khẩu-so-trong-code** — repo public
+  nên hash lộ ra ngay, và trước khi xoá, README từng công khai luôn cả mật khẩu
+  gốc `Badminton2808` (SHA-256 của nó chính là `ADMIN_PASSWORD_HASH` cũ) — nếu
+  mật khẩu đó (hoặc biến thể) còn dùng ở đâu khác thì nên đổi.
 - `firebaseConfig` công khai được (Firebase thiết kế vậy). **Mật khẩu, token,
   khoá riêng thì không** — đừng nhận và đừng yêu cầu chúng qua khung chat.
 - Việc xoá dữ liệu, publish rules, tạo tài khoản: nêu rõ các bước rồi để chủ
   trang tự bấm.
+- **Content-Security-Policy (09/2026)**, thẻ `<meta http-equiv>` trong
+  `index.html` — lớp phòng thủ phụ ở trình duyệt, không thay cho
+  `firestore.rules`. `script-src` dùng hash SHA-256 thật của
+  `<script type="importmap">` (chỉ nội dung inline duy nhất trong trang;
+  `src/main.js` tải qua file ngoài, không cần hash).
+  - **Sửa importmap thì PHẢI tính lại hash** — chạy
+    `node scripts/check-csp-hash.mjs`, dán hash mới vào CSP. Bước này đã gắn
+    vào `npm run check` (`npm run check:csp`) nên quên là bị chặn ngay khi
+    chạy `check` trước khi đẩy, không cần nhớ tay.
+  - **Cạm bẫy đã gặp lúc viết script kiểm hash:** chú thích giải thích CSP
+    (ngay phía trên thẻ meta) nếu viết nguyên văn chuỗi
+    `<script type="importmap">` để mô tả thì chính chuỗi đó khớp luôn vào
+    regex tìm importmap, khiến script tính hash sai đối tượng (tính luôn cả
+    phần CSP + hash cũ vào input, hash đổi khác nhau mỗi lần chạy, không bao
+    giờ hội tụ). `check-csp-hash.mjs` đã tự bóc `<!-- comment -->` ra trước
+    khi tìm importmap để tránh lặp lại — thêm chú thích mới nhắc tới cú pháp
+    thẻ script thì nhớ giữ trong comment, script đã tự lo phần đó, nhưng cẩn
+    thận vẫn hơn.
+  - **`frame-ancestors` không khai báo được** — directive này chỉ có tác dụng
+    qua HTTP header thật, GitHub Pages không cho set header nên khai qua thẻ
+    meta chỉ sinh cảnh báo console suông (browser tự bỏ qua), đã thử và bỏ
+    khỏi policy. Đừng thêm lại trừ khi có cách set HTTP header thật.
+  - **`tests/make-fbtest.sh` tự tính lại hash cho bản test** — bản test sửa
+    nội dung importmap (trỏ sang `fbstub/`) nên hash gốc trong `index.html`
+    sẽ sai với bản đó; script tự tính lại và thay đúng hash trước khi ghi ra
+    `/tmp/fbtest`. Thêm import mới vào `firebase-service.js` (kiểu
+    `firebase/xxx`) thì nhớ thêm cả stub trong `tests/fbstub/` lẫn map URL
+    trong `make-fbtest.sh` như hai module kia — thiếu bước đó thì bản test
+    vỡ vì cố tải thật từ CDN trong môi trường không mạng, không liên quan gì
+    tới hash CSP.
+  - **`style-src` phải giữ `'unsafe-inline'`** — code gán rất nhiều
+    `style="..."` trực tiếp qua JS với giá trị đổi liên tục theo dữ liệu (VD
+    `style="background:${...}"`), không thể tính hash cố định cho từng cái.
+    Đánh đổi phổ biến, rủi ro thấp (CSS injection không chạy được JS ở trình
+    duyệt hiện đại).
+  - **`connect-src` dùng `https://*.googleapis.com`** (wildcard subdomain)
+    thay vì liệt kê từng domain con của Firestore/Auth/Installations — cố
+    tình rộng hơn mức tối thiểu để tránh chặn nhầm request thật (hẹp quá mà
+    thiếu một domain con là Firestore/Auth báo lỗi kết nối hàng loạt).
 
 ## Lịch sử cần biết
 

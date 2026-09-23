@@ -22,7 +22,7 @@ import {
 import { saveSection } from './save-bar.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
-import { copyToClipboard, escapeHtml, qs, qsa, setVisible } from '../utils/dom.js';
+import { copyToClipboard, escapeHtml, isSafeUrl, qs, qsa, setVisible } from '../utils/dom.js';
 import { formatCurrency, formatDateLabel, formatNoteHtml } from '../utils/format.js';
 
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>`;
@@ -148,8 +148,11 @@ function renderAddressPanel() {
   }
   panel.style.display = '';
 
-  const mapLinkHtml = address.mapLink
-    ? ` — <a href="${escapeHtml(address.mapLink)}" target="_blank" rel="noopener">Xem trên Google Maps →</a>`
+  // isSafeUrl chặn scheme kiểu javascript: — phòng khi tài khoản admin bị
+  // chiếm và mapLink bị đổi thành thứ khác ngoài link http(s) thật.
+  const safeMapLink = isSafeUrl(address.mapLink);
+  const mapLinkHtml = safeMapLink
+    ? ` — <a href="${escapeHtml(safeMapLink)}" target="_blank" rel="noopener">Xem trên Google Maps →</a>`
     : '';
 
   const pinSpan = (size) =>
@@ -297,13 +300,16 @@ function renderRules() {
 export function renderQrPanel() {
   const qrConfig = store.data.qr;
   const panel = qs('#qr-panel');
-  if (!qrConfig?.image) {
+  // isSafeUrl chặn scheme kiểu javascript: — phòng khi tài khoản admin bị
+  // chiếm và qr.image bị đổi thành thứ khác ngoài đường dẫn ảnh/link http(s) thật.
+  const safeImage = isSafeUrl(qrConfig?.image);
+  if (!safeImage) {
     panel.style.display = 'none';
     return;
   }
   panel.style.display = '';
-  qs('#qr-image').src = qrConfig.image;
-  qs('#qr-link').href = qrConfig.image;
+  qs('#qr-image').src = safeImage;
+  qs('#qr-link').href = safeImage;
   qs('#qr-name').textContent = qrConfig.name ?? '';
   qs('#qr-account').textContent = qrConfig.account ?? '';
   qs('#qr-bank').textContent = qrConfig.bank ?? '';
