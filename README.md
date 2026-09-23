@@ -209,7 +209,7 @@ Hiện ở tab **Đóng quỹ theo tháng**, cột bên phải bảng đóng qu�
 
 ```jsonc
 "qr": {
-  "image": "src/assets/images/qr-transfer.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
+  "image": "src/assets/images/qr-cua-ban.png",     // đổi ảnh: upload ảnh mới lên repo rồi đổi tên file ở đây
   "name": "TEN CHU TAI KHOAN",
   "account": "0000 0000 0000 00",
   "bank": "Ten ngan hang · VietQR / Napas 247",
