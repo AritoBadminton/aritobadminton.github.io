@@ -20,7 +20,7 @@ import { startPresenceTracking } from './services/presence-service.js';
 import { buildDerivedState } from './services/sync-service.js';
 import { registerRenderer, requestRender } from './state/render-bus.js';
 import { store } from './state/store.js';
-import { qs, setVisible } from './utils/dom.js';
+import { escapeHtml, qs, setVisible } from './utils/dom.js';
 
 /** Vẽ lại các ô lọc rồi vẽ lại bảng tương ứng. */
 function renderLedgerWithFilters() {
@@ -48,7 +48,7 @@ function registerRenderers() {
 function showLoadError(error) {
   qs('#loading-state').innerHTML = isFirebaseMode()
     ? 'Không kết nối được Firebase.<br>' +
-      `<span class="text-muted">${String(error?.message ?? error)}</span>`
+      `<span class="text-muted">${escapeHtml(String(error?.message ?? error))}</span>`
     : 'Không tải được <code>data.json</code>.<br>' +
       '<span class="text-muted">Nếu bạn mở file trực tiếp từ máy, hãy mở qua GitHub Pages ' +
       'hoặc chạy một máy chủ cục bộ.</span>';

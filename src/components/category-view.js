@@ -162,7 +162,7 @@ export function renderCategoryGrid() {
         .map((row) => {
           const inUse = isCategoryInUse(row.name);
           return `<tr>
-        <td><i class="color-dot" style="background:${row.color}"></i></td>
+        <td><i class="color-dot" style="background:${escapeHtml(row.color)}"></i></td>
         <td class="cell-name">${escapeHtml(row.name)}
           ${row.protected ? '<span class="pill pill--merged" title="Gắn với công thức Tiền quỹ công ty cấp">khoá tên</span>' : ''}
         </td>
