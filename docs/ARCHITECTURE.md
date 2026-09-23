@@ -47,6 +47,7 @@ src/
 │   ├── format.js             Định dạng tiền, ngày, nhãn tháng
 │   └── date.js               Tính khoá tháng
 └── assets/
+    ├── images/qr-transfer.png
     └── styles/
         ├── base.css          Biến thiết kế, reset, kiểu chữ
         ├── layout.css        Header, tab, lưới, footer
