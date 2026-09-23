@@ -17,7 +17,6 @@
  */
 
 import { initializeApp } from 'firebase/app';
-import { ReCaptchaV3Provider, initializeAppCheck } from 'firebase/app-check';
 import {
   EmailAuthProvider,
   browserLocalPersistence,
@@ -49,7 +48,7 @@ import {
   where,
   writeBatch,
 } from 'firebase/firestore';
-import { FIREBASE_CONFIG, RECAPTCHA_SITE_KEY, isAppCheckConfigured } from '../config/firebase-config.js';
+import { FIREBASE_CONFIG } from '../config/firebase-config.js';
 
 /** Số tài liệu tối đa trong một lô ghi của Firestore. */
 const BATCH_LIMIT = 450;
@@ -66,15 +65,6 @@ let unsubscribers = [];
 export function getConnection() {
   if (!connection) {
     const app = initializeApp(FIREBASE_CONFIG);
-    // Khởi tạo App Check trước khi lấy các service khác, để Firestore/Auth
-    // gắn kèm token xác thực ngay từ request đầu tiên. Đang ở chế độ Monitor
-    // trên Firebase Console (chưa Enforce) nên chưa chặn gì, chỉ log số liệu.
-    if (isAppCheckConfigured()) {
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
-        isTokenAutoRefreshEnabled: true,
-      });
-    }
     connection = { app, db: getFirestore(app), auth: getAuth(app) };
   }
   return connection;

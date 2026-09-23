@@ -18,7 +18,6 @@ import sys, re, pathlib
 d = pathlib.Path(sys.argv[1])
 stub = {
   "firebase/app": "/fbstub/app.js",
-  "firebase/app-check": "/fbstub/app-check.js",
   "firebase/auth": "/fbstub/auth.js",
   "firebase/firestore": "/fbstub/firestore.js",
 }
