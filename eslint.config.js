@@ -53,6 +53,21 @@ export default [
     },
   },
   {
+    // Script tiện ích chạy bằng Node (VD kiểm hash CSP trước khi đẩy), không
+    // phải trình duyệt.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2023,
+      sourceType: 'module',
+      globals: globals.node,
+    },
+    rules: {
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-var': 'error',
+      'prefer-const': 'error',
+    },
+  },
+  {
     // Worker chạy trên Cloudflare, không phải trình duyệt: có fetch, crypto,
     // Response nhưng không có window hay document.
     files: ['worker/**/*.js'],

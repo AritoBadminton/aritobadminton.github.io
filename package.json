@@ -15,7 +15,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint"
+    "check:csp": "node scripts/check-csp-hash.mjs",
+    "check": "npm run format:check && npm run lint && npm run check:csp"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

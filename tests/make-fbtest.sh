@@ -14,7 +14,7 @@ rm -rf "$DEST"; mkdir -p "$DEST"
 cp -r "$HERE/fbstub" "$DEST/fbstub"
 
 python3 - "$DEST" <<'PY'
-import sys, re, pathlib
+import sys, re, pathlib, hashlib, base64
 d = pathlib.Path(sys.argv[1])
 stub = {
   "firebase/app": "/fbstub/app.js",
@@ -25,6 +25,16 @@ for p in d.glob("*.html"):
     s = p.read_text(encoding="utf-8")
     for k, v in stub.items():
         s = re.sub(r'"%s": "[^"]+"' % re.escape(k), '"%s": "%s"' % (k, v), s)
+
+    # Sửa importmap ở trên đổi luôn nội dung khối <script type="importmap">,
+    # nên hash CSP (script-src) đang trỏ vào bản gốc sẽ sai — tính lại đúng
+    # bản đã sửa, giống hệt cách scripts/check-csp-hash.mjs làm với bản thật.
+    no_comments = re.sub(r"<!--[\s\S]*?-->", "", s)
+    m = re.search(r'<script type="importmap">([\s\S]*?)</script>', no_comments)
+    if m and "Content-Security-Policy" in s:
+        new_hash = base64.b64encode(hashlib.sha256(m.group(1).encode("utf-8")).digest()).decode()
+        s = re.sub(r"sha256-[A-Za-z0-9+/=]+", "sha256-" + new_hash, s)
+
     p.write_text(s, encoding="utf-8")
 
 # Bật chế độ Firebase bằng cấu hình giả; không có khoá thật nào nằm trong test.
