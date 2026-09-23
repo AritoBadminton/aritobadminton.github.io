@@ -63,7 +63,6 @@ export const PRESENCE_TTL_MS = 5 * 60 * 1000;
 /** Khoá lưu trữ trong localStorage / sessionStorage. */
 export const STORAGE_KEYS = {
   THEME: 'clb-theme',
-  AUTH: 'clb-auth-v1',
   ACTIVE_MEMBERS: 'clb-active-v1',
   DUES_PAID: 'clb-paid-v1',
   DUES_NOTES: 'clb-note-v1',
@@ -76,17 +75,6 @@ export const STORAGE_KEYS = {
   API_SESSION: 'clb-session-v1',
   PRESENCE_SESSION: 'clb-presence-v1',
 };
-
-/**
- * Thông tin đăng nhập quản trị.
- *
- * CẢNH BÁO: đây là web tĩnh không có máy chủ, việc kiểm tra chạy ngay trong
- * trình duyệt và repo để public — nên đây chỉ là khoá chống bấm nhầm, KHÔNG
- * phải bảo mật thật. Dữ liệu chung được bảo vệ bởi quyền ghi vào repo GitHub.
- * Đổi mật khẩu: thay ADMIN_PASSWORD_HASH bằng SHA-256 của mật khẩu mới.
- */
-export const ADMIN_USERNAME = 'admin';
-export const ADMIN_PASSWORD_HASH = '0f52167b7f8d9dd7a4cb1f59cfd855acf53021f3168cae3bc9c5085a4d1afab5';
 
 /**
  * Trạng thái đóng quỹ của một thành viên trong tháng.

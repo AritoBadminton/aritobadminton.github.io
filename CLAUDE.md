@@ -431,9 +431,14 @@ trong `firebase-service.js`.
   và `README.md` nhưng **vẫn còn trong lịch sử git**, và ảnh
   `src/assets/images/qr-transfer.png` vẫn mã hoá số tài khoản đó. Muốn sạch hẳn
   phải viết lại lịch sử repo.
-- `ADMIN_PASSWORD_HASH` trong `constants.js` là tàn dư của cách đăng nhập cũ chạy
-  ngay trong trình duyệt — **không phải bảo mật thật**. Bảo vệ thật nằm ở Firebase
-  Auth và `firestore.rules`.
+- **Không còn nhánh đăng nhập bằng mật khẩu cục bộ trong trình duyệt** (đã xoá
+  09/2026 — `ADMIN_PASSWORD_HASH`/`ADMIN_USERNAME` trong `constants.js` và nhánh
+  else trong `auth-service.js`). Chỉ còn hai đường: Firebase Auth (trang thật
+  đang dùng) và Worker (`worker/`, hiện không chạy, giữ phòng khi quay lại lưu
+  bằng Git). **Đừng thêm lại kiểu hash-mật-khẩu-so-trong-code** — repo public
+  nên hash lộ ra ngay, và trước khi xoá, README từng công khai luôn cả mật khẩu
+  gốc `Badminton2808` (SHA-256 của nó chính là `ADMIN_PASSWORD_HASH` cũ) — nếu
+  mật khẩu đó (hoặc biến thể) còn dùng ở đâu khác thì nên đổi.
 - `firebaseConfig` công khai được (Firebase thiết kế vậy). **Mật khẩu, token,
   khoá riêng thì không** — đừng nhận và đừng yêu cầu chúng qua khung chat.
 - Việc xoá dữ liệu, publish rules, tạo tài khoản: nêu rõ các bước rồi để chủ
