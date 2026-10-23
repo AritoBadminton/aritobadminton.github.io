@@ -589,7 +589,6 @@
       <!-- ==================== Đóng quỹ theo tháng ==================== -->
       <section class="tab-panel" id="panel-months" role="tabpanel" aria-label="Đóng quỹ theo tháng">
         <div class="toolbar">
-          <select id="month-picker" aria-label="Chọn tháng"></select>
           <button class="btn btn--ghost admin-only" id="month-fill" style="display: none" type="button">
             + Bổ sung thành viên đang hoạt động
           </button>
@@ -624,23 +623,16 @@
           </div>
         </div>
 
+        <div class="toolbar">
+          <select id="month-picker" aria-label="Chọn tháng"></select>
+          <input type="search" id="month-keyword" placeholder="Tìm tên thành viên…" aria-label="Tìm thành viên" />
+        </div>
+
         <div class="grid grid--dues">
           <div class="card">
-            <div
-              class="card__header"
-              style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px"
-            >
-              <div style="flex: 1; min-width: 200px">
-                <h3>Danh sách đóng quỹ</h3>
-                <p id="month-subtitle"></p>
-              </div>
-              <input
-                type="search"
-                id="month-keyword"
-                placeholder="Tìm tên thành viên…"
-                aria-label="Tìm thành viên"
-                style="flex: 0 1 220px"
-              />
+            <div class="card__header">
+              <h3>Danh sách đóng quỹ</h3>
+              <p id="month-subtitle"></p>
             </div>
             <div class="card__body">
               <div class="table-scroll">
