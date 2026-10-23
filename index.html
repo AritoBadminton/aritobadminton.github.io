@@ -394,17 +394,6 @@
           <div class="card__body" id="ledger-export-body"></div>
         </div>
 
-        <div class="toolbar">
-          <div class="segmented" id="ledger-type-toggle">
-            <button class="segmented__item" data-type="all" aria-pressed="true" type="button">Tất cả</button>
-            <button class="segmented__item" data-type="thu" aria-pressed="false" type="button">Thu</button>
-            <button class="segmented__item" data-type="chi" aria-pressed="false" type="button">Chi</button>
-          </div>
-          <select id="filter-month" aria-label="Lọc theo tháng"></select>
-          <select id="filter-category" aria-label="Lọc theo danh mục"></select>
-          <input type="search" id="filter-keyword" placeholder="Tìm nội dung giao dịch…" aria-label="Tìm giao dịch" />
-        </div>
-
         <div class="grid grid--4" style="margin-bottom: 14px">
           <div class="card stat-tile">
             <div class="stat-tile__label">Số dư quỹ của tháng</div>
@@ -423,6 +412,17 @@
             <div class="stat-tile__label">Chênh lệch</div>
             <div class="stat-tile__value stat-tile__value--compact" id="ledger-net">—</div>
           </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="segmented" id="ledger-type-toggle">
+            <button class="segmented__item" data-type="all" aria-pressed="true" type="button">Tất cả</button>
+            <button class="segmented__item" data-type="thu" aria-pressed="false" type="button">Thu</button>
+            <button class="segmented__item" data-type="chi" aria-pressed="false" type="button">Chi</button>
+          </div>
+          <select id="filter-month" aria-label="Lọc theo tháng"></select>
+          <select id="filter-category" aria-label="Lọc theo danh mục"></select>
+          <input type="search" id="filter-keyword" placeholder="Tìm nội dung giao dịch…" aria-label="Tìm giao dịch" />
         </div>
 
         <div class="table-scroll">
