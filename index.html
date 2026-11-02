@@ -87,6 +87,22 @@
             <path d="M8 10V7a4 4 0 018 0v3" />
           </svg>
         </button>
+        <button class="btn--icon admin-only" id="backup-toggle" type="button" title="Tải bản sao lưu" aria-label="Tải bản sao lưu">
+          <svg
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+            <path d="M7 10l5 5 5-5" />
+            <path d="M12 15V3" />
+          </svg>
+        </button>
         <button class="btn--auth" id="auth-toggle" type="button">
           <span id="auth-icon">🔒</span><span id="auth-label">Đăng nhập</span>
         </button>
@@ -605,7 +621,7 @@
 
         <div class="grid grid--auto" style="margin-bottom: 14px">
           <div class="card stat-tile">
-            <div class="stat-tile__label">Thu được</div>
+            <div class="stat-tile__label">Tiền thu thành viên</div>
             <div class="stat-tile__value stat-tile__value--compact" id="month-collected">—</div>
           </div>
           <div class="card stat-tile" id="month-company-tile">
@@ -613,13 +629,13 @@
             <div class="stat-tile__value stat-tile__value--compact stat-tile__value--positive" id="month-company-fund">—</div>
           </div>
           <div class="card stat-tile">
+            <div class="stat-tile__label">Tổng tiền đã thu</div>
+            <div class="stat-tile__value stat-tile__value--compact stat-tile__value--positive" id="month-total-collected">—</div>
+          </div>
+          <div class="card stat-tile">
             <div class="stat-tile__label">Đã đóng</div>
             <div class="stat-tile__value stat-tile__value--compact stat-tile__value--positive" id="month-paid-count">—</div>
             <div class="stat-tile__footnote" id="month-paid-note"></div>
-          </div>
-          <div class="card stat-tile">
-            <div class="stat-tile__label">Chưa đóng</div>
-            <div class="stat-tile__value stat-tile__value--compact" id="month-unpaid-count">—</div>
           </div>
         </div>
 

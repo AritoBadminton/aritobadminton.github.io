@@ -307,10 +307,17 @@ hiện chữ "Đã xoá thành công" ở `#toast` rồi tự ẩn sau 3 giây.
 chép) — đều gọi thêm `showToast('Đã thực hiện xong')` sau khi lưu, cùng cơ chế
 toast của nút xoá ở trên. Chữ khác nhau theo hành động (`'Đã xoá thành công'` so
 với `'Đã thực hiện xong'`), không dùng chung một hằng số — nếu sau này thêm chỗ
-gọi mới thì nhớ chọn đúng câu, đừng gộp lại thành một chuỗi chung chung. Riêng
-form Thêm giao dịch vẫn giữ nguyên hành vi **không đóng popup** sau khi lưu
-(để nhập liên tiếp nhiều khoản), form Cập nhật/Sao chép thì đóng popup như cũ —
-toast không đổi phần đó, chỉ thêm thông báo.
+gọi mới thì nhớ chọn đúng câu, đừng gộp lại thành một chuỗi chung chung.
+
+**Form Thêm giao dịch cũng đóng popup sau khi lưu (11/2026, lật ngược quyết
+định cũ).** Trước đó cố tình giữ popup mở sau khi bấm "Thêm vào sổ" để nhập
+liên tiếp nhiều khoản không phải mở lại form mỗi lần — chủ trang đổi ý, giờ
+cả ba form (Thêm/Cập nhật/Sao chép) đều đóng popup ngay sau khi lưu thành
+công, chỉ còn toast báo kết quả. `handleAddTransaction` (`ledger-view.js`)
+không còn gọi `resetNewEntryFields()` + chọn lại ô Nội dung sau khi lưu, gọi
+thẳng `closeNewEntryModal()`; dòng `message.textContent = 'Đã thêm: ...'`
+cũng bỏ vì popup đóng ngay, không ai kịp thấy — `#new-message` giờ chỉ còn
+dùng cho thông báo lỗi thiếu trường khi submit.
 
 **Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
 cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"
@@ -413,6 +420,33 @@ trong `firebase-service.js`.
   hiện diện tới khi `lastSeen` quá hạn cửa sổ 50s).
 - Chỉ chạy ở chế độ Firebase (`isFirebaseMode()`) — chế độ `data.json` không
   có nơi ghi/đọc chung nên `store.onlineCount` luôn `null`, huy hiệu tự ẩn.
+
+**Nút "Tải bản sao lưu" (10/2026)**, biểu tượng tải xuống ở header, cạnh nút
+đổi mật khẩu — chỉ admin thấy (class `admin-only`, không cần toggle tay như
+`password-toggle`). Bấm là đọc một lần toàn bộ `months`, `transactions`,
+`categories`, `admins`, và 4 tài liệu `settings/*` qua `fetchBackupData()`
+(`firebase-service.js`), rồi tải xuống một file JSON ngay trên máy admin
+(`downloadFile()`, `utils/dom.js`) — không qua máy chủ nào khác.
+
+- **Cố tình không dùng `buildClubData()`** (hàm dựng `store.data` cho màn
+  hình) — hàm đó nắn lại dữ liệu (gộp `dues` thành mảng `members`, đổi tên
+  trường...) để tiện vẽ giao diện, không còn đúng hình dạng thật trên
+  Firestore nữa nên không ghi ngược lại được nếu sau này cần khôi phục. Bản
+  sao lưu đọc thẳng, giữ nguyên đúng hình dạng từng collection/tài liệu như
+  mô tả ở mục "Hình dạng dữ liệu trên Firestore" đầu file này.
+- **Cạm bẫy đã gặp lúc viết test:** gọi nhầm `snapshot.forEach(...)` thay vì
+  `snapshot.docs.forEach(...)` — Firestore thật có `.forEach()` ngay trên
+  `QuerySnapshot` nên chạy được trên trang thật, nhưng bản giả lập
+  (`tests/fbstub/firestore.js`) chỉ có `.docs`, thiếu `.forEach()`, nên lỗi
+  chỉ lộ ra khi chạy test chứ không lộ khi tự kiểm tay trên trang thật. Dùng
+  `.docs.forEach(...)` thì đúng với cả hai.
+- **`downloadFile()` phải gắn thẻ `<a>` vào DOM trước khi `.click()`** — tạo
+  xong bấm ngay mà không `appendChild` thì một số trình duyệt (kể cả
+  Chromium headless lúc chạy test) coi như không có gì xảy ra, không tải
+  được file.
+- File JSON không mã hoá gì — admin tự chịu trách nhiệm giữ file đó an toàn
+  sau khi tải (có số tài khoản ngân hàng trong `settings/qr`, email trong
+  `admins`).
 
 ## Cạm bẫy đã gặp
 

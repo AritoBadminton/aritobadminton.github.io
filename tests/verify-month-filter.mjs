@@ -69,7 +69,7 @@ const statSnapshot = () =>
   page.evaluate(() => ({
     collected: document.querySelector('#month-collected').textContent,
     paidCount: document.querySelector('#month-paid-count').textContent,
-    unpaidCount: document.querySelector('#month-unpaid-count').textContent,
+    totalCollected: document.querySelector('#month-total-collected').textContent,
   }));
 
 /* ---------- 1. Chưa gõ gì: đủ ba người ---------- */

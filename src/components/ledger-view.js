@@ -212,6 +212,10 @@ function openNewEntryModal() {
 /** Đóng hộp thoại thêm giao dịch mới. */
 function closeNewEntryModal() {
   qs('#new-entry-modal').hidden = true;
+  // Xoá ô Số tiền để lần mở lại sau tự về đúng mặc định của danh mục đang
+  // chọn (xem điều kiện trong openNewEntryModal) — không để sót số liệu của
+  // lần nhập trước.
+  qs('#new-amount').value = '';
 }
 
 /** Ghi nhận một khoản thu/chi mới. */
@@ -230,11 +234,8 @@ function handleAddTransaction() {
 
   addTransaction(newEntryType, { date, amount, desc, cat: category });
   requestRender();
-  message.textContent = `Đã thêm: ${newEntryType === 'thu' ? 'thu' : 'chi'} ${formatCurrency(amount)} — ${desc}`;
-  message.style.color = 'var(--good)';
   showToast('Đã thực hiện xong');
-  resetNewEntryFields();
-  qs('#new-desc').select();
+  closeNewEntryModal();
 }
 
 /* ---------- Form cập nhật ---------- */

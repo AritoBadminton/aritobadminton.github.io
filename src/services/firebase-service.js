@@ -524,3 +524,51 @@ export async function countOnlineViewers(windowMs) {
   const snapshot = await getDocs(query(collection(db, 'presence'), where('lastSeen', '>', cutoff)));
   return snapshot.size;
 }
+
+/* ---------- Sao lưu ---------- */
+
+/**
+ * Đọc trọn một lần toàn bộ dữ liệu quỹ, đúng hình dạng thật trên Firestore —
+ * không qua buildClubData(), vì hàm đó đã nắn lại dữ liệu cho màn hình dùng
+ * (gộp/đổi tên trường), không ghi ngược lại từng collection được nếu sau này
+ * cần khôi phục. Dùng getDoc/getDocs một lần, không onSnapshot, vì đây là
+ * thao tác bấm một lần chứ không phải theo dõi liên tục.
+ * @returns {Promise<object>}
+ */
+export async function fetchBackupData() {
+  const { db } = getConnection();
+
+  const [monthsSnap, transactionsSnap, categoriesSnap, adminsSnap, club, rules, qr, roster] =
+    await Promise.all([
+      getDocs(collection(db, 'months')),
+      getDocs(collection(db, 'transactions')),
+      getDocs(collection(db, 'categories')),
+      getDocs(collection(db, 'admins')),
+      getDoc(doc(db, 'settings', 'club')),
+      getDoc(doc(db, 'settings', 'rules')),
+      getDoc(doc(db, 'settings', 'qr')),
+      getDoc(doc(db, 'settings', 'roster')),
+    ]);
+
+  const toMap = (snapshot) => {
+    const result = {};
+    snapshot.docs.forEach((item) => {
+      result[item.id] = item.data();
+    });
+    return result;
+  };
+
+  return {
+    exportedAt: new Date().toISOString(),
+    months: toMap(monthsSnap),
+    transactions: toMap(transactionsSnap),
+    categories: toMap(categoriesSnap),
+    admins: toMap(adminsSnap),
+    settings: {
+      club: club.data() ?? {},
+      rules: rules.data() ?? {},
+      qr: qr.data() ?? {},
+      roster: roster.data() ?? {},
+    },
+  };
+}
