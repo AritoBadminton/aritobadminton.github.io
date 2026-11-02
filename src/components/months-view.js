@@ -275,15 +275,15 @@ export function renderMonths() {
   const skippedRows = rows.filter((row) => row.status === DUES_STATUS.SKIPPED);
   const expectedCount = rows.length - skippedRows.length;
   const collected = rows.reduce((sum, row) => sum + row.amount, 0);
-  const unpaidCount = expectedCount - paidRows.length;
   qs('#month-collected').textContent = formatCurrency(collected);
   renderCompanyFund(monthKey);
+  // Tổng tiền đã thu = tiền thành viên đóng + tiền công ty cấp, gộp hai nguồn
+  // thu của quỹ tháng này vào đúng một ô.
+  qs('#month-total-collected').textContent = formatCurrency(collected + getCompanyFundTotal(monthKey));
   qs('#month-paid-count').textContent = `${paidRows.length}/${expectedCount}`;
   qs('#month-paid-note').textContent = skippedRows.length
     ? `${skippedRows.length} người không chơi tháng này`
     : '';
-  qs('#month-unpaid-count').textContent = `${unpaidCount} người`;
-  qs('#month-unpaid-count').style.color = unpaidCount ? 'var(--crit)' : 'var(--good)';
 
   qs('#month-subtitle').textContent =
     `${formatMonthLabel(monthKey)} · ${rows.length} thành viên` +

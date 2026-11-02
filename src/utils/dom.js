@@ -50,6 +50,26 @@ export function isSafeUrl(url) {
 }
 
 /**
+ * Tải một chuỗi xuống máy người dùng dưới dạng file, không cần máy chủ.
+ * @param {string} filename
+ * @param {string} content
+ * @param {string} [mimeType='application/json']
+ */
+export function downloadFile(filename, content, mimeType = 'application/json') {
+  const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  // Một số trình duyệt (kể cả Chromium headless) chỉ coi là tải file thật khi
+  // thẻ <a> đang nằm trong DOM lúc bấm — tạo rồi bấm ngay không gắn vào trang
+  // có khi bị bỏ qua.
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+/**
  * Bật/tắt trạng thái ẩn của một phần tử bằng thuộc tính display.
  * @param {HTMLElement} element
  * @param {boolean} visible

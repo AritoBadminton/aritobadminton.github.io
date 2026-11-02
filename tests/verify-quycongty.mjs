@@ -121,7 +121,7 @@ check(
 check(
   'thứ tự bốn ô đúng',
   await page.$$eval('#panel-months .stat-tile__label', (els) => els.map((e) => e.textContent.trim())),
-  ['Thu được', 'Tiền quỹ công ty cấp', 'Đã đóng', 'Chưa đóng'],
+  ['Tiền thu thành viên', 'Tiền quỹ công ty cấp', 'Tổng tiền đã thu', 'Đã đóng'],
 );
 
 /* ---------- 2. Số tiền lấy từ sổ thu chi, theo tháng đang xem ---------- */
@@ -149,7 +149,11 @@ await page.waitForTimeout(800);
 /* ---------- 3. Các ô đếm cũ giữ nguyên ---------- */
 
 check('ô Đã đóng đếm đúng', (await page.textContent('#month-paid-count')).trim(), '1/2');
-check('ô Chưa đóng đếm đúng', (await page.textContent('#month-unpaid-count')).trim(), '1 người');
+check(
+  'ô Tổng tiền đã thu cộng đủ tiền thành viên + tiền công ty cấp',
+  (await page.textContent('#month-total-collected')).trim(),
+  '1.250.000 đ',
+);
 check(
   'ghi chú người không chơi vẫn ở ô Đã đóng',
   (await page.textContent('#month-paid-note')).trim(),
@@ -212,12 +216,7 @@ await page.click('#new-submit');
 await page.waitForTimeout(1600);
 check('thêm xong hiện toast báo đã thực hiện', await page.isVisible('#toast'), true);
 check('toast đúng nội dung', (await page.textContent('#toast')).trim(), 'Đã thực hiện xong');
-check('thêm xong Chi vẫn để trống, không tự điền mặc định của Thu', await page.inputValue('#new-amount'), '');
-check(
-  'thêm xong nội dung quay lại đúng danh mục đang chọn',
-  await page.inputValue('#new-desc'),
-  'Tiền thuê sân',
-);
+check('thêm xong tự đóng popup (11/2026)', await page.isVisible('#new-entry-modal'), false);
 check(
   'vẫn ghi đúng nội dung đã gõ',
   await page.evaluate(() =>
@@ -226,6 +225,19 @@ check(
     ),
   ),
   true,
+);
+
+await page.click('#ledger-add-toggle');
+await page.waitForTimeout(400);
+check(
+  'mở lại popup thì Chi về đúng mặc định, không còn sót số liệu lần trước',
+  await page.inputValue('#new-amount'),
+  '',
+);
+check(
+  'mở lại popup thì nội dung quay lại đúng danh mục đang chọn',
+  await page.inputValue('#new-desc'),
+  'Tiền thuê sân',
 );
 
 /* ---------- 6. Danh mục thu có quỹ công ty và tiền tài trợ ---------- */

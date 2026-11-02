@@ -6,7 +6,7 @@ import { firebaseApi, isFirebaseMode } from '../services/data-source.js';
 import { requestRender } from '../state/render-bus.js';
 import { store } from '../state/store.js';
 import { enforceVisibleTab } from './tab-nav.js';
-import { escapeHtml, qs, setVisible } from '../utils/dom.js';
+import { downloadFile, escapeHtml, qs, setVisible, showToast } from '../utils/dom.js';
 
 /** Firebase bắt mật khẩu tối thiểu 6 ký tự. */
 const MIN_PASSWORD_LENGTH = 6;
@@ -150,6 +150,30 @@ async function handleChangePassword() {
   window.alert('Đã đổi mật khẩu. Lần đăng nhập sau dùng mật khẩu mới.');
 }
 
+/* ---------- Sao lưu ---------- */
+
+/** Đọc toàn bộ dữ liệu quỹ từ Firestore rồi tải xuống một file JSON. */
+async function handleDownloadBackup() {
+  if (!isFirebaseMode()) {
+    window.alert('Chỉ tải được bản sao lưu ở chế độ Firebase.');
+    return;
+  }
+
+  const button = qs('#backup-toggle');
+  button.disabled = true;
+
+  try {
+    const data = await firebaseApi().fetchBackupData();
+    const stamp = new Date().toISOString().slice(0, 16).replace('T', '-').replace(':', 'h');
+    downloadFile(`sao-luu-quy-arito-${stamp}.json`, JSON.stringify(data, null, 2));
+    showToast('Đã tải xong bản sao lưu');
+  } catch (error) {
+    window.alert(`Không đọc được dữ liệu để sao lưu: ${error?.message ?? error}`);
+  } finally {
+    button.disabled = false;
+  }
+}
+
 /** Gửi thư đặt lại mật khẩu tới email đang gõ ở ô tài khoản. */
 async function handleForgotPassword() {
   const email = qs('#login-username').value.trim();
@@ -174,6 +198,7 @@ export function initLoginModal() {
     else openLoginModal();
   });
   qs('#password-toggle').addEventListener('click', openPasswordModal);
+  qs('#backup-toggle').addEventListener('click', handleDownloadBackup);
   qs('#password-cancel').addEventListener('click', closePasswordModal);
   qs('#password-submit').addEventListener('click', handleChangePassword);
   qs('#login-forgot').addEventListener('click', handleForgotPassword);

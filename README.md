@@ -142,9 +142,9 @@ Cột **Trạng thái** là dropdown 3 lựa chọn:
 | **Chưa đóng**  | đỏ      | Còn nợ quỹ tháng này                                                                        |
 | **Không chơi** | vàng    | Tháng đó nghỉ, **không bị tính là còn nợ**                                                  |
 
-Khi chọn **Không chơi**, người đó bị trừ khỏi mẫu số ô "Đã đóng x/y", khỏi ô "Chưa đóng",
-và khỏi tỷ lệ đóng đủ ở tab Thành viên. Ô số tiền cũng khoá lại. Nhờ vậy người nghỉ hẳn một
-tháng không làm số liệu trông như đang nợ quỹ.
+Khi chọn **Không chơi**, người đó bị trừ khỏi mẫu số ô "Đã đóng x/y" và khỏi tỷ lệ đóng đủ ở
+tab Thành viên. Ô số tiền cũng khoá lại. Nhờ vậy người nghỉ hẳn một tháng không làm số liệu
+trông như đang nợ quỹ.
 
 Ngoài ra:
 
