@@ -73,6 +73,7 @@ Tài khoản admin trong bản giả lập: `nghia@arito.vn` / `MatKhauRatDai#20
 | `verify-category.mjs`                                    | Tab Danh mục giao dịch: Grid CRUD, chặn xoá danh mục đang dùng, khoá tên danh mục bảo vệ, tự điền tiền/nội dung ở Sổ thu chi |
 | `verify-presence.mjs`                                    | Huy hiệu số người đang xem: đếm đúng, loại phiên đã quá hạn, hai tab cùng thấy nhau                                          |
 | `verify-backup.mjs`                                      | Nút "Tải bản sao lưu": chỉ admin thấy, file JSON tải về đủ 5 nhóm dữ liệu và đúng nội dung                                   |
+| `verify-filter-alias.mjs`                                | Ô lọc danh mục ở Sổ thu chi gộp "Tiền thuê sân 1 tháng" (tên cũ) vào "Tiền thuê sân", lọc ra đủ cả hai                       |
 
 Chạy hết bộ mất khoảng 12 phút. Sửa mã nguồn xong vẫn nên chạy lại **cả bộ**
 trước khi đẩy lên, vì các màn hình dùng
