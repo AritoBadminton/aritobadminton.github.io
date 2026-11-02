@@ -319,6 +319,16 @@ thẳng `closeNewEntryModal()`; dòng `message.textContent = 'Đã thêm: ...'`
 cũng bỏ vì popup đóng ngay, không ai kịp thấy — `#new-message` giờ chỉ còn
 dùng cho thông báo lỗi thiếu trường khi submit.
 
+**Ô lọc danh mục ở Sổ thu chi gộp tên danh mục cũ vào tên hiện hành
+(11/2026).** `LEDGER_FILTER_CATEGORY_ALIASES` (`ledger-view.js`) ánh xạ
+`"Tiền thuê sân 1 tháng"` (tên cũ, không còn trong tab Danh mục giao dịch,
+chỉ còn sót ở vài dòng giao dịch cũ) sang `"Tiền thuê sân"` — cả lúc dựng
+danh sách lựa chọn (`renderLedgerFilters`) lẫn lúc so khớp bộ lọc
+(`getScopedRows`) đều đi qua hàm `filterCategoryLabel()` nên hai nơi luôn
+nhất quán. **Chỉ gộp ở bộ lọc** — bảng giao dịch vẫn hiện đúng tên gốc từng
+dòng (`row.cat`), và tab Danh mục giao dịch/dữ liệu Firestore không đổi gì.
+Muốn gộp thêm cặp danh mục khác thì thêm một dòng vào đúng object này.
+
 **Ô "Số dư quỹ" ở tab Sổ thu chi theo bộ lọc tháng (09/2026, lật ngược quyết định
 cũ).** Trước đây ô này cố ý KHÔNG theo bộ lọc để luôn khớp ô "Số dư quỹ hiện tại"
 ở Tổng quan. Chủ trang đổi ý: ô này đổi tên thành "Số dư quỹ của tháng" và tính

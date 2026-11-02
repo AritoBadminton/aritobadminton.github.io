@@ -53,6 +53,21 @@ const EDIT_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" s
 /** Biểu tượng hai ô chồng nhau cho nút "Sao chép" ở mỗi dòng. */
 const COPY_ICON = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h8" /></svg>`;
 
+/**
+ * Danh mục cũ gộp chung vào một lựa chọn khi lọc ở Sổ thu chi (11/2026) —
+ * chỉ gộp ở bộ lọc, không đụng tới tab Danh mục giao dịch hay dữ liệu giao
+ * dịch gốc. "Tiền thuê sân 1 tháng" là tên cũ không còn trong danh mục đang
+ * quản lý, chỉ còn sót lại ở vài dòng giao dịch cũ.
+ */
+const LEDGER_FILTER_CATEGORY_ALIASES = {
+  'Tiền thuê sân 1 tháng': 'Tiền thuê sân',
+};
+
+/** Tên danh mục dùng để lọc/gom nhóm ở Sổ thu chi, sau khi áp alias ở trên. */
+function filterCategoryLabel(cat) {
+  return LEDGER_FILTER_CATEGORY_ALIASES[cat] ?? cat;
+}
+
 /** Id dòng đang chờ xác nhận xoá ở hộp thoại, rỗng khi hộp thoại đang đóng. */
 let deleteTargetId = '';
 
@@ -87,7 +102,7 @@ function getScopedRows() {
   return store.transactions.filter(
     (item) =>
       (!month || item.date.startsWith(month)) &&
-      (!category || item.cat === category) &&
+      (!category || filterCategoryLabel(item.cat) === category) &&
       (!keyword || `${item.desc} ${item.cat}`.toLowerCase().includes(keyword)),
   );
 }
@@ -490,7 +505,7 @@ export function renderLedgerFilters() {
     shownMonths.map((month) => `<option value="${month}">${formatMonthLabel(month)}</option>`).join('') +
     buildMoreOption(months.length - shownMonths.length, MONTH_OPTION_MORE);
 
-  const categories = [...new Set(store.transactions.map((item) => item.cat))].sort();
+  const categories = [...new Set(store.transactions.map((item) => filterCategoryLabel(item.cat)))].sort();
   qs('#filter-category').innerHTML =
     '<option value="">Tất cả danh mục</option>' +
     categories
